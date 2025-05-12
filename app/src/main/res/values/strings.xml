@@ -4,4 +4,7 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="continuar">Continuar</string>
+    <string name="oops">Oops!</string>
+    <string name="conexionInternet">Parece que no tienes conexión. Revisa la conexión a internet y vuelve a intentar.</string>
+    <string name="ok">Ok</string>
 </resources>

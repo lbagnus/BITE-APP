@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:gravity="center"
-            android:text="Oops!"
+            android:text="@string/oops"
             android:textColor="#FFFFFF"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -34,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Parece que no tienes conexión. Revisa la conexión a internet y vuelve a intentar."
+            android:text="@string/conexionInternet"
             android:textColor="#FFFFFF"
             android:textSize="16sp" />
 
@@ -45,7 +45,7 @@
             android:layout_gravity="end|center_vertical"
             android:layout_marginTop="16dp"
             android:background="@android:color/transparent"
-            android:text="Ok"
+            android:text="@string/ok"
             android:textColor="#FFFFFF"
             android:textSize="18sp" />
 
