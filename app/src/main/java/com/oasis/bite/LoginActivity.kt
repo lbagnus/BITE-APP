@@ -1,6 +1,8 @@
 package com.oasis.bite
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.Paint
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Bundle
@@ -24,6 +26,14 @@ class LoginActivity : AppCompatActivity() {
         if (!isInternetAvailable(this)) {
             showCustomNoInternetDialog()
         }
+
+        // Vincular el TextView de "¿Olvidaste tu contraseña?" y agregarle comportamiento de link
+        val forgotPasswordText: TextView = findViewById(R.id.forgotPasswordText)
+        forgotPasswordText.paintFlags = forgotPasswordText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        forgotPasswordText.setOnClickListener {
+            val intent = Intent(this, ForgotPasswordActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     // Función para verificar la conexión a Internet
@@ -38,7 +48,6 @@ class LoginActivity : AppCompatActivity() {
         val inflater = LayoutInflater.from(this)
         val customView = inflater.inflate(R.layout.popup_no_internet, null)
 
-
         // Acceder a los elementos del layout personalizado
         val messageTextView: TextView = customView.findViewById(R.id.popupMessage)
         val closeButton: Button = customView.findViewById(R.id.closeButton)
@@ -48,7 +57,6 @@ class LoginActivity : AppCompatActivity() {
             .setView(customView)
             .setCancelable(false)  // No permitir que se cierre tocando fuera del popup
             .create()
-
 
         // Acción del botón "Cerrar"
         closeButton.setOnClickListener {
