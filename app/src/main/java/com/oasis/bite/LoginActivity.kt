@@ -8,9 +8,13 @@ import android.net.NetworkInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.oasis.bite.presentation.viewmodel.UsersViewModel
 
 class LoginActivity : AppCompatActivity() {
 
@@ -21,6 +25,28 @@ class LoginActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         setContentView(R.layout.activity_login)
+
+        val viewModel = ViewModelProvider(this).get(UsersViewModel::class.java);
+        val loginButton: Button = findViewById(R.id.loginButton)
+        val emailEditText: EditText = findViewById(R.id.emailEditText)
+        val passwordEditText: EditText = findViewById(R.id.passwordEditText)
+
+        loginButton.setOnClickListener {
+            val email = emailEditText.text.toString()
+            val password = passwordEditText.text.toString()
+            viewModel.login(email, password)
+        }
+
+        viewModel.usuarioLogueado.observe(this) { usuario ->
+            if (usuario != null) {
+                Toast.makeText(this, "Bienvenido ${usuario.username}", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        viewModel.mensajeError.observe(this) { mensaje ->
+            Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
+        }
+
 
         // Verificar si hay conexión a internet al iniciar la actividad
         if (!isInternetAvailable(this)) {
