@@ -1,4 +1,4 @@
-package com.oasis.bite.ui.home
+package com.oasis.bite.presentation.ui.home
 
 import android.os.Bundle
 import android.view.LayoutInflater

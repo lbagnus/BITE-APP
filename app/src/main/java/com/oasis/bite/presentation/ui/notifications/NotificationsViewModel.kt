@@ -1,4 +1,4 @@
-package com.oasis.bite.ui.notifications
+package com.oasis.bite.presentation.ui.notifications
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
