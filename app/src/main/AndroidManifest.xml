@@ -15,6 +15,7 @@
         android:theme="@style/Theme.Bite"
         tools:targetApi="31">
 
+        <activity android:name=".MainActivity" />
         <activity android:name=".LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.Bite">
@@ -26,6 +27,8 @@
 
         <activity android:name=".ForgotPasswordActivity"
             android:exported="false" />
+
+
 
     </application>
 

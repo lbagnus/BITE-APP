@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="12dp"
+    card_view:cardCornerRadius="20dp"
+    card_view:cardElevation="4dp"
+    card_view:cardBackgroundColor="#FAE1C3">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Ícono menú -->
+        <ImageView
+            android:id="@+id/menuIcon"
+            android:layout_width="29dp"
+            android:layout_height="29dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="3dp"
+            android:src="@drawable/menu_toolbar" />
+
+        <!-- Texto saludo -->
+        <TextView
+            android:id="@+id/saludoText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="¡Hola María!"
+            android:textColor="#4E342E"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Ícono decorativo (galletita) -->
+        <ImageView
+            android:id="@+id/cookieIcon"
+            android:layout_width="59dp"
+            android:layout_height="60dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/cookie_logo" />
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>
+

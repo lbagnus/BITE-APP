@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.oasis.bite.presentation.viewmodel.UsersViewModel
+import com.oasis.bite.MainActivity
 
 class LoginActivity : AppCompatActivity() {
 
@@ -40,6 +41,13 @@ class LoginActivity : AppCompatActivity() {
         viewModel.usuarioLogueado.observe(this) { usuario ->
             if (usuario != null) {
                 Toast.makeText(this, "Bienvenido ${usuario.username}", Toast.LENGTH_SHORT).show()
+
+                // Ir al MainActivity
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("username", usuario.username) // opcional
+                startActivity(intent)
+                finish() // Cierra la LoginActivity para que no se pueda volver con el botón atrás
+
             }
         }
 
