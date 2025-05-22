@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Sombra difusa -->
+    <item android:left="2dp" android:top="2dp" android:right="2dp" android:bottom="2dp">
+        <shape android:shape="oval">
+            <solid android:color="#22000000"/> <!-- Sombra negra suave -->
+            <corners android:radius="50dp" />
+        </shape>
+    </item>
+
+    <!-- Círculo beige -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/beige"/>
+            <stroke android:width="2dp" android:color="@android:color/transparent"/>
+        </shape>
+    </item>
+
+</layer-list>
+
