@@ -1,28 +1,36 @@
 package com.oasis.bite.data.repository
 
-import com.oasis.bite.data.model.User
+import android.util.Log
+import com.oasis.bite.data.api.ApiService
+import com.oasis.bite.data.model.LoginRequest
+import com.oasis.bite.data.toUser
 
-class UserRepository {
+class UserRepository(private val apiService: ApiService) {
 
-    // Lista simulada de usuarios
-    private val usuarios = listOf(
-        User("1", "thomas", "thomas@email.com", "1234", "admin"),
-        User("2", "laura", "laura@email.com", "5678", "user"),
-        User("3", "eduardo", "edu@email.com", "abcd", "user")
-    )
+    suspend fun login(email: String, password: String): com.oasis.bite.domain.models.User? {
+        val response = apiService.loginUser(LoginRequest(email, password))
 
-    // Simula el login buscando por username y password
-    fun login(email: String, password: String): User? {
-        return usuarios.find { it.email == email && it.password == password }
-    }
+        Log.d("UserRepository", "Response code: ${response.code()}")
+        Log.d("UserRepository", "Response successful: ${response.isSuccessful}")
+        Log.d("UserRepository", "Response body: ${response.body()}")
+        Log.d("UserRepository", "Response error: ${response.errorBody()?.string()}")
 
-    // Buscar un usuario por ID
-    fun getUsuarioById(id: String): User? {
-        return usuarios.find { it.id == id }
-    }
+        return if (response.isSuccessful && response.body() != null) {
+            val loginResponse = response.body()!!
+            Log.d("UserRepository", "LoginResponse: $loginResponse")
 
-    // Buscar por email
-    fun getUsuarioByEmail(email: String): User? {
-        return usuarios.find { it.email == email }
+            try {
+                val user = loginResponse.toUser()
+                Log.d("UserRepository", "User convertido: $user")
+                user
+            } catch (e: Exception) {
+                Log.e("UserRepository", "ERROR en toUser(): ${e.message}", e)
+                Log.e("UserRepository", "Stack trace completo: ${e.stackTrace.contentToString()}")
+                null // o lanza la excepción si prefieres
+            }
+        } else {
+            Log.e("UserRepository", "Response no exitosa o body null")
+            null
+        }
     }
 }

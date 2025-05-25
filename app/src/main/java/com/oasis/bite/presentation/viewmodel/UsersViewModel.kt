@@ -3,13 +3,20 @@ package com.oasis.bite.presentation.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.oasis.bite.data.model.User
+import androidx.lifecycle.viewModelScope
+import com.oasis.bite.data.RetrofitInstance
+import com.oasis.bite.data.repository.RecetasRepository
+import com.oasis.bite.domain.models.User
 
 import com.oasis.bite.data.repository.UserRepository
+import kotlinx.coroutines.launch
 
 class UsersViewModel : ViewModel() {
 
-    private val repository = UserRepository();
+    private val apiService = RetrofitInstance.apiService
+
+    private val repository = UserRepository(apiService)
+    private val recetaRepo = RecetasRepository(apiService)
 
     private val _usuarioLogueado = MutableLiveData<User?>()
     val usuarioLogueado: LiveData<User?> = _usuarioLogueado
@@ -18,11 +25,14 @@ class UsersViewModel : ViewModel() {
     val mensajeError: LiveData<String> = _mensajeError
 
     fun login(email: String, password: String) {
-        val usuario = repository.login(email, password)
-        if (usuario != null) {
-            _usuarioLogueado.value = usuario
-        } else {
-            _mensajeError.value = "Usuario o contraseña incorrectos"
+        viewModelScope.launch {
+            // val receta = recetaRepo.getRecetaPorId(1)
+            val usuario = repository.login(email, password)
+            if (usuario != null) {
+                _usuarioLogueado.value = usuario
+            } else {
+                _mensajeError.value = "Usuario o contraseña incorrectos"
+            }
         }
     }
 }
