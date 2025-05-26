@@ -9,7 +9,7 @@ data class Receta(
     val dificultad: Dificultad,
     val imagen: String?,
     val estado: RecetaStatus,
-    val creador: User, // solo si querés mostrar nombre/email del creador
+    val username: String,
     val categoria: String,
     val pasos: List<PasoReceta>,
     val ingredientes: List<Ingrediente>

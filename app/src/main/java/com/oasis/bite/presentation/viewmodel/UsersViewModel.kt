@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.oasis.bite.data.RetrofitInstance
+import com.oasis.bite.data.model.RecetaSearchParams
+import com.oasis.bite.data.model.RecetaSimpleResponse
 import com.oasis.bite.data.repository.RecetasRepository
 import com.oasis.bite.domain.models.User
 
@@ -26,7 +28,11 @@ class UsersViewModel : ViewModel() {
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
-            // val receta = recetaRepo.getRecetaPorId(1)
+            //val receta = recetaRepo.getRecetasHome();
+
+            val params = RecetaSearchParams(name = "Bondiola");
+            val recetas = recetaRepo.getRecetasSearch(params);
+
             val usuario = repository.login(email, password)
             if (usuario != null) {
                 _usuarioLogueado.value = usuario

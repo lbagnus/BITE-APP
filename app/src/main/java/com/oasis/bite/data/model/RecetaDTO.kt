@@ -27,8 +27,8 @@ data class RecetaDTO(
     @SerializedName("estado")
     val estado: String,
 
-    @SerializedName("creadorEmail")
-    val creadorEmail: String,
+    @SerializedName("username")
+    val username: String,
 
     @SerializedName("Categorium")
     val categoria: CategoriaDTO?,

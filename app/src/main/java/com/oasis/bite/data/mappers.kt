@@ -32,13 +32,7 @@ fun RecetaDTO.toReceta(): Receta {
         dificultad = Dificultad.valueOf(this.dificultad?.uppercase() ?: "MEDIA"),
         imagen = this.imagen,
         estado = RecetaStatus.valueOf(this.estado.uppercase()),
-        creador = User(
-            email = this.creadorEmail,
-            username = "", // Si no viene en el DTO, lo dejás vacío
-            firstName = "",
-            lastName = "",
-            role = Role.USER // Asumimos USER por defecto
-        ),
+        username = this.username,
         categoria = this.categoria?.categoria ?: "Sin categoría",
         pasos = this.pasos.map { it.toPasoReceta() },
         ingredientes = this.ingredientes.map { it.toIngrediente() }
