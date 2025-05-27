@@ -1,6 +1,7 @@
 package com.oasis.bite.data.repository
 
 import android.util.Log
+import com.google.gson.Gson
 import com.oasis.bite.data.api.ApiService
 import com.oasis.bite.data.model.RecetaSearchParams
 import com.oasis.bite.data.model.RecetaSimpleResponse
@@ -47,6 +48,9 @@ class RecetasRepository(private val apiService: ApiService) {
 
         return if (response.isSuccessful && response.body() != null) {
             Log.d("RecetasRepository", "Recetas recibidas correctamente: ${response.body()?.size} recetas")
+            val gson = Gson()
+            val json = gson.toJson(response.body())
+            Log.d("API_RESPONSE", json)
             response.body()
         } else {
             Log.e("RecetasRepository", "Error al obtener recetas: ${response.code()} - ${response.message()}")
