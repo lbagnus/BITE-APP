@@ -30,6 +30,12 @@ data class RecetaDTO(
     @SerializedName("username")
     val username: String,
 
+    @SerializedName("reviewCount")
+    val reviewCount: Int,
+
+    @SerializedName("averageRating")
+    val averageRating: Float?,
+
     @SerializedName("Categorium")
     val categoria: CategoriaDTO?,
 

@@ -1,5 +1,7 @@
 package com.oasis.bite.data.model
 
+import com.google.gson.annotations.SerializedName
+
 data class RecetaSimpleResponse(
     val id: Int,
     val nombre: String,
@@ -9,6 +11,8 @@ data class RecetaSimpleResponse(
     val dificultad: String,
     val imagen: String?,
     val estado: String,
+    val reviewCount: Int,
+    val averageRating: Float?,
     val createdAt: String,
     val updatedAt: String,
     val username: String,

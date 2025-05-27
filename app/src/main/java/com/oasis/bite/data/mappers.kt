@@ -35,6 +35,8 @@ fun RecetaDTO.toReceta(): Receta {
         username = this.username,
         categoria = this.categoria?.categoria ?: "Sin categoría",
         pasos = this.pasos.map { it.toPasoReceta() },
+        reviewCount = this.reviewCount,
+        averageRating = this.averageRating,
         ingredientes = this.ingredientes.map { it.toIngrediente() }
     )
 }
