@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="10dp">
+
+        <CheckBox
+            android:id="@+id/checkboxIngrediente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/orange"
+            android:padding="0dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            />
+
+        <TextView
+            android:id="@+id/txtNombreIngrediente"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingStart="8dp"
+            android:text="Harina"
+            android:textSize="16sp"
+            android:textColor="@color/black"/>
+
+        <TextView
+            android:id="@+id/txtCantidad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="200"
+            android:textColor="@color/black"/>
+
+        <TextView
+            android:id="@+id/txtUnidad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="4dp"
+            android:text="g"
+            android:textColor="@color/black"/>
+    </LinearLayout>

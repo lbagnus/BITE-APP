@@ -7,11 +7,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.oasis.bite.Category
 import com.oasis.bite.R
+import com.oasis.bite.domain.models.Category
 
 class CategoryAdapter(
-    private val categories: List<Category>
+    private var categories: List<Category>,
+    private val onItemClick: (Category) -> Unit
 ) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
 
     inner class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -30,9 +31,19 @@ class CategoryAdapter(
         val categoria = categories[position]
         holder.iconoCategoria.setImageResource(categoria.iconoResId)
         holder.tituloCategoria.text = categoria.nombre
+
+        holder.itemView.setOnClickListener {
+            onItemClick(categoria)
+        }
     }
 
     override fun getItemCount(): Int = categories.size
+
+    fun actualizarCategorias(nuevas: List<Category>) {
+        categories = nuevas
+        notifyDataSetChanged()
+    }
+
 }
 
 

@@ -27,16 +27,26 @@ data class RecetaDTO(
     @SerializedName("estado")
     val estado: String,
 
-    @SerializedName("creadorEmail")
-    val creadorEmail: String,
+    @SerializedName("username")
+    val userName: String,
+
+    @SerializedName("reviewCount")
+    val reviewCount: Int?,
+
+    @SerializedName("averageRating")
+    val averageRating: Float?,
 
     @SerializedName("Categorium")
     val categoria: CategoriaDTO?,
 
     @SerializedName("IngredientesReceta")
-    val ingredientes: List<IngredienteDTO>,
+    val ingredientes: List<IngredienteDTO>?,
 
     @SerializedName("PasoReceta")
-    val pasos: List<PasoRecetaDTO>
+    val pasos: List<PasoRecetaDTO>?,
+
+    @SerializedName("Reseñas")
+    val comentarios: List<ComentarioDTO>?
+
 )
 

@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class PasoReceta(
 
     @SerializedName("numeroDePaso")
-    val numeroDePaso: Int,
+    val numeroDePaso: String,
 
     @SerializedName("contenido")
     val contenido: String,

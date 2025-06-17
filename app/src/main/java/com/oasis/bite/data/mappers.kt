@@ -1,9 +1,14 @@
 package com.oasis.bite.data
 
+import com.oasis.bite.data.model.CategoriaDTO
+import com.oasis.bite.data.model.ComentarioDTO
 import com.oasis.bite.data.model.IngredienteDTO
 import com.oasis.bite.data.model.LoginResponse
 import com.oasis.bite.data.model.PasoRecetaDTO
 import com.oasis.bite.data.model.RecetaDTO
+import com.oasis.bite.data.model.RecetaSimpleResponse
+import com.oasis.bite.domain.models.Category
+import com.oasis.bite.domain.models.Comentario
 import com.oasis.bite.domain.models.Dificultad
 import com.oasis.bite.domain.models.Ingrediente
 import com.oasis.bite.domain.models.PasoReceta
@@ -11,6 +16,7 @@ import com.oasis.bite.domain.models.Receta
 import com.oasis.bite.domain.models.RecetaStatus
 import com.oasis.bite.domain.models.Role
 import com.oasis.bite.domain.models.User
+import kotlin.Int
 
 fun LoginResponse.toUser(): User {
     return User(
@@ -32,22 +38,19 @@ fun RecetaDTO.toReceta(): Receta {
         dificultad = Dificultad.valueOf(this.dificultad?.uppercase() ?: "MEDIA"),
         imagen = this.imagen,
         estado = RecetaStatus.valueOf(this.estado.uppercase()),
-        creador = User(
-            email = this.creadorEmail,
-            username = "", // Si no viene en el DTO, lo dejás vacío
-            firstName = "",
-            lastName = "",
-            role = Role.USER // Asumimos USER por defecto
-        ),
-        categoria = this.categoria?.categoria ?: "Sin categoría",
-        pasos = this.pasos.map { it.toPasoReceta() },
-        ingredientes = this.ingredientes.map { it.toIngrediente() }
+        username = this.userName ?: "Desconocido",
+        categoria = this.categoria?.nombre ?: "Sin categoría",
+        pasos = this.pasos?.map { it.toPasoReceta() } ?: emptyList(),
+        reviewCount = this.reviewCount?: 0,
+        averageRating = this.averageRating?: 0f,
+        ingredientes = this.ingredientes?.map { it.toIngrediente() } ?: emptyList(),
+        comentarios = this.comentarios?.map {it.toComentario()} ?: emptyList()
     )
 }
 
 fun PasoRecetaDTO.toPasoReceta(): PasoReceta {
     return PasoReceta(
-        numeroDePaso = this.numeroDePaso,
+        numeroDePaso = this.numeroDePaso.toString(),
         contenido = this.contenido,
         archivoFoto = this.archivoFoto
     )
@@ -57,7 +60,39 @@ fun IngredienteDTO.toIngrediente(): Ingrediente {
     return Ingrediente(
         nombre = this.nombre,
         cantidad = this.cantidad,
-        unidad = this.unidad
+        unidad = this.unidad,
+        seleccionado = this.seleccionado
+    )
+}
+
+fun ComentarioDTO.toComentario(): Comentario {
+    return Comentario(
+        id = this.id,
+        titulo = this.titulo,
+        valoracion = this.valoracion,
+        reseña = this.reseña,
+        userName = this.username.username
+    )
+}
+
+
+fun RecetaSimpleResponse.toReceta(): Receta{
+    return Receta(
+        id = this.id,
+        nombre = this.nombre,
+        descripcion = this.descripcion,
+        tiempo = this.tiempo,
+        porciones = this.porciones,
+        dificultad = Dificultad.valueOf(this.dificultad?.uppercase() ?: "MEDIA"),
+        imagen = this.imagen,
+        estado = RecetaStatus.valueOf(this.estado.uppercase()),
+        username = this.username,
+        categoria = this.CategoriumCategoria?: "Sin categoría",
+        pasos = emptyList(),
+        reviewCount = this.reviewCount?:0,
+        averageRating = this.averageRating?:0f,
+        ingredientes = emptyList(),
+        comentarios = emptyList()
     )
 }
 

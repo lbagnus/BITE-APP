@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="10dp">
+
+        <TextView
+            android:id="@+id/txtNumeroPaso"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="2dp"
+            android:paddingEnd="0dp"
+            android:text="1"
+            android:textColor="@color/black"
+            android:textSize="18dp" />
+
+        <TextView
+            android:id="@+id/txtpunto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="."
+            android:textColor="@color/black"
+            android:textSize="25sp" />
+
+        <TextView
+            android:id="@+id/txtContenido"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingStart="8dp"
+            android:text="Cortar las cebollas en juliana bien finitas"
+            android:textSize="18sp"
+            android:textColor="@color/black"/>
+    </LinearLayout>

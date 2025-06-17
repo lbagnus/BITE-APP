@@ -9,9 +9,12 @@ data class Receta(
     val dificultad: Dificultad,
     val imagen: String?,
     val estado: RecetaStatus,
-    val creador: User, // solo si querés mostrar nombre/email del creador
+    val username: String,
     val categoria: String,
+    val reviewCount: Int,
+    val averageRating: Float,
     val pasos: List<PasoReceta>,
-    val ingredientes: List<Ingrediente>
+    val ingredientes: List<Ingrediente>,
+    val comentarios: List<Comentario>?
 )
 

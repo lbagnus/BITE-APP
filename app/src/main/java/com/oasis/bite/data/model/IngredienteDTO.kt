@@ -10,8 +10,11 @@ data class IngredienteDTO(
     val nombre: String,
 
     @SerializedName("cantidad")
-    val cantidad: Int,
+    val cantidad: Float,
 
     @SerializedName("unidad")
-    val unidad: String
+    val unidad: String,
+
+    @SerializedName("seleccionado")
+    var seleccionado: Boolean = false
 )

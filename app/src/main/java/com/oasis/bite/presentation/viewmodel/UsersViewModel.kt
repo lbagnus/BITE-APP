@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.oasis.bite.data.RetrofitInstance
-import com.oasis.bite.data.repository.RecetasRepository
+import com.oasis.bite.data.repository.RecetaRepository
 import com.oasis.bite.domain.models.User
 
 import com.oasis.bite.data.repository.UserRepository
@@ -16,7 +16,7 @@ class UsersViewModel : ViewModel() {
     private val apiService = RetrofitInstance.apiService
 
     private val repository = UserRepository(apiService)
-    private val recetaRepo = RecetasRepository(apiService)
+    private val recetaRepo = RecetaRepository(apiService)
 
     private val _usuarioLogueado = MutableLiveData<User?>()
     val usuarioLogueado: LiveData<User?> = _usuarioLogueado

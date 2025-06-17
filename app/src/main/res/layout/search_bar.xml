@@ -17,6 +17,9 @@
         android:iconifiedByDefault="false"
         android:inputType="text"
         android:padding="8dp"
-        android:textColorHint="@color/brown" />
+        android:queryHint="Buscar recetas…"
+        android:textColorHint="@color/brown"
+        />
+
 
 </androidx.cardview.widget.CardView>

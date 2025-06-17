@@ -22,4 +22,25 @@
         android:name="com.oasis.bite.presentation.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/recetaFragment"
+        android:name="com.oasis.bite.presentation.ui.RecetaFragment"
+        android:label="Receta"
+        tools:layout="@layout/fragment_receta">
+        <argument
+            android:name="recetaId"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ResultadoBusqueda"
+        android:name="com.oasis.bite.presentation.ui.ResultadoBusqueda"
+        android:label="busqueda"
+        tools:layout="@layout/resultados_busquedas">
+    <argument
+        android:name="nombre"
+        app:argType="string"
+        android:defaultValue="0" />
 </navigation>
