@@ -37,6 +37,13 @@
             android:name="com.oasis.bite.ForgotPasswordActivity"
             android:exported="false" />
 
+        <activity
+            android:name="com.oasis.bite.VerifyCodeActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.oasis.bite.ResetPasswordActivity"
+            android:exported="false" />
+
 
     </application>
 

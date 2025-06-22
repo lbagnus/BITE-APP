@@ -43,4 +43,6 @@
         android:name="nombre"
         app:argType="string"
         android:defaultValue="0" />
+
+    </fragment>
 </navigation>

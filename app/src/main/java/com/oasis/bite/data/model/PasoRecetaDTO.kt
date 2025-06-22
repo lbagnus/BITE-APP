@@ -13,6 +13,9 @@ data class PasoRecetaDTO(
     val contenido: String,
 
     @SerializedName("archivoFoto")
-    val archivoFoto: String?
+    val archivoFoto: String?,
+
+    @SerializedName("imagenes")
+    val imagenes: List<String>?
 )
 

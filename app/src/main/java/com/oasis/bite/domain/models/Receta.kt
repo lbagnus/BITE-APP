@@ -15,6 +15,17 @@ data class Receta(
     val averageRating: Float,
     val pasos: List<PasoReceta>,
     val ingredientes: List<Ingrediente>,
-    val comentarios: List<Comentario>?
+    val comentarios: List<Comentario>?,
+    val imagenes: List<MediaItem>?
 )
+
+data class MediaItem(
+    val url: String,
+    val type: MediaType // IMAGE o VIDEO
+)
+
+enum class MediaType {
+    IMAGE,
+    VIDEO
+}
 

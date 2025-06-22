@@ -11,5 +11,8 @@ data class PasoReceta(
     val contenido: String,
 
     @SerializedName("archivoFoto")
-    val archivoFoto: String?
+    val archivoFoto: String?,
+
+    @SerializedName("imagenes")
+    val imagenesPasos: List<MediaItem>?
 )

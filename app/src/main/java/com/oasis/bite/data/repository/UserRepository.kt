@@ -2,8 +2,11 @@ package com.oasis.bite.data.repository
 
 import android.util.Log
 import com.oasis.bite.data.api.ApiService
+import com.oasis.bite.data.model.CodeRequest
 import com.oasis.bite.data.model.LoginRequest
+import com.oasis.bite.data.model.PassRequest
 import com.oasis.bite.data.toUser
+import retrofit2.Response
 
 class UserRepository(private val apiService: ApiService) {
 
@@ -32,5 +35,17 @@ class UserRepository(private val apiService: ApiService) {
             Log.e("UserRepository", "Response no exitosa o body null")
             null
         }
+    }
+
+    suspend fun verificar(email: String, code: String): Response<Unit> {
+        return apiService.verify(CodeRequest(email, code))
+    }
+
+    suspend fun enviar(email: String): Response<Unit> {
+        return apiService.sendResetCode(email)
+    }
+
+    suspend fun cambiarContraseña(email: String, password: String): Response<Unit> {
+        return apiService.cambiarPassword(PassRequest(email, password, password))
     }
 }

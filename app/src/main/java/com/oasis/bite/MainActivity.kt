@@ -57,7 +57,23 @@ class MainActivity : AppCompatActivity() {
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+        navView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    navController.popBackStack(R.id.navigation_home, false)
+                    true
+                }
+                R.id.navigation_dashboard -> {
+                    navController.navigate(R.id.navigation_dashboard)
+                    true
+                }
+                R.id.navigation_notifications -> {
+                    navController.navigate(R.id.navigation_notifications)
+                    true
+                }
+                else -> false
+            }
+        }
 
         val textoHtml = "Hoy es un <font color='#FFD700'>hermoso día</font>, para una <font color='#FFD700'>deliciosa comida</font>"
         binding.fraseDestacada1.text = Html.fromHtml(textoHtml, Html.FROM_HTML_MODE_LEGACY)

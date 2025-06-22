@@ -1,20 +1,31 @@
 package com.oasis.bite
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.util.Patterns
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.textfield.TextInputLayout
+import com.oasis.bite.presentation.viewmodel.UsersViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ForgotPasswordActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forgot_password)
-
+        val viewModel = ViewModelProvider(this).get(UsersViewModel::class.java);
         supportActionBar?.hide()
 
         // Verificar conexión
@@ -25,16 +36,45 @@ class ForgotPasswordActivity : AppCompatActivity() {
         // Referencias
         val emailEditText = findViewById<EditText>(R.id.emailEditText)
         val resetButton = findViewById<Button>(R.id.continueButton)
+        val emailInputLayout = findViewById<TextInputLayout>(R.id.emailInputLayout)
+        val botonCancelar = findViewById<TextView>(R.id.cancelText)
 
+        botonCancelar.setOnClickListener {
+            finish()
+        }
         resetButton.setOnClickListener {
             val email = emailEditText.text.toString().trim()
+            val errorText = findViewById<TextView>(R.id.errorText)
+
             if (email.isEmpty()) {
-                emailEditText.error = "El campo no puede estar vacío"
-            } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                emailEditText.error = "Formato de correo inválido"
+                emailInputLayout.boxStrokeColor = Color.RED
+                errorText.visibility = View.VISIBLE
+                errorText.text = "El campo no puede estar vacío"
+            } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                emailInputLayout.boxStrokeColor = Color.RED
+                errorText.visibility = View.VISIBLE
+                errorText.text = "Formato de correo inválido"
             } else {
-                Toast.makeText(this, "Se envió un correo de recuperación a $email", Toast.LENGTH_LONG).show()
-                // Lógica de envío real acá
+                // Llamar al backend para validar si existe
+                lifecycleScope.launch {
+                    val errorText = findViewById<TextView>(R.id.errorText)
+                        val response = withContext(Dispatchers.IO) {
+                            viewModel.sendResetCode(email)
+                        }
+
+                        if (response.isSuccessful) {
+                            startActivity(
+                                Intent(this@ForgotPasswordActivity, VerifyCodeActivity::class.java)
+                                    .putExtra("email", email)
+                            )
+                        } else {
+                            emailInputLayout.boxStrokeColor = Color.RED
+                            errorText.visibility = View.VISIBLE
+                            errorText.text = "El correo no está registrado"
+                        }
+
+                }
+
             }
         }
     }

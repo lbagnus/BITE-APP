@@ -11,6 +11,8 @@ import com.oasis.bite.domain.models.Category
 import com.oasis.bite.domain.models.Comentario
 import com.oasis.bite.domain.models.Dificultad
 import com.oasis.bite.domain.models.Ingrediente
+import com.oasis.bite.domain.models.MediaItem
+import com.oasis.bite.domain.models.MediaType
 import com.oasis.bite.domain.models.PasoReceta
 import com.oasis.bite.domain.models.Receta
 import com.oasis.bite.domain.models.RecetaStatus
@@ -38,13 +40,14 @@ fun RecetaDTO.toReceta(): Receta {
         dificultad = Dificultad.valueOf(this.dificultad?.uppercase() ?: "MEDIA"),
         imagen = this.imagen,
         estado = RecetaStatus.valueOf(this.estado.uppercase()),
-        username = this.userName ?: "Desconocido",
+        username = this.username.username ,
         categoria = this.categoria?.nombre ?: "Sin categoría",
         pasos = this.pasos?.map { it.toPasoReceta() } ?: emptyList(),
         reviewCount = this.reviewCount?: 0,
         averageRating = this.averageRating?: 0f,
         ingredientes = this.ingredientes?.map { it.toIngrediente() } ?: emptyList(),
-        comentarios = this.comentarios?.map {it.toComentario()} ?: emptyList()
+        comentarios = this.comentarios?.map {it.toComentario()} ?: emptyList(),
+        imagenes = this.imagenes?.map{it.toMedia()} ?: emptyList()
     )
 }
 
@@ -52,7 +55,8 @@ fun PasoRecetaDTO.toPasoReceta(): PasoReceta {
     return PasoReceta(
         numeroDePaso = this.numeroDePaso.toString(),
         contenido = this.contenido,
-        archivoFoto = this.archivoFoto
+        archivoFoto = this.archivoFoto,
+        imagenesPasos = this.imagenes?.map{it.toMedia()} ?: emptyList()
     )
 }
 
@@ -92,7 +96,22 @@ fun RecetaSimpleResponse.toReceta(): Receta{
         reviewCount = this.reviewCount?:0,
         averageRating = this.averageRating?:0f,
         ingredientes = emptyList(),
-        comentarios = emptyList()
+        comentarios = emptyList(),
+        imagenes = emptyList()
+    )
+}
+
+fun getMediaTypeFromUrl(url: String): MediaType {
+    return when {
+        url.endsWith(".mp4", true) || url.contains("video") -> MediaType.VIDEO
+        else -> MediaType.IMAGE
+    }
+}
+
+fun String.toMedia(): MediaItem{
+    return MediaItem(
+        url = this,
+        type = getMediaTypeFromUrl(this)
     )
 }
 

@@ -10,6 +10,7 @@ import com.oasis.bite.domain.models.User
 
 import com.oasis.bite.data.repository.UserRepository
 import kotlinx.coroutines.launch
+import retrofit2.Response
 
 class UsersViewModel : ViewModel() {
 
@@ -34,5 +35,17 @@ class UsersViewModel : ViewModel() {
                 _mensajeError.value = "Usuario o contraseña incorrectos"
             }
         }
+    }
+
+    suspend fun verify(email: String, code: String):Response<Unit>{
+            return repository.verificar(email, code)
+    }
+
+    suspend fun sendResetCode(email: String):Response<Unit>{
+        return repository.enviar(email)
+    }
+
+    suspend fun updatePassword(email: String, password: String):Response<Unit>{
+        return repository.cambiarContraseña(email, password)
     }
 }

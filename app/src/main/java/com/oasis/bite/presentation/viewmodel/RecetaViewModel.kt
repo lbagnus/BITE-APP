@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.oasis.bite.data.RetrofitInstance
+import com.oasis.bite.data.model.FavParams
 import com.oasis.bite.data.repository.RecetaRepository
 import com.oasis.bite.domain.models.Receta
 import com.oasis.bite.domain.models.Ingrediente
@@ -26,6 +27,7 @@ class RecetaViewModel : ViewModel() {
 
     private val _pasos = MutableLiveData<List<PasoReceta>>()
     val pasos: LiveData<List<PasoReceta>> get() = _pasos
+    val favoritoLiveData = MutableLiveData<List<Receta>?>()
 
     fun cargarReceta(id: String) {
         viewModelScope.launch {
@@ -38,6 +40,25 @@ class RecetaViewModel : ViewModel() {
                 Log.e("RecetaViewModel", "Error al cargar receta", e)
             }
         }
+    }
+
+    fun getRecetasFavoritos(email: String, onResult: (List<Receta>) -> Unit) {
+        viewModelScope.launch {
+            val favoritos = repository.getRecetasFavoritos(email)
+            favoritoLiveData.postValue(favoritos ?:emptyList())
+        }
+    }
+
+    fun eliminarRecetaFavorito(email: String, receta: Int){
+        viewModelScope.launch{
+            var params = FavParams(email = email, recetaId =receta)
+            repository.deleteFavorito(params)}
+    }
+
+    fun agregarRecetaFavorito(email: String, receta: Int){
+        viewModelScope.launch{
+            var params = FavParams(email = email, recetaId =receta)
+            repository.addFavorito(params)}
     }
 
 }

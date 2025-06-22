@@ -3,6 +3,8 @@ package com.oasis.bite.data.repository
 import android.util.Log
 import com.google.gson.Gson
 import com.oasis.bite.data.api.ApiService
+import com.oasis.bite.data.model.FavParams
+import com.oasis.bite.data.model.FavRequest
 import com.oasis.bite.data.model.RecetaSearchParams
 import com.oasis.bite.data.model.RecetaSimpleResponse
 import com.oasis.bite.data.toReceta
@@ -57,6 +59,28 @@ class RecetaRepository(private val apiService: ApiService) {
             Log.e("RecetasRepository", "Error al obtener recetas: ${response.code()} - ${response.message()}")
             null
         }
+    }
+
+     suspend fun getRecetasFavoritos(email: String): List<Receta>? {
+        val response= apiService.getRecetaFavoritos(email)
+        return if (response.isSuccessful && response.body() != null) {
+            val gson = Gson()
+            val json = gson.toJson(response.body())
+            Log.d("RecetasRepositoryFavoritos", "Receta recibida correctamente favoritos")
+            Log.d("favoritos", json)
+            return response.body()!!.map { it.toReceta() }
+        } else {
+            Log.e("RecetasRepository", "Error al obtener receta: ${response.code()} - ${response.message()}")
+            null
+        }
+    }
+
+    suspend fun deleteFavorito(params: FavParams){
+        apiService.deletefav(FavRequest(params.email.toString(),params.recetaId))
+    }
+
+    suspend fun addFavorito(params: FavParams){
+        apiService.addfav(FavRequest(params.email.toString(),params.recetaId))
     }
 
 }

@@ -27,8 +27,8 @@ data class RecetaDTO(
     @SerializedName("estado")
     val estado: String,
 
-    @SerializedName("username")
-    val userName: String,
+    @SerializedName("Usuario")
+    val username: UsuarioRecetaResponse,
 
     @SerializedName("reviewCount")
     val reviewCount: Int?,
@@ -46,7 +46,13 @@ data class RecetaDTO(
     val pasos: List<PasoRecetaDTO>?,
 
     @SerializedName("Reseñas")
-    val comentarios: List<ComentarioDTO>?
+    val comentarios: List<ComentarioDTO>?,
 
+    @SerializedName("imagenes")
+    val imagenes: List<String>?
+
+)
+data class UsuarioRecetaResponse(
+    val username: String
 )
 
