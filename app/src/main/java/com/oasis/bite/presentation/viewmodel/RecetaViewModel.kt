@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.oasis.bite.data.RetrofitInstance
+import com.oasis.bite.data.model.CommentRequest
 import com.oasis.bite.data.model.FavParams
 import com.oasis.bite.data.repository.RecetaRepository
 import com.oasis.bite.domain.models.Receta
@@ -59,6 +60,12 @@ class RecetaViewModel : ViewModel() {
         viewModelScope.launch{
             var params = FavParams(email = email, recetaId =receta)
             repository.addFavorito(params)}
+    }
+
+    fun agregarComentario(email: String, titulo: String, reseña: String, valoracion: String, receta: Float){
+        viewModelScope.launch{
+            var params = CommentRequest(usuarioEmail = email, recetaId =receta, titulo = titulo, reseña = reseña, valoracion = valoracion)
+            repository.addComentario(params)}
     }
 
 }

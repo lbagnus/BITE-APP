@@ -3,10 +3,10 @@ package com.oasis.bite.data.repository
 import android.util.Log
 import com.google.gson.Gson
 import com.oasis.bite.data.api.ApiService
+import com.oasis.bite.data.model.CommentRequest
 import com.oasis.bite.data.model.FavParams
 import com.oasis.bite.data.model.FavRequest
 import com.oasis.bite.data.model.RecetaSearchParams
-import com.oasis.bite.data.model.RecetaSimpleResponse
 import com.oasis.bite.data.toReceta
 import com.oasis.bite.domain.models.Receta
 
@@ -82,6 +82,13 @@ class RecetaRepository(private val apiService: ApiService) {
     suspend fun addFavorito(params: FavParams){
         apiService.addfav(FavRequest(params.email.toString(),params.recetaId))
     }
+
+    suspend fun addComentario(params: CommentRequest){
+        apiService.addComment(CommentRequest(params.titulo, params.reseña,
+            params.valoracion, params.usuarioEmail, params.recetaId))
+    }
+
+
 
 }
 

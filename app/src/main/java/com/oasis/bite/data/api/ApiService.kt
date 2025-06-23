@@ -2,6 +2,7 @@ package com.oasis.bite.data.api
 
 import com.oasis.bite.data.model.CategoriaDTO
 import com.oasis.bite.data.model.CodeRequest
+import com.oasis.bite.data.model.CommentRequest
 import com.oasis.bite.data.model.FavRequest
 import com.oasis.bite.data.model.LoginRequest
 import com.oasis.bite.data.model.LoginResponse
@@ -63,4 +64,7 @@ interface ApiService {
 
     @PUT("users/password")
     suspend fun cambiarPassword(@Body params: PassRequest): Response<Unit>
+
+    @POST("recetas/review")
+    suspend fun addComment(@Body params : CommentRequest): Response<Unit>
 }

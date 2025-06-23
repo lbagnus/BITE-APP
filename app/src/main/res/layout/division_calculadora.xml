@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <LinearLayout
+        android:paddingTop="15dp"
         android:id="@+id/primerRenglon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_horizontal">
+        android:gravity="center_vertical">
     <ImageButton
         android:id="@+id/btnVolver"
         android:layout_width="40dp"
@@ -20,7 +22,6 @@
         android:src="@drawable/baseline_arrow_back_24"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="10dp"
         />
         <View
             android:layout_width="0dp"
@@ -30,7 +31,6 @@
         android:id="@+id/titulo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
         android:text="Calculadora de Ingredientes"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -42,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_horizontal"
+        android:gravity="center_vertical"
         app:layout_constraintTop_toBottomOf="@+id/primerRenglon">
         <TextView
             android:id="@+id/recetaTitulo"
@@ -53,6 +53,7 @@
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="@color/black"
+            android:layout_marginStart="15dp"
             />
         <View
             android:layout_width="0dp"
@@ -75,13 +76,137 @@
         android:textColor="@color/black"
         android:textSize="18sp"
         app:layout_constraintTop_toBottomOf="@id/segundoRenglon"
-        android:paddingStart="20dp"/>
+        android:paddingStart="26dp"/>
     <View
         android:id="@+id/linea"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#D3D3D3"
         android:layout_marginTop="5dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
         app:layout_constraintTop_toBottomOf="@id/recetaAutor"/>
+    <TextView
+        android:id="@+id/calcularTitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:paddingStart="26dp"
+        android:text="Calcular"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/linea"
+        />
+    <LinearLayout
+        android:id = "@+id/porcionesBoxHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/calcularTitulo"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:id = "@+id/porcionesBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+        <TextView
+            android:id="@+id/porcionesTitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:paddingStart="26dp"
+            android:text="Cantidad de porciones:"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+
+            />
+        <TextView
+            android:id="@+id/porcionesDescripciones"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:paddingStart="26dp"
+            android:text="Ingresa la cantidad de porciones y los ingredientes se calcularán automáticamente"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toBottomOf="@id/porcionesTitulo"
+            />
+            <View
+                android:id="@+id/linea2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#D3D3D3"
+                android:layout_marginTop="5dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                />
+        </LinearLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxBackgroundColor="@color/beige">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/codeDigit2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:textAlignment="center"
+                android:text="4"
+                android:singleLine="true"/>
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:id = "@+id/ingredientesBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/porcionesBoxHorizontal"
+        >
+        <TextView
+            android:id="@+id/ingredientesTitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:paddingStart="26dp"
+            android:text="Cantidad de porciones:"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+
+            />
+        <TextView
+            android:id="@+id/ingredientesDescripciones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:paddingStart="26dp"
+            android:text="Ingresa la cantidad de porciones y los ingredientes se calcularán automáticamente"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toBottomOf="@id/porcionesTitulo"
+            />
+        <View
+            android:id="@+id/linea3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#D3D3D3"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            />
+        <LinearLayout
+            android:id="@+id/layoutIngredientes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
