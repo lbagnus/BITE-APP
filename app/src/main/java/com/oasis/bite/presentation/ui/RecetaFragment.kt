@@ -1,6 +1,7 @@
 package com.oasis.bite.presentation.ui
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,7 +14,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
+import com.oasis.bite.ComentarioActivity
+import com.oasis.bite.ForgotPasswordActivity
 import com.oasis.bite.R
+import com.oasis.bite.VerifyCodeActivity
 import com.oasis.bite.databinding.FragmentRecetaBinding
 import com.oasis.bite.domain.models.User
 import com.oasis.bite.presentation.adapters.MediaAdapter
@@ -140,12 +144,25 @@ class RecetaFragment : Fragment() {
                 binding.recyclerMedia.adapter = adapter
                 binding.recyclerMedia.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
+                binding.botonAgregarResenia.setOnClickListener {
+                    val intent = Intent(requireContext(), ComentarioActivity::class.java)
+                    intent.putExtra("recetaId", recetaId)
+                    intent.putExtra("tituloReceta", receta.nombre)
+                    intent.putExtra("usuarioEmail", usuario.email)
+                    intent.putExtra("recetaAutor", receta.username)
+                    Log.d("comentarioActivity", "recetaID: $recetaId")
+                    startActivity(intent)
+
+                }
 
             }
         }
         binding.btnVolver.setOnClickListener {
             findNavController().navigateUp()
         }
+
+
+
         return binding.root
     }
 
@@ -153,12 +170,14 @@ class RecetaFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-    fun getUsuarioLogueado(context: Context): User? {
+    fun getUsuarioLogueado(context: Context): User {
         val prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         val json = prefs.getString("usuario_logueado", null)
-        return json?.let { Gson().fromJson(it, User::class.java) }
+        return json.let { Gson().fromJson(it, User::class.java) }
     }
 }
+
+
 
 
 

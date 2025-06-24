@@ -10,11 +10,11 @@ class CommentRequest (
     val reseña: String,
 
     @SerializedName("valoracion")
-    val valoracion: String,
+    val valoracion: Int,
 
     @SerializedName("usuarioEmail")
     val usuarioEmail: String,
 
     @SerializedName("recetaId")
-    val recetaId: Float
+    val recetaId: Int
 )

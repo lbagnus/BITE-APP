@@ -62,11 +62,14 @@ class RecetaViewModel : ViewModel() {
             repository.addFavorito(params)}
     }
 
-    fun agregarComentario(email: String, titulo: String, reseña: String, valoracion: String, receta: Float){
+    fun agregarComentario(email: String, titulo: String, reseña: String, valoracion: Int, receta: Int): Int{
+        var response = 0
         viewModelScope.launch{
             var params = CommentRequest(usuarioEmail = email, recetaId =receta, titulo = titulo, reseña = reseña, valoracion = valoracion)
-            repository.addComentario(params)}
+                response =  repository.addComentario(params)}
+        return response
     }
+
 
 }
 

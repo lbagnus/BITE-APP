@@ -44,6 +44,10 @@
             android:name="com.oasis.bite.ResetPasswordActivity"
             android:exported="false" />
 
+        <activity
+            android:name="com.oasis.bite.ComentarioActivity"
+            />
+
 
     </application>
 

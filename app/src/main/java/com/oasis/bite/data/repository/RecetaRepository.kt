@@ -83,9 +83,16 @@ class RecetaRepository(private val apiService: ApiService) {
         apiService.addfav(FavRequest(params.email.toString(),params.recetaId))
     }
 
-    suspend fun addComentario(params: CommentRequest){
-        apiService.addComment(CommentRequest(params.titulo, params.reseña,
+    suspend fun addComentario(params: CommentRequest): Int{
+        val response = apiService.addComment(CommentRequest(params.titulo, params.reseña,
             params.valoracion, params.usuarioEmail, params.recetaId))
+        if (response.isSuccessful){
+            return 1
+        }else{
+            0
+        }
+
+        return 0
     }
 
 
