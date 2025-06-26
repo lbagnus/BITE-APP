@@ -1,48 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="12dp"
-    card_view:cardCornerRadius="20dp"
-    card_view:cardElevation="4dp"
-    card_view:cardBackgroundColor="#FAE1C3">
+    android:layout_height="match_parent">
 
-    <RelativeLayout
+    <!-- Toolbar arriba -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:background="@color/beigeClaro"
+        android:paddingTop="36dp"
+        android:paddingBottom="16dp"
+        android:elevation="4dp"
+        app:title=""
+        app:layout_scrollFlags="scroll|enterAlways">
 
-        <!-- Ícono menú -->
-        <ImageView
-            android:id="@+id/menuIcon"
-            android:layout_width="29dp"
-            android:layout_height="29dp"
-            android:layout_alignParentStart="true"
-            android:layout_marginBottom="3dp"
-            android:layout_alignBaseline="@id/cookieIcon"
-            android:src="@drawable/menu_toolbar" />
-
-        <!-- Texto saludo -->
-        <TextView
-            android:id="@+id/saludoText"
-            android:layout_width="wrap_content"
+        <!-- Contenido personalizado -->
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="¡Hola María!"
-            android:textColor="#4E342E"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:paddingHorizontal="16dp">
 
-        <!-- Ícono decorativo (galletita) -->
-        <ImageView
-            android:id="@+id/cookieIcon"
-            android:layout_width="29dp"
-            android:layout_height="29dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:src="@mipmap/cookie_logo" />
-    </RelativeLayout>
+            <!-- Ícono menú -->
+            <ImageView
+                android:id="@+id/menuIcon"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/menu_toolbar"
+                android:scaleType="fitCenter" />
 
-</androidx.cardview.widget.CardView>
+            <!-- Texto saludo -->
+            <TextView
+                android:id="@+id/saludoText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="¡Hola María!"
+                android:textColor="@color/brown"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- Ícono galletita -->
+            <ImageView
+                android:id="@+id/cookieIcon"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/cookie_logo"
+                android:scaleType="fitCenter" />
+        </RelativeLayout>
+
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <!-- Acá va el resto del contenido de tu pantalla -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="88dp"
+        android:fillViewport="true">
+
+        <!-- Tu contenido -->
+
+    </ScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+
+
 
