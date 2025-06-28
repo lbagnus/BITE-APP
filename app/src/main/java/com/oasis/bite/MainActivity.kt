@@ -15,6 +15,10 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.oasis.bite.databinding.ActivityMainBinding
 import com.oasis.bite.databinding.FiltroPopupBinding
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -114,6 +118,7 @@ class MainActivity : AppCompatActivity() {
                 return false
             }
         })
+
 
     }
 

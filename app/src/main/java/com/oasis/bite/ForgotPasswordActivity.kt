@@ -1,5 +1,6 @@
 package com.oasis.bite
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -19,9 +20,13 @@ import com.oasis.bite.presentation.viewmodel.UsersViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.core.content.ContextCompat
+import com.google.android.material.textfield.TextInputEditText
+
 
 class ForgotPasswordActivity : AppCompatActivity() {
 
+    @SuppressLint("SoonBlockedPrivateApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forgot_password)
@@ -34,9 +39,13 @@ class ForgotPasswordActivity : AppCompatActivity() {
         }
 
         // Referencias
-        val emailEditText = findViewById<EditText>(R.id.emailEditText)
+        val emailEditText = findViewById<TextInputEditText>(R.id.emailEditText)
         val resetButton = findViewById<Button>(R.id.continueButton)
         val emailInputLayout = findViewById<TextInputLayout>(R.id.emailInputLayout)
+        emailInputLayout.setEndIconTintList(
+            ContextCompat.getColorStateList(this, R.color.brown)
+        )
+
         val botonCancelar = findViewById<TextView>(R.id.cancelText)
 
         botonCancelar.setOnClickListener {
@@ -50,10 +59,12 @@ class ForgotPasswordActivity : AppCompatActivity() {
                 emailInputLayout.boxStrokeColor = Color.RED
                 errorText.visibility = View.VISIBLE
                 errorText.text = "El campo no puede estar vacío"
+
             } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                 emailInputLayout.boxStrokeColor = Color.RED
                 errorText.visibility = View.VISIBLE
                 errorText.text = "Formato de correo inválido"
+
             } else {
                 // Llamar al backend para validar si existe
                 lifecycleScope.launch {
@@ -67,10 +78,12 @@ class ForgotPasswordActivity : AppCompatActivity() {
                                 Intent(this@ForgotPasswordActivity, VerifyCodeActivity::class.java)
                                     .putExtra("email", email)
                             )
+
                         } else {
                             emailInputLayout.boxStrokeColor = Color.RED
                             errorText.visibility = View.VISIBLE
                             errorText.text = "El correo no está registrado"
+
                         }
 
                 }
