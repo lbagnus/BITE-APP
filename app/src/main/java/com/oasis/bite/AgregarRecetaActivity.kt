@@ -27,8 +27,8 @@ class AgregarRecetaActivity : AppCompatActivity() {
     private var _binding: ActivityAgregarRecetaBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: RecetaViewModel
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: MultimediaAdapter
+    //private lateinit var recyclerView: RecyclerView
+    //private lateinit var adapter: MultimediaAdapter
     private val archivos = mutableListOf<Uri>()
     private val listaIngredientes = mutableListOf<Ingrediente>()
     private val listaPasos = mutableListOf<PasoReceta>()
@@ -62,15 +62,27 @@ class AgregarRecetaActivity : AppCompatActivity() {
             ) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     result.data?.data?.let { uri ->
+                        archivos.clear()
                         archivos.add(uri)
-                        adapter.notifyItemInserted(archivos.size - 1)
+                        binding.imagenSeleccionada.apply {
+                            setImageURI(uri)
+                            visibility = View.VISIBLE
+                        }
                     }
                 }
             }
-            recyclerView = binding.recyclerMultimedia
-            recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-            adapter = MultimediaAdapter(archivos, ::onAddClicked)
-            recyclerView.adapter = adapter
+            //recyclerView = binding.recyclerMultimedia
+            //recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            //adapter = MultimediaAdapter(archivos, ::onAddClicked)
+            //recyclerView.adapter = adapter
+            binding.btnSubirImagen.setOnClickListener {
+                val intent = Intent(Intent.ACTION_GET_CONTENT)
+                intent.type = "image/*"
+                intent.addCategory(Intent.CATEGORY_OPENABLE)
+                pickMediaLauncher.launch(Intent.createChooser(intent, "Seleccioná una imagen"))
+
+            }
+
             val layoutIngredientes = binding.layoutIngredientes
             val botonAgregarIngrediente = binding.btnAgregarIngrediente
             val inflater = LayoutInflater.from(this) // o requireContext()
@@ -176,9 +188,11 @@ class AgregarRecetaActivity : AppCompatActivity() {
     }
 
     private fun onAddClicked() {
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = "image/* video/*"
-        pickMediaLauncher.launch(intent) // En vez de startActivityForResult
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.type = "image/*"
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        pickMediaLauncher.launch(Intent.createChooser(intent, "Seleccioná una imagen"))
+
     }
 
 }
