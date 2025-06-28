@@ -1,6 +1,7 @@
 package com.oasis.bite.presentation.ui.dashboard
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,7 +14,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
+import com.oasis.bite.AgregarRecetaActivity
+import com.oasis.bite.ForgotPasswordActivity
 import com.oasis.bite.R
+import com.oasis.bite.VerifyCodeActivity
 import com.oasis.bite.databinding.FragmentDashboardBinding
 import com.oasis.bite.domain.models.User
 import com.oasis.bite.presentation.adapters.RecetaAdapter
@@ -61,6 +65,13 @@ class DashboardFragment : Fragment() {
                 Log.d("Es favorito? home", idsFavoritos.toString())
                 recetaAdapter.actualizarRecetas(recetas)
             }
+        }
+        val botonAgregar = binding.btnAgregarReceta
+        botonAgregar.setOnClickListener {
+            val intent = Intent(requireContext(), AgregarRecetaActivity::class.java)
+            intent.putExtra("usuario", usuario.email)
+            intent.putExtra("isEditando", false)
+            startActivity(intent)
         }
 
         homeViewModel.cargarRecetasUsuario(usuario.username)

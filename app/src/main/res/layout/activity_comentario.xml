@@ -132,10 +132,10 @@
         android:background="@drawable/text_background"
         android:hint="Título (opcional)"
         android:backgroundTint="@color/beige"
-        android:inputType="textEmailAddress"
+        android:inputType="text"
         android:paddingHorizontal="16dp"
-        android:textColor="#A0A0A0"
-        android:textColorHint="#A0A0A0"
+        android:textColor="@color/gris"
+        android:textColorHint="@color/gris"
         app:layout_constraintTop_toBottomOf="@id/renglon2"/>
     <EditText
         android:id="@+id/titulobox2"
@@ -145,10 +145,10 @@
         android:background="@drawable/text_background"
         android:backgroundTint="@color/beige"
         android:hint="Reseña (opcional)"
-        android:inputType="textEmailAddress"
+        android:inputType="text"
         android:paddingHorizontal="16dp"
-        android:textColor="#A0A0A0"
-        android:textColorHint="#A0A0A0"
+        android:textColor="@color/gris"
+        android:textColorHint="@color/gris"
         app:layout_constraintTop_toBottomOf="@id/titulobox"/>
 
 

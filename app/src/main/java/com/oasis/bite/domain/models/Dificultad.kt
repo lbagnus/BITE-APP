@@ -1,5 +1,7 @@
 package com.oasis.bite.domain.models
 
-enum class Dificultad {
-    FACIL, MEDIA, DIFICIL
+enum class Dificultad(val label: String) {
+    FACIL("Fácil"),
+    MEDIA("Media"),
+    DIFICIL("Difícil")
 }

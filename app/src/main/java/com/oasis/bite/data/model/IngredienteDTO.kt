@@ -15,6 +15,5 @@ data class IngredienteDTO(
     @SerializedName("unidad")
     val unidad: String,
 
-    @SerializedName("seleccionado")
-    var seleccionado: Boolean = false
+
 )

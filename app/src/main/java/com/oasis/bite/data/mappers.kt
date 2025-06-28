@@ -64,8 +64,7 @@ fun IngredienteDTO.toIngrediente(): Ingrediente {
     return Ingrediente(
         nombre = this.nombre,
         cantidad = this.cantidad,
-        unidad = this.unidad,
-        seleccionado = this.seleccionado
+        unidad = this.unidad
     )
 }
 

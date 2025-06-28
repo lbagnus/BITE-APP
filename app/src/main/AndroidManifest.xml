@@ -48,6 +48,10 @@
             android:name="com.oasis.bite.ComentarioActivity"
             />
 
+        <activity
+            android:name="com.oasis.bite.AgregarRecetaActivity"
+            />
+
 
     </application>
 

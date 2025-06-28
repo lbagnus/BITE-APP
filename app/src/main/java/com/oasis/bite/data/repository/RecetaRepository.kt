@@ -6,6 +6,7 @@ import com.oasis.bite.data.api.ApiService
 import com.oasis.bite.data.model.CommentRequest
 import com.oasis.bite.data.model.FavParams
 import com.oasis.bite.data.model.FavRequest
+import com.oasis.bite.data.model.RecetaRequest
 import com.oasis.bite.data.model.RecetaSearchParams
 import com.oasis.bite.data.toReceta
 import com.oasis.bite.domain.models.Receta
@@ -95,6 +96,40 @@ class RecetaRepository(private val apiService: ApiService) {
         return 0
     }
 
+    suspend fun addReceta(params: RecetaRequest){
+        val response = apiService.addReceta(RecetaRequest(
+            params.nombre,
+            params.descripcion,
+            params.tiempo,
+            params.porciones,
+            params.dificultad,
+            params.imagen,
+            params.creadorEmail,
+            params.ingredientes,
+            params.pasos,
+            params.estado))
+        /*Log.d("RecetaRepository", "Response code: ${response.code()}")
+        Log.d("RecetaRepository", "Response successful: ${response.isSuccessful}")
+        Log.d("RecetaRepository", "Response body: ${response.body()}")
+        Log.d("RecetaRepository", "Response error: ${response.errorBody()?.string()}")
+
+        return if (response.isSuccessful && response.body() != null) {
+            val recetaResponse = response.body()!!
+            Log.d("RecetaRepository", "LoginResponse: $recetaResponse")
+            try {
+                Log.d("RecetaRepository", "receta cargada con exito")
+                return recetaResponse
+
+            } catch (e: Exception) {
+                Log.e("RecetaRepository", "ERROR en agregarrecta: ${e.message}", e)
+                Log.e("RecetaRepository", "Stack trace completo: ${e.stackTrace.contentToString()}")
+               null
+            }
+        } else {
+            Log.e("RecetaRepository", "Response no exitosa o body null")
+           null
+        }*/
+    }
 
 
 }

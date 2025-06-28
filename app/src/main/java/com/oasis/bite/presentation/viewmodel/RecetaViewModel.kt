@@ -8,10 +8,13 @@ import androidx.lifecycle.viewModelScope
 import com.oasis.bite.data.RetrofitInstance
 import com.oasis.bite.data.model.CommentRequest
 import com.oasis.bite.data.model.FavParams
+import com.oasis.bite.data.model.RecetaRequest
+import com.oasis.bite.data.model.RecetaSearchParams
 import com.oasis.bite.data.repository.RecetaRepository
 import com.oasis.bite.domain.models.Receta
 import com.oasis.bite.domain.models.Ingrediente
 import com.oasis.bite.domain.models.PasoReceta
+import com.oasis.bite.domain.models.RecetaStatus
 import kotlinx.coroutines.launch
 
 class RecetaViewModel : ViewModel() {
@@ -19,6 +22,7 @@ class RecetaViewModel : ViewModel() {
     private val apiService = RetrofitInstance.apiService
 
     private val repository = RecetaRepository(apiService)
+
 
     private val _receta = MutableLiveData<Receta?>()
     val receta: MutableLiveData<Receta?> get() = _receta
@@ -69,6 +73,40 @@ class RecetaViewModel : ViewModel() {
                 response =  repository.addComentario(params)}
         return response
     }
+
+    fun verificarSiRecetaExiste(titulo: String, usuario : String): Int{
+        var recetas: List<Receta>? = emptyList<Receta>()
+        viewModelScope.launch {
+            val params = RecetaSearchParams(
+                userName = usuario, // 👈 acá pasás la categoría
+                limit = 20,
+                offset = 0
+            )
+
+                recetas = repository.getRecetasSearch(params)
+            //_receta.postValue(recetas ?: emptyList())
+        }
+        if (recetas != null && recetas != emptyList<Receta>()){
+            for (receta in recetas){
+                if (receta.nombre == titulo){
+                    return receta.id
+                }else{
+                    return 0
+                }
+            }
+        }
+        return 0
+
+
+    }
+    fun agregarReceta(nombre: String, descripcion: String, tiempo: String, porciones: String, dificultad: String, imagen:String, creadorEmail: String, ingredientes: List<Ingrediente>, pasos : List<PasoReceta>){
+        viewModelScope.launch{
+            var params = RecetaRequest(nombre = nombre, descripcion =descripcion, tiempo = tiempo, porciones = porciones, dificultad = dificultad, imagen = imagen, creadorEmail = creadorEmail, ingredientes = ingredientes, pasos = pasos, estado = "Aprobada")
+             repository.addReceta(params)}
+
+    }
+
+
 
 
 }

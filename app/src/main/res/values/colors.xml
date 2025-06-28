@@ -8,6 +8,8 @@
     <color name="beige">#FAECD7</color>
     <color name="beigeClaro">#FAECD7</color>
     <color name="gris">#595959</color>
+    <color name="grisdeshabilitado">#D9D9D9</color>
+
 
     <color name="mi_fondo">#DF88B7</color>
     <color name="teal_200">#DF88B7</color>

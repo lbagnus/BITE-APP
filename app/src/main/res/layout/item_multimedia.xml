@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    android:layout_marginEnd="8dp"
+    android:orientation="horizontal">
+
+    <!-- Ítem Agregar (+) -->
+    <LinearLayout
+        android:id="@+id/addItemLayout"
+        android:layout_width="100dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:background="@drawable/bg_rounded_beige"
+        >
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/add_outlined"
+            app:tint="@color/grisdeshabilitado" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Agregar"
+            android:textSize="12sp"
+            android:textColor="@color/grisdeshabilitado" />
+    </LinearLayout>
+
+    <!-- Imagen o thumbnail de video -->
+    <ImageView
+        android:id="@+id/imagePreview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:layout_marginStart="10dp"
+        android:contentDescription="Archivo subido"
+        android:src="@drawable/ic_carbonara"
+        android:background="@drawable/bg_rounded_beige"
+
+        />
+</LinearLayout>
+

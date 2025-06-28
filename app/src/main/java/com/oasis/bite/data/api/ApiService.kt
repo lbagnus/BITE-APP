@@ -1,6 +1,5 @@
 package com.oasis.bite.data.api
 
-import com.oasis.bite.data.model.CategoriaDTO
 import com.oasis.bite.data.model.CodeRequest
 import com.oasis.bite.data.model.CommentRequest
 import com.oasis.bite.data.model.FavRequest
@@ -8,10 +7,10 @@ import com.oasis.bite.data.model.LoginRequest
 import com.oasis.bite.data.model.LoginResponse
 import com.oasis.bite.data.model.PassRequest
 import com.oasis.bite.data.model.RecetaDTO
+import com.oasis.bite.data.model.RecetaRequest
 import com.oasis.bite.data.model.RecetaSimpleResponse
 import retrofit2.Response
 import retrofit2.http.Body
-import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.HTTP
 import retrofit2.http.POST
@@ -67,4 +66,7 @@ interface ApiService {
 
     @POST("recetas/review")
     suspend fun addComment(@Body params : CommentRequest): Response<Unit>
+
+    @POST("recetas")
+    suspend fun addReceta(@Body params: RecetaRequest): Response<Unit>
 }
