@@ -1,5 +1,6 @@
 package com.oasis.bite.presentation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -28,6 +29,15 @@ class UsersViewModel(private val sessionRepository: UserSessionRepository) : Vie
     private val _mensajeError = MutableLiveData<String>()
     val mensajeError: LiveData<String> = _mensajeError
 
+    private val _localSessionExists = MutableLiveData<Boolean>()
+    val localSessionExists: LiveData<Boolean> = _localSessionExists
+
+    init {
+        // Llama a inicializarSesion tan pronto como el ViewModel se crea
+        // para que el estado de la sesión local esté disponible desde el principio.
+        inicializarSesion()
+    }
+
     fun inicializarSesion() {
         viewModelScope.launch {
             val userEntity = sessionRepository.getUserSession()
@@ -39,6 +49,12 @@ class UsersViewModel(private val sessionRepository: UserSessionRepository) : Vie
                     lastName = userEntity.lastName,
                     role = userEntity.role
                 )
+                _localSessionExists.value = true // Sesión local encontrada
+                Log.d("UsersViewModel", "Sesión local encontrada para: ${userEntity.username}")
+            } else {
+                _usuarioLogueado.value = null
+                _localSessionExists.value = false // No se encontró sesión local
+                Log.d("UsersViewModel", "No se encontró sesión local.")
             }
         }
     }
@@ -46,21 +62,30 @@ class UsersViewModel(private val sessionRepository: UserSessionRepository) : Vie
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
-            val usuario = repository.login(email, password)
-            if (usuario != null) {
-                _usuarioLogueado.value = usuario
+            try { // Agregamos un try-catch para manejar errores de red/API
+                val usuario = repository.login(email, password)
+                if (usuario != null) {
+                    _usuarioLogueado.value = usuario
 
-                // Guardar usuario en Room
-                val userEntity = LocalUser(
-                    email = usuario.email,
-                    username = usuario.username,
-                    firstName = usuario.firstName,
-                    lastName = usuario.lastName,
-                    role = usuario.role
-                )
-                sessionRepository.saveUserSession(userEntity)
-            } else {
-                _mensajeError.value = "Usuario o contraseña incorrectos"
+                    // Guardar usuario en Room
+                    val userEntity = LocalUser(
+                        email = usuario.email,
+                        username = usuario.username,
+                        firstName = usuario.firstName,
+                        lastName = usuario.lastName,
+                        role = usuario.role
+                    )
+                    sessionRepository.saveUserSession(userEntity)
+                    _localSessionExists.value = true // Actualizar estado de sesión local después de login exitoso
+                } else {
+                    _mensajeError.value = "Usuario o contraseña incorrectos"
+                    _usuarioLogueado.value = null
+                    _localSessionExists.value = false // Login fallido
+                }
+            } catch (e: Exception) {
+                _mensajeError.value = "Error de red o servidor: ${e.message}"
+                _usuarioLogueado.value = null
+                _localSessionExists.value = false // Error de login
             }
         }
     }
@@ -69,6 +94,7 @@ class UsersViewModel(private val sessionRepository: UserSessionRepository) : Vie
         viewModelScope.launch {
             sessionRepository.clearSession()
             _usuarioLogueado.value = null
+            _localSessionExists.value = false // Sesión local borrada
         }
     }
 

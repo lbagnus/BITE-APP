@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.oasis.bite.data.RetrofitInstance.apiService
 import com.oasis.bite.presentation.viewmodel.UsersViewModel
+import com.oasis.bite.presentation.viewmodel.UsersViewModelFactory
 import kotlinx.coroutines.launch
 
 class VerifyCodeActivity : AppCompatActivity() {
@@ -26,7 +27,8 @@ class VerifyCodeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_verify_code)
 
-        val viewModel = ViewModelProvider(this).get(UsersViewModel::class.java);
+        val factory = UsersViewModelFactory(applicationContext)
+        val viewModel = ViewModelProvider(this, factory).get(UsersViewModel::class.java)
         supportActionBar?.hide()
         if (!isInternetAvailable(this)) {
             showCustomNoInternetDialog()
