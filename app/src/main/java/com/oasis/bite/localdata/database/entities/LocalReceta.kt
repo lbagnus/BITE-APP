@@ -13,7 +13,7 @@ data class LocalReceta(
     val nombre: String,
     val descripcion: String,
     val tiempo: String?,
-    val porciones: Int,
+    val porciones: String,
     val dificultad: String, // guardamos como String por simplicidad
     val imagen: String?,
     val username: String,

@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.core.content.ContextCompat
 import com.google.android.material.textfield.TextInputEditText
+import com.oasis.bite.presentation.viewmodel.UsersViewModelFactory
 
 
 class ForgotPasswordActivity : AppCompatActivity() {
@@ -30,7 +31,10 @@ class ForgotPasswordActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forgot_password)
-        val viewModel = ViewModelProvider(this).get(UsersViewModel::class.java);
+
+        val factory = UsersViewModelFactory(applicationContext)
+        val viewModel = ViewModelProvider(this, factory).get(UsersViewModel::class.java)
+
         supportActionBar?.hide()
 
         // Verificar conexión

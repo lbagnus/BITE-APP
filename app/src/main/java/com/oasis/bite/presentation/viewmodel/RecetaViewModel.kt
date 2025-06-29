@@ -22,12 +22,9 @@ import com.oasis.bite.domain.models.PasoReceta
 import com.oasis.bite.domain.models.RecetaStatus
 import kotlinx.coroutines.launch
 
-class RecetaViewModel : ViewModel() {
+class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
 
     private val apiService = RetrofitInstance.apiService
-
-    private val repository = RecetaRepository(apiService)
-
 
     private val _receta = MutableLiveData<Receta?>()
     val receta: MutableLiveData<Receta?> get() = _receta
