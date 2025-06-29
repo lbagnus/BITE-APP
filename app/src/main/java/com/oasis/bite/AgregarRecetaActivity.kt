@@ -29,6 +29,7 @@ import com.oasis.bite.domain.models.MediaType
 import com.oasis.bite.domain.models.PasoReceta
 import com.oasis.bite.presentation.adapters.MultimediaAdapter
 import com.oasis.bite.presentation.viewmodel.RecetaViewModel
+import com.oasis.bite.presentation.viewmodel.RecetaViewModelFactory
 
 class AgregarRecetaActivity : AppCompatActivity() {
     private var _binding: ActivityAgregarRecetaBinding? = null
@@ -50,7 +51,8 @@ class AgregarRecetaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityAgregarRecetaBinding.inflate(layoutInflater)
-        viewModel = ViewModelProvider(this).get(RecetaViewModel::class.java)
+        val factory = RecetaViewModelFactory(applicationContext)
+        val viewModel = ViewModelProvider(this, factory).get(RecetaViewModel::class.java)
         setContentView(binding.root)
         supportActionBar?.hide()
 

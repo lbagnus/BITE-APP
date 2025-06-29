@@ -105,10 +105,6 @@ class MainActivity : AppCompatActivity() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 // Acá se ejecuta cuando el usuario presiona "Enter" o el ícono de buscar
                 query?.let {
-                    val bundle = Bundle().apply {
-                        putString("searchBar", query)
-                    }
-                    findNavController().navigate(R.id.ResultadoBusqueda, bundle)
                     Log.d("Busqueda", "Se buscó: $query")
                 }
                 // Evita que se borre el texto
