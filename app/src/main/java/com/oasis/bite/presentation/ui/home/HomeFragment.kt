@@ -27,12 +27,9 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    val factory = HomeViewModelFactory(requireContext().applicationContext)
-    val homeViewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
-
+    private lateinit var homeViewModel: HomeViewModel
     private lateinit var categoriaAdapter: CategoryAdapter
     private lateinit var recetaAdapter: RecetaAdapter
-
     private var idsFavoritos: List<Int> = emptyList()
 
     override fun onCreateView(
@@ -41,6 +38,9 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+
+        val factory = HomeViewModelFactory(requireContext().applicationContext)
+        homeViewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
 
         // 1. Obtener usuario logueado
         val usuario = getUsuarioLogueado(requireContext())

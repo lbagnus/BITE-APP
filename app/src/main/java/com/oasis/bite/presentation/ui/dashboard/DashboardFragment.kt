@@ -22,15 +22,14 @@ import com.oasis.bite.databinding.FragmentDashboardBinding
 import com.oasis.bite.domain.models.User
 import com.oasis.bite.presentation.adapters.RecetaAdapter
 import com.oasis.bite.presentation.ui.home.HomeViewModel
+import com.oasis.bite.presentation.ui.home.HomeViewModelFactory
 import kotlin.getValue
 
 class DashboardFragment : Fragment() {
 
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
-
-    private val homeViewModel: HomeViewModel by viewModels()
-
+    private lateinit var homeViewModel: HomeViewModel
     private lateinit var recetaAdapter: RecetaAdapter
 
     private var idsFavoritos: List<Int> = emptyList()
@@ -42,6 +41,10 @@ class DashboardFragment : Fragment() {
     ): View {
 
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
+
+        val factory = HomeViewModelFactory(requireContext().applicationContext)
+        homeViewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
+
         val usuario = getUsuarioLogueado(requireContext())
         recetaAdapter = RecetaAdapter(
             emptyList(),

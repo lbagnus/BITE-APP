@@ -17,7 +17,7 @@ class RecetaViewModelFactory( private val context: Context) : ViewModelProvider.
             val repository = RecetaRepository(apiService, recetaDao, context)
 
             @Suppress("UNCHECKED_CAST")
-            return HomeViewModel(repository) as T
+            return RecetaViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
