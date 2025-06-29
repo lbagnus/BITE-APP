@@ -42,10 +42,11 @@ class ResetPasswordActivity : AppCompatActivity() {
                     password2.error = "Las contraseñas no coinciden"
                 } else {
                     lifecycleScope.launch {
-                        val response = viewModel.updatePassword(email, pass1)
+                        val response = viewModel.resetPassword(email, pass1)
                         if (response.isSuccessful) {
                             Toast.makeText(this@ResetPasswordActivity, "Contraseña actualizada", Toast.LENGTH_SHORT).show()
-                            showCustomNoInternetDialog() // volver al login
+                            showCustomNoInternetDialog()
+                            // volver al login
                         } else {
                             Toast.makeText(this@ResetPasswordActivity, "Error al actualizar", Toast.LENGTH_SHORT).show()
                         }

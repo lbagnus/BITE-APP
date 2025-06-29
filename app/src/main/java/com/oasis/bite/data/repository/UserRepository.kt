@@ -5,6 +5,7 @@ import com.oasis.bite.data.api.ApiService
 import com.oasis.bite.data.model.CodeRequest
 import com.oasis.bite.data.model.LoginRequest
 import com.oasis.bite.data.model.PassRequest
+import com.oasis.bite.data.model.PassResetRequest
 import com.oasis.bite.data.toUser
 import retrofit2.Response
 
@@ -47,5 +48,8 @@ class UserRepository(private val apiService: ApiService) {
 
     suspend fun cambiarContraseña(email: String, password: String): Response<Unit> {
         return apiService.cambiarPassword(PassRequest(email, password, password))
+    }
+    suspend fun resetContraseña(email: String, password: String): Response<Unit> {
+        return apiService.resetearPassword(PassResetRequest(email, password))
     }
 }

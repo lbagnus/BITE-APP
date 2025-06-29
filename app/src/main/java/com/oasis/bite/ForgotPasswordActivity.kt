@@ -78,6 +78,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
                                 Intent(this@ForgotPasswordActivity, VerifyCodeActivity::class.java)
                                     .putExtra("email", email)
                             )
+                            finish()
 
                         } else {
                             emailInputLayout.boxStrokeColor = Color.RED
