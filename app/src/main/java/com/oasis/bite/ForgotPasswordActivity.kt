@@ -31,8 +31,10 @@ class ForgotPasswordActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forgot_password)
+
         val factory = UsersViewModelFactory(applicationContext)
         val viewModel = ViewModelProvider(this, factory).get(UsersViewModel::class.java)
+
         supportActionBar?.hide()
 
         // Verificar conexión

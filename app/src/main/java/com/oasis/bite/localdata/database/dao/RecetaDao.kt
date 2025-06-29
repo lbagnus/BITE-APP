@@ -19,8 +19,8 @@ interface RecetaDao {
     suspend fun obtenerPendientes(): List<LocalReceta>
 
     // 4. Marcar una receta como sincronizada (después de subirla al server)
-    @Query("UPDATE recetas SET pendienteDeSync = 0, idRemoto = :idRemoto WHERE localId = :localId")
-    suspend fun marcarComoSincronizada(localId: Int, idRemoto: Int)
+    @Query("UPDATE recetas SET pendienteDeSync = 0 WHERE localId = :localId")
+    suspend fun marcarComoSincronizada(localId: Int)
 
     // 5. (Opcional) Eliminar receta local
     @Delete

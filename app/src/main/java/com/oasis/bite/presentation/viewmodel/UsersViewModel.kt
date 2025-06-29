@@ -21,7 +21,6 @@ class UsersViewModel(private val sessionRepository: UserSessionRepository) : Vie
     private val apiService = RetrofitInstance.apiService
 
     private val repository = UserRepository(apiService)
-    private val recetaRepo = RecetaRepository(apiService)
 
     private val _usuarioLogueado = MutableLiveData<User?>()
     val usuarioLogueado: LiveData<User?> = _usuarioLogueado

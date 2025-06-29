@@ -1,25 +1,36 @@
 package com.oasis.bite.data.repository
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.net.Uri
 import android.util.Log
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.oasis.bite.data.api.ApiService
 import com.oasis.bite.data.model.CommentRequest
 import com.oasis.bite.data.model.FavParams
 import com.oasis.bite.data.model.FavRequest
+import com.oasis.bite.data.model.PasoRecetaRequest
 import com.oasis.bite.data.model.RecetaRequest
 import com.oasis.bite.data.model.RecetaSearchParams
 import com.oasis.bite.data.toReceta
+import com.oasis.bite.domain.models.Ingrediente
+import com.oasis.bite.domain.models.PasoReceta
 import com.oasis.bite.domain.models.Receta
+import com.oasis.bite.localdata.database.dao.RecetaDao
+import com.oasis.bite.localdata.database.entities.LocalReceta
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
-import org.tensorflow.lite.support.common.FileUtil
 import java.io.File
 import java.io.FileOutputStream
 
-class RecetaRepository(private val apiService: ApiService) {
+class RecetaRepository(
+    private val apiService: ApiService,
+    private val recetaDao: RecetaDao,
+    private val context: Context
+) {
 
     suspend fun getRecetaPorId(id: String): Receta? {
         Log.d("RecetasRepository", "Solicitando receta con id: $id")
@@ -104,7 +115,7 @@ class RecetaRepository(private val apiService: ApiService) {
         return 0
     }
 
-    suspend fun addReceta(params: RecetaRequest){
+    /*suspend fun addReceta(params: RecetaRequest){
         val response = apiService.addReceta(RecetaRequest(
             params.nombre,
             params.descripcion,
@@ -139,7 +150,45 @@ class RecetaRepository(private val apiService: ApiService) {
             Log.e("RecetaRepository", "Response no exitosa o body null")
            null
         }*/
+    }*/
+
+    suspend fun addReceta(params: RecetaRequest) {
+        val gson = Gson()
+        val recetaEntity = LocalReceta(
+            idRemoto = null,
+            nombre = params.nombre,
+            descripcion = params.descripcion,
+            tiempo = params.tiempo,
+            porciones = params.porciones,
+            dificultad = params.dificultad,
+            imagen = params.imagen,
+            username = params.creadorEmail,
+            categoria = params.categoriaId,
+            pasosJson = gson.toJson(params.pasos),
+            ingredientesJson = gson.toJson(params.ingredientes),
+            pendienteDeSync = true
+        )
+
+        if (isInternetAvailable(context)) {
+            try {
+                val response = apiService.addReceta(params)
+                if (response.isSuccessful) {
+                    Log.d("AddReceta", "✅ Receta enviada correctamente al servidor")
+                } else {
+                    recetaDao.insertarReceta(recetaEntity)
+                    Log.w("AddReceta", "⚠️ Falló la respuesta del servidor, receta guardada localmente")
+                }
+            } catch (e: Exception) {
+                recetaDao.insertarReceta(recetaEntity)
+                Log.e("AddReceta", "❌ Excepción al enviar receta, guardada localmente: ${e.message}")
+            }
+        } else {
+            recetaDao.insertarReceta(recetaEntity)
+            Log.d("AddReceta", "📴 Sin conexión, receta guardada localmente")
+        }
     }
+
+
 
     suspend fun subirImagen(context: Context, uri: Uri): String? {
         return try {
@@ -203,6 +252,61 @@ class RecetaRepository(private val apiService: ApiService) {
     suspend fun deleteReceta(id: String){
         apiService.deleteReceta(id)
     }
+
+    // Función para verificar la conexión a Internet
+    private fun isInternetAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnected
+    }
+
+    suspend fun sincronizarPendientes() {
+        if (!isInternetAvailable(context)) return
+        val pendientes = recetaDao.obtenerPendientes()
+        for (receta in pendientes) {
+            try {
+
+                val pasosOriginales = Gson().fromJson<List<PasoReceta>>(
+                    receta.pasosJson,
+                    object : TypeToken<List<PasoReceta>>() {}.type
+                )
+
+                val pasos = pasosOriginales.map { paso ->
+                    PasoRecetaRequest(
+                        numeroDePaso = paso.numeroDePaso,
+                        contenido = paso.contenido,
+                        archivoFoto = paso.archivoFoto,
+                        imagenesPasos = paso.imagenesPasos?.map { it.url } // Convertís MediaItem a String (URL)
+                    )
+                }
+
+                val ingredientes = Gson().fromJson<List<Ingrediente>>(receta.ingredientesJson, object : TypeToken<List<Ingrediente>>() {}.type)
+
+                val request = RecetaRequest(
+                    nombre = receta.nombre,
+                    descripcion = receta.descripcion,
+                    tiempo = receta.tiempo ?: "",
+                    porciones = receta.porciones,
+                    dificultad = receta.dificultad,
+                    categoriaId = receta.categoria,
+                    imagen = receta.imagen ?: "",
+                    imagenes = emptyList(), // completar si corresponde
+                    creadorEmail = receta.username,
+                    ingredientes = ingredientes,
+                    pasos = pasos,
+                    estado = "ACTIVA"
+                )
+
+                val response = apiService.addReceta(request)
+                if (response.isSuccessful) {
+                    recetaDao.marcarComoSincronizada(receta.localId)
+                }
+            } catch (_: Exception) {
+                // sigue siendo pendiente
+            }
+        }
+    }
+
 
 }
 

@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import com.oasis.bite.R
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.oasis.bite.databinding.FragmentHomeBinding
@@ -26,7 +27,8 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private val homeViewModel: HomeViewModel by viewModels()
+    val factory = HomeViewModelFactory(requireContext().applicationContext)
+    val homeViewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
 
     private lateinit var categoriaAdapter: CategoryAdapter
     private lateinit var recetaAdapter: RecetaAdapter

@@ -79,7 +79,6 @@ fun ComentarioDTO.toComentario(): Comentario {
     )
 }
 
-
 fun RecetaSimpleResponse.toReceta(): Receta{
     return Receta(
         id = this.id,
