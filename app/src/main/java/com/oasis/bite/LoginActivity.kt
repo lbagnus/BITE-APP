@@ -8,6 +8,7 @@ import android.net.NetworkInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -49,12 +50,15 @@ class LoginActivity : AppCompatActivity() {
                 sharedPrefs.edit().putString("usuario_logueado", usuarioJson).apply()
 
 
-                // Ir al MainActivity
+                val nombreCompleto = "${usuario.firstName} ${usuario.lastName}"
                 val intent = Intent(this, MainActivity::class.java)
-                Log.d("usuarioLogueado??", usuarioJson)
-                intent.putExtra("username", usuario.username) // opcional
+                intent.putExtra("nombreUsuario", nombreCompleto)
                 startActivity(intent)
-                finish() // Cierra la LoginActivity para que no se pueda volver con el botón atrás
+                finish()
+
+                intent.putExtra("nombre", usuario.firstName + " " + usuario.lastName)
+                intent.putExtra("rolUsuario", usuario.role.name)
+                startActivity(intent)
 
             }
         }

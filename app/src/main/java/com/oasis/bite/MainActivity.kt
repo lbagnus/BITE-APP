@@ -1,14 +1,18 @@
 package com.oasis.bite
+import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.GravityCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -18,6 +22,7 @@ import com.oasis.bite.databinding.FiltroPopupBinding
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.drawerlayout.widget.DrawerLayout
 
 
 class MainActivity : AppCompatActivity() {
@@ -30,6 +35,45 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
+
+        val cerrarSesionView = findViewById<TextView>(R.id.opcionCerrarSesion)
+        cerrarSesionView.setOnClickListener {
+            // Borrar preferencias guardadas
+            val prefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+            prefs.edit().clear().apply()
+
+            // Volver al login
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+        }
+
+        // Obtener el DrawerLayout
+        val drawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
+
+        // Botón del menú (en tu custom_toolbar)
+        val btnMenu = findViewById<View>(R.id.menuIcon)
+        btnMenu.setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+
+        val btnCambiarContrasena = findViewById<TextView>(R.id.opcionCambiarContrasena)
+
+        btnCambiarContrasena.setOnClickListener {
+            val intent = Intent(this, ResetPasswordActivity::class.java)
+            startActivity(intent)
+        }
+
+        val nombreUsuario = intent.getStringExtra("nombreUsuario") ?: "Usuario"
+        findViewById<TextView>(R.id.saludoText)?.text = "¡Hola $nombreUsuario!"
+        findViewById<TextView>(R.id.nombreUsuario)?.text = nombreUsuario
+
+        val rolUsuario = intent.getStringExtra("rolUsuario") ?: "USER"
+        val opcionAutorizacion = findViewById<TextView>(R.id.opcionAutorizacion)
+
+        if (rolUsuario == "ADMIN") {
+            opcionAutorizacion.visibility = View.VISIBLE
+        }
 
 
         val navView: BottomNavigationView = binding.navView
