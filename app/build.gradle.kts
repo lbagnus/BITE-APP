@@ -3,6 +3,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt") // Agregar esta línea
 }
 
 val localProperties = Properties()
@@ -72,4 +73,15 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.logging.interceptor)
     implementation(libs.imagen)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
+
+    // DataStore
+    implementation(libs.androidx.datastore.preferences)
+
+    // Corrutinas (solo si no las tienes)
+    implementation(libs.kotlinx.coroutines.android)
 }

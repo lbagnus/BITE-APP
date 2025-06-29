@@ -18,6 +18,7 @@ import com.oasis.bite.domain.models.Receta
 import com.oasis.bite.domain.models.RecetaStatus
 import com.oasis.bite.domain.models.Role
 import com.oasis.bite.domain.models.User
+import java.util.UUID
 import kotlin.Int
 
 fun LoginResponse.toUser(): User {
@@ -113,6 +114,7 @@ fun String.toMedia(): MediaItem{
         type = getMediaTypeFromUrl(this)
     )
 }
+
 
 
 

@@ -15,11 +15,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
 import com.oasis.bite.presentation.viewmodel.UsersViewModel
 import com.oasis.bite.MainActivity
+import com.oasis.bite.presentation.viewmodel.UsersViewModelFactory
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +33,13 @@ class LoginActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_login)
 
-        val viewModel = ViewModelProvider(this).get(UsersViewModel::class.java);
+        // Usar Factory personalizado
+        val factory = UsersViewModelFactory(applicationContext)
+        val viewModel = ViewModelProvider(this, factory).get(UsersViewModel::class.java)
+
+        // Verificar si ya hay sesión iniciada
+        viewModel.inicializarSesion()
+
         val loginButton: Button = findViewById(R.id.loginButton)
         val emailEditText: EditText = findViewById(R.id.emailEditText)
         val passwordEditText: EditText = findViewById(R.id.passwordEditText)
