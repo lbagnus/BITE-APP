@@ -9,10 +9,13 @@ import com.oasis.bite.data.repository.RecetaRepository
 import com.oasis.bite.domain.models.User
 
 import com.oasis.bite.data.repository.UserRepository
+import com.oasis.bite.localdata.database.AppDatabase
+import com.oasis.bite.localdata.database.entities.LocalUser
+import com.oasis.bite.localdata.repository.UserSessionRepository
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
-class UsersViewModel : ViewModel() {
+class UsersViewModel(private val sessionRepository: UserSessionRepository) : ViewModel() {
 
     private val apiService = RetrofitInstance.apiService
 
@@ -25,15 +28,47 @@ class UsersViewModel : ViewModel() {
     private val _mensajeError = MutableLiveData<String>()
     val mensajeError: LiveData<String> = _mensajeError
 
+    fun inicializarSesion() {
+        viewModelScope.launch {
+            val userEntity = sessionRepository.getUserSession()
+            if (userEntity != null) {
+                _usuarioLogueado.value = User(
+                    email = userEntity.email,
+                    username = userEntity.username,
+                    firstName = userEntity.firstName,
+                    lastName = userEntity.lastName,
+                    role = userEntity.role
+                )
+            }
+        }
+    }
+
+
     fun login(email: String, password: String) {
         viewModelScope.launch {
-            // val receta = recetaRepo.getRecetaPorId(1)
             val usuario = repository.login(email, password)
             if (usuario != null) {
                 _usuarioLogueado.value = usuario
+
+                // Guardar usuario en Room
+                val userEntity = LocalUser(
+                    email = usuario.email,
+                    username = usuario.username,
+                    firstName = usuario.firstName,
+                    lastName = usuario.lastName,
+                    role = usuario.role
+                )
+                sessionRepository.saveUserSession(userEntity)
             } else {
                 _mensajeError.value = "Usuario o contraseña incorrectos"
             }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            sessionRepository.clearSession()
+            _usuarioLogueado.value = null
         }
     }
 
