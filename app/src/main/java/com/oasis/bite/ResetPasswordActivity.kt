@@ -13,13 +13,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.oasis.bite.presentation.viewmodel.UsersViewModel
+import com.oasis.bite.presentation.viewmodel.UsersViewModelFactory
 import kotlinx.coroutines.launch
 
 class ResetPasswordActivity : AppCompatActivity() {
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            val viewModel = ViewModelProvider(this).get(UsersViewModel::class.java);
+            val factory = UsersViewModelFactory(applicationContext)
+            val viewModel = ViewModelProvider(this, factory).get(UsersViewModel::class.java)
             setContentView(R.layout.activity_reset_password)
             supportActionBar?.hide()
 
