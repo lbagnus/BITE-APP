@@ -8,6 +8,7 @@ import android.net.NetworkInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -36,7 +37,34 @@ class LoginActivity : AppCompatActivity() {
         // Usar Factory personalizado
         val factory = UsersViewModelFactory(applicationContext)
         val viewModel = ViewModelProvider(this, factory).get(UsersViewModel::class.java)
+// --- Variables para controlar el estado de la sesión y la conexión ---
+        var hasLocalSession = false // Variable para guardar el estado de la sesión local
+        var isInternetConnected = isInternetAvailable(this) // Verificar internet al inicio
 
+        // Observador para verificar si hay sesión local
+        viewModel.localSessionExists.observe(this) { localSessionExists ->
+            if (localSessionExists) {
+                // Si hay sesión local, intentar ir directamente al MainActivity
+                Toast.makeText(this, "Sesión local encontrada. Redirigiendo...", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, MainActivity::class.java)
+                viewModel.usuarioLogueado.value?.let { user ->
+                    intent.putExtra("username", user.username)
+                    val gson = Gson()
+                    intent.putExtra("usuario_json", gson.toJson(user))
+                }
+                startActivity(intent)
+                finish() // Cierra LoginActivity después de redirigir
+            } else {
+                // No hay sesión local, AHORA verificamos internet para mostrar el diálogo o el formulario
+                if (!isInternetConnected) {
+                    // No hay sesión local Y no hay internet: NO puede proceder.
+                    showCustomNoInternetDialog(canProceedOffline = false)
+                } else {
+                    // No hay sesión local, pero SÍ hay internet: Mostrar el formulario de login.
+                    findViewById<View>(R.id.loginLayout).visibility = View.VISIBLE // Asegurarse que el layout de login es visible
+                }
+            }
+        }
         // Verificar si ya hay sesión iniciada
         viewModel.inicializarSesion()
 
@@ -47,7 +75,13 @@ class LoginActivity : AppCompatActivity() {
         loginButton.setOnClickListener {
             val email = emailEditText.text.toString()
             val password = passwordEditText.text.toString()
-            viewModel.login(email, password)
+            // Solo intentar login si hay internet, o si hay sesión local (aunque en este caso ya habríamos redirigido)
+            if (isInternetConnected || hasLocalSession) { // hasLocalSession para el caso de reintentar si se pierde la conexión
+                viewModel.login(email, password)
+            } else {
+                // Si no hay internet y no hay sesión local, no tiene sentido intentar login
+                Toast.makeText(this, "No hay conexión a internet para iniciar sesión.", Toast.LENGTH_LONG).show()
+            }
         }
 
         viewModel.usuarioLogueado.observe(this) { usuario ->
@@ -74,11 +108,6 @@ class LoginActivity : AppCompatActivity() {
         }
 
 
-        // Verificar si hay conexión a internet al iniciar la actividad
-        if (!isInternetAvailable(this)) {
-            showCustomNoInternetDialog()
-        }
-
         // Vincular el TextView de "¿Olvidaste tu contraseña?" y agregarle comportamiento de link
         val forgotPasswordText: TextView = findViewById(R.id.forgotPasswordText)
         forgotPasswordText.paintFlags = forgotPasswordText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
@@ -96,26 +125,35 @@ class LoginActivity : AppCompatActivity() {
     }
 
     // Mostrar el popup personalizado si no hay internet
-    private fun showCustomNoInternetDialog() {
+    private fun showCustomNoInternetDialog(canProceedOffline: Boolean) {
         val inflater = LayoutInflater.from(this)
         val customView = inflater.inflate(R.layout.popup_no_internet, null)
 
-        // Acceder a los elementos del layout personalizado
         val messageTextView: TextView = customView.findViewById(R.id.popupMessage)
         val closeButton: Button = customView.findViewById(R.id.closeButton)
 
-        // Crear el AlertDialog
-        val dialog = AlertDialog.Builder(this)
-            .setView(customView)
-            .setCancelable(false)  // No permitir que se cierre tocando fuera del popup
-            .create()
-
-        // Acción del botón "Cerrar"
-        closeButton.setOnClickListener {
-            finish()  // Cierra la actividad si el usuario decide salir
+        messageTextView.text = if (canProceedOffline) {
+            "No hay conexión a internet. Puedes usar la aplicación sin conexión."
+        } else {
+            "No hay conexión a internet. No puedes iniciar sesión sin conexión."
         }
 
-        // Mostrar el popup
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(customView)
+            .setCancelable(false)
+            .create()
+
+        closeButton.setOnClickListener {
+            if (canProceedOffline) {
+                // Si puede proceder offline, simplemente cierra el diálogo
+                dialog.dismiss()
+            } else {
+                // Si no puede proceder offline, cierra la actividad
+                finish()
+            }
+        }
+
         dialog.show()
     }
 }
