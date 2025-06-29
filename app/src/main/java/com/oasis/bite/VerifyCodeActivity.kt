@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -60,9 +61,9 @@ class VerifyCodeActivity : AppCompatActivity() {
             if (text?.length == 1) digit6.requestFocus()
         }
 
-        val codigo = digit1.text.toString() + digit2.text.toString() + digit3.text.toString() + digit4.text.toString() + digit5.text.toString() + digit6.text.toString().trim()
 
         continueButton.setOnClickListener {
+            val codigo = digit1.text.toString() + digit2.text.toString() + digit3.text.toString() + digit4.text.toString() + digit5.text.toString() + digit6.text.toString().trim()
             val errorText = findViewById<TextView>(R.id.errorText)
             if (codigo.isNotEmpty()) {
                 lifecycleScope.launch {
@@ -71,6 +72,7 @@ class VerifyCodeActivity : AppCompatActivity() {
                         if (response.isSuccessful) {
                             startActivity(Intent(this@VerifyCodeActivity, ResetPasswordActivity::class.java)
                                 .putExtra("email", email))
+                            finish()
                         } else {
                             errorText.visibility = View.VISIBLE
                             errorText.text = "El correo no está registrado"
@@ -80,6 +82,8 @@ class VerifyCodeActivity : AppCompatActivity() {
                         errorText.text = "Error de red"
                     }
                 }
+            }else{
+                Log.d("verificar codigo", codigo)
             }
         }
     }

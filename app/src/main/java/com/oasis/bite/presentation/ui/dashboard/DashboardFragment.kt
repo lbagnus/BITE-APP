@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
-import com.oasis.bite.AgregarRecetaActivity
+import com.oasis.bite.AgregarTituloRecetaActivty
 import com.oasis.bite.ForgotPasswordActivity
 import com.oasis.bite.R
 import com.oasis.bite.VerifyCodeActivity
@@ -68,9 +68,9 @@ class DashboardFragment : Fragment() {
         }
         val botonAgregar = binding.btnAgregarReceta
         botonAgregar.setOnClickListener {
-            val intent = Intent(requireContext(), AgregarRecetaActivity::class.java)
-            intent.putExtra("usuario", usuario.email)
-            intent.putExtra("isEditando", false)
+            val intent = Intent(requireContext(), AgregarTituloRecetaActivty::class.java)
+            intent.putExtra("usuarioEmail", usuario.email)
+            intent.putExtra("usuarioUserName", usuario.username)
             startActivity(intent)
         }
 
