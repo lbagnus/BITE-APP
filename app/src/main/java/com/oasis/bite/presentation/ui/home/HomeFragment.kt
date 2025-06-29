@@ -27,11 +27,9 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var homeViewModel : HomeViewModel
-
+    private lateinit var homeViewModel: HomeViewModel
     private lateinit var categoriaAdapter: CategoryAdapter
     private lateinit var recetaAdapter: RecetaAdapter
-
     private var idsFavoritos: List<Int> = emptyList()
 
     override fun onCreateView(

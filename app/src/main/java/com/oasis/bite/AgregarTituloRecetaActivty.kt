@@ -15,6 +15,9 @@ import androidx.navigation.fragment.findNavController
 import com.oasis.bite.databinding.ActivityAgregarRecetaBinding
 import com.oasis.bite.databinding.ActivityAgregarTituloRecetaBinding
 import com.oasis.bite.presentation.viewmodel.RecetaViewModel
+import com.oasis.bite.presentation.viewmodel.RecetaViewModelFactory
+import com.oasis.bite.presentation.viewmodel.UsersViewModel
+import com.oasis.bite.presentation.viewmodel.UsersViewModelFactory
 
 class AgregarTituloRecetaActivty: AppCompatActivity() {
     private var _binding: ActivityAgregarTituloRecetaBinding? = null
@@ -23,7 +26,10 @@ class AgregarTituloRecetaActivty: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityAgregarTituloRecetaBinding.inflate(layoutInflater)
-        viewModel = ViewModelProvider(this).get(RecetaViewModel::class.java)
+
+        val factory = RecetaViewModelFactory(applicationContext)
+        viewModel = ViewModelProvider(this, factory).get(RecetaViewModel::class.java)
+
         setContentView(binding.root)
         supportActionBar?.hide()
 

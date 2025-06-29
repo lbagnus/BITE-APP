@@ -18,6 +18,7 @@ import com.oasis.bite.databinding.FiltroPopupBinding
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.navigation.fragment.findNavController
 
 
 class MainActivity : AppCompatActivity() {
@@ -30,7 +31,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
-
 
         val navView: BottomNavigationView = binding.navView
 
@@ -105,7 +105,6 @@ class MainActivity : AppCompatActivity() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 // Acá se ejecuta cuando el usuario presiona "Enter" o el ícono de buscar
                 query?.let {
-                    // Podés usar el texto ingresado para buscar, filtrar, etc.
                     Log.d("Busqueda", "Se buscó: $query")
                 }
                 // Evita que se borre el texto

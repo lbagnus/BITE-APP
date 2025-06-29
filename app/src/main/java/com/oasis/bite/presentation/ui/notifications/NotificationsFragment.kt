@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
@@ -16,6 +17,7 @@ import com.oasis.bite.databinding.FragmentNotificationsBinding
 import com.oasis.bite.domain.models.User
 import com.oasis.bite.presentation.adapters.RecetaAdapter
 import com.oasis.bite.presentation.ui.home.HomeViewModel
+import com.oasis.bite.presentation.ui.home.HomeViewModelFactory
 import kotlin.getValue
 
 class NotificationsFragment : Fragment() {
@@ -23,7 +25,7 @@ class NotificationsFragment : Fragment() {
     private var _binding: FragmentNotificationsBinding? = null
     private val binding get() = _binding!!
 
-    private val homeViewModel: HomeViewModel by viewModels()
+    private lateinit var homeViewModel: HomeViewModel
 
     private lateinit var recetaAdapter: RecetaAdapter
 
@@ -36,6 +38,9 @@ class NotificationsFragment : Fragment() {
     ): View {
 
         _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
+
+        val factory = HomeViewModelFactory(requireContext().applicationContext)
+        homeViewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
 
         // --- Inicializar adapters ---
         val usuario = getUsuarioLogueado(requireContext())
