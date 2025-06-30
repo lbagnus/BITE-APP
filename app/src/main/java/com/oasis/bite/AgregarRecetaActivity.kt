@@ -370,6 +370,7 @@ class AgregarRecetaActivity : AppCompatActivity() {
                 } else {
                     viewModel.agregarRecetaOffline(titulo, descripcion, tiempo, porciones, dificultad, imagenPrincipalReceta, imagenesRecetaParaEnvio,
                         usuarioEmail.toString(), listaIngredientes, pasosValidos, categoria)
+                    Toast.makeText(this, "Receta guardada localmente", Toast.LENGTH_SHORT).show()
                 }
 
                 finish()
