@@ -104,6 +104,14 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
              repository.addReceta(params)}
 
     }
+
+    fun agregarRecetaOffline(nombre: String, descripcion: String, tiempo: String, porciones: String, dificultad: String, imagen:String, imagenes: List<String>, creadorEmail: String, ingredientes: List<Ingrediente>, pasos : List<PasoRecetaRequest>, categoria: String){
+        viewModelScope.launch {
+            var params = RecetaRequest(nombre = nombre, descripcion =descripcion, tiempo = tiempo, porciones = porciones, dificultad = dificultad, imagen = imagen, imagenes =imagenes, creadorEmail = creadorEmail, ingredientes = ingredientes, pasos = pasos, estado = "Aprobada", categoriaId = categoria)
+            repository.addRecetaLocal(params)
+        }
+    }
+
     fun subirImagen(context: Context, uri: Uri, callback: (String?) -> Unit) {
         viewModelScope.launch {
             val url = repository.subirImagen(context, uri)
@@ -116,10 +124,6 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
             repository.deleteReceta(id = id)
         }
     }
-
-
-
-
 
 }
 

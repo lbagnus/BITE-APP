@@ -2,9 +2,8 @@ package com.oasis.bite
 
 import android.content.Context
 import android.content.Intent
-import android.net.NetworkInfo
-
 import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -95,9 +94,10 @@ class AgregarTituloRecetaActivty: AppCompatActivity() {
         }
 
         binding.btnVolver.setOnClickListener {
-            finish()
+                finish()
+            }
         }
-    }
+    
     private fun showCustomNoInternetDialog(onDecision: (Boolean) -> Unit) {
         val inflater = LayoutInflater.from(this)
         val customView = inflater.inflate(R.layout.popup_receta_existe, null)

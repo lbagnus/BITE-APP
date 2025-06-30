@@ -174,6 +174,7 @@ class RecetaRepository(
             porciones = params.porciones,
             dificultad = params.dificultad,
             imagen = params.imagen,
+            imagenes = gson.toJson(params.imagenes),
             username = params.creadorEmail,
             categoria = params.categoriaId,
             pasosJson = gson.toJson(params.pasos),
@@ -185,21 +186,58 @@ class RecetaRepository(
             try {
                 val response = apiService.addReceta(params)
                 if (response.isSuccessful) {
-                    Log.d("AddReceta", "✅ Receta enviada correctamente al servidor")
+                    Log.i("AddReceta", "✅ Receta enviada correctamente al servidor")
                 } else {
                     recetaDao.insertarReceta(recetaEntity)
-                    Log.w("AddReceta", "⚠️ Falló la respuesta del servidor, receta guardada localmente")
+                    Log.i("AddReceta", "⚠️ Falló la respuesta del servidor, receta guardada localmente")
                 }
             } catch (e: Exception) {
                 recetaDao.insertarReceta(recetaEntity)
-                Log.e("AddReceta", "❌ Excepción al enviar receta, guardada localmente: ${e.message}")
+                Log.i("AddReceta", "❌ Excepción al enviar receta, guardada localmente: ${e.message}")
             }
         } else {
             recetaDao.insertarReceta(recetaEntity)
-            Log.d("AddReceta", "📴 Sin conexión, receta guardada localmente")
+            Log.i("AddReceta", "📴 Sin conexión, receta guardada localmente")
         }
     }
 
+    suspend fun addRecetaLocal(params: RecetaRequest) {
+        val gson = Gson()
+        val recetaEntity = LocalReceta(
+            idRemoto = null,
+            nombre = params.nombre,
+            descripcion = params.descripcion,
+            tiempo = params.tiempo,
+            porciones = params.porciones,
+            dificultad = params.dificultad,
+            imagen = params.imagen,
+            imagenes = gson.toJson(params.imagenes),
+            username = params.creadorEmail,
+            categoria = params.categoriaId,
+            pasosJson = gson.toJson(params.pasos),
+            ingredientesJson = gson.toJson(params.ingredientes),
+            pendienteDeSync = true
+        )
+
+        recetaDao.insertarReceta(recetaEntity)
+
+        Log.d("AddReceta", "📴 Sin conexión, receta guardada localmente")
+        Log.d("AddReceta", """
+        🔒 Datos guardados:
+        - Nombre: ${recetaEntity.nombre}
+        - Descripción: ${recetaEntity.descripcion}
+        - Tiempo: ${recetaEntity.tiempo}
+        - Porciones: ${recetaEntity.porciones}
+        - Dificultad: ${recetaEntity.dificultad}
+        - Imagen principal (ruta o URL): ${recetaEntity.imagen}
+        - Imagenes: ${recetaEntity.imagenes}
+        - Creador: ${recetaEntity.username}
+        - Categoría: ${recetaEntity.categoria}
+        - Pasos (JSON): ${recetaEntity.pasosJson}
+        - Ingredientes (JSON): ${recetaEntity.ingredientesJson}
+        - Pendiente de sincronizar: ${recetaEntity.pendienteDeSync}
+    """.trimIndent())
+    }
 
 
     suspend fun subirImagen(context: Context, uri: Uri): String? {
@@ -274,25 +312,72 @@ class RecetaRepository(
 
     suspend fun sincronizarPendientes() {
         if (!isInternetAvailable(context)) return
+
         val pendientes = recetaDao.obtenerPendientes()
         for (receta in pendientes) {
             try {
+                val gson = Gson()
 
-                val pasosOriginales = Gson().fromJson<List<PasoReceta>>(
+                val pasosOriginales = gson.fromJson<List<PasoRecetaRequest>>(
                     receta.pasosJson,
-                    object : TypeToken<List<PasoReceta>>() {}.type
+                    object : TypeToken<List<PasoRecetaRequest>>() {}.type
                 )
 
-                val pasos = pasosOriginales.map { paso ->
+                val ingredientes = gson.fromJson<List<Ingrediente>>(
+                    receta.ingredientesJson,
+                    object : TypeToken<List<Ingrediente>>() {}.type
+                )
+
+                // Subir imagen principal si es ruta local
+                val imagenPrincipalUrl = if (receta.imagen?.startsWith("/") == true || receta.imagen?.startsWith("file://") == true) {
+                    subirImagen(context, Uri.fromFile(File(receta.imagen))) ?: ""
+                } else {
+                    receta.imagen ?: ""
+                }
+
+                // Subir imagenes principales
+                val imagenesPrincipalesLocales: List<String> = try {
+                    gson.fromJson<List<String>>(receta.imagenes ?: "[]", object : TypeToken<List<String>>() {}.type)
+                } catch (e: Exception) {
+                    emptyList()
+                }
+
+                val imagenesPrincipalesUrls = imagenesPrincipalesLocales.mapNotNull { imagenPathRaw ->
+                    val imagenPath = imagenPathRaw as? String ?: return@mapNotNull null
+
+                    if ((imagenPath.startsWith("/") || imagenPath.startsWith("file://")) && File(imagenPath).exists()) {
+                        subirImagen(context, Uri.fromFile(File(imagenPath))) ?: imagenPath
+                    } else {
+                        imagenPath
+                    }
+                }
+
+
+                // Subir imágenes de pasos si son locales
+                val pasosActualizados = pasosOriginales.map { paso ->
+                    val nuevaArchivoFoto = if (paso.archivoFoto?.startsWith("/") == true || paso.archivoFoto?.startsWith("file://") == true) {
+                        subirImagen(context, Uri.fromFile(File(paso.archivoFoto))) ?: paso.archivoFoto
+                    } else {
+                        paso.archivoFoto
+                    }
+
+                    val nuevasImagenes = paso.imagenesPasos?.mapNotNull { imagenPathRaw ->
+                        val imagenPath = imagenPathRaw as? String ?: return@mapNotNull null
+
+                        if (File(imagenPath).exists() && imagenPath.startsWith("/") || imagenPath.startsWith("file://")) {
+                            subirImagen(context, Uri.fromFile(File(imagenPath))) ?: imagenPath
+                        } else {
+                            imagenPath
+                        }
+                    }
+
                     PasoRecetaRequest(
                         numeroDePaso = paso.numeroDePaso,
                         contenido = paso.contenido,
-                        archivoFoto = paso.archivoFoto,
-                        imagenesPasos = paso.imagenesPasos?.map { it.url } // Convertís MediaItem a String (URL)
+                        archivoFoto = nuevaArchivoFoto,
+                        imagenesPasos = nuevasImagenes
                     )
                 }
-
-                val ingredientes = Gson().fromJson<List<Ingrediente>>(receta.ingredientesJson, object : TypeToken<List<Ingrediente>>() {}.type)
 
                 val request = RecetaRequest(
                     nombre = receta.nombre,
@@ -301,20 +386,24 @@ class RecetaRepository(
                     porciones = receta.porciones,
                     dificultad = receta.dificultad,
                     categoriaId = receta.categoria,
-                    imagen = receta.imagen ?: "",
-                    imagenes = emptyList(), // completar si corresponde
+                    imagen = imagenPrincipalUrl,
+                    imagenes = imagenesPrincipalesUrls, // si vas a permitir múltiples imágenes principales, aquí también podés subirlas
                     creadorEmail = receta.username,
                     ingredientes = ingredientes,
-                    pasos = pasos,
+                    pasos = pasosActualizados,
                     estado = "ACTIVA"
                 )
 
                 val response = apiService.addReceta(request)
                 if (response.isSuccessful) {
                     recetaDao.marcarComoSincronizada(receta.localId)
+                    Log.d("Sync", "✅ Receta sincronizada correctamente: ${receta.nombre}")
+                } else {
+                    Log.e("Sync", "❌ Error al sincronizar receta: ${response.code()} - ${response.message()}")
                 }
-            } catch (_: Exception) {
-                // sigue siendo pendiente
+            } catch (e: Exception) {
+                Log.e("Sync", "⚠️ Error al procesar receta pendiente: ${e.message}", e)
+                // Sigue pendiente
             }
         }
     }

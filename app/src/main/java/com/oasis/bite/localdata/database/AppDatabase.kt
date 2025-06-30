@@ -10,7 +10,7 @@ import com.oasis.bite.localdata.database.entities.LocalReceta
 
 @Database(
     entities = [LocalUser::class, LocalReceta::class],
-    version = 3
+    version = 4
 )
 
 @TypeConverters(Converters::class)

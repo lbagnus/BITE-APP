@@ -67,6 +67,9 @@ class DashboardFragment : Fragment() {
             { receta -> idsFavoritos.contains(receta.id) }, usuario, homeViewModel, true
         )
 
+        // Prueba de sincronizar las recetas
+        homeViewModel.syncRecetasLocales()
+
         val recyclerRecetas = binding.recyclerRecetas
         recyclerRecetas.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
