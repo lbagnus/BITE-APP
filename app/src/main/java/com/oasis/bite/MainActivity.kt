@@ -23,6 +23,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.fragment.findNavController
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -74,7 +76,6 @@ class MainActivity : AppCompatActivity() {
         if (rolUsuario == "ADMIN") {
             opcionAutorizacion.visibility = View.VISIBLE
         }
-
 
         val navView: BottomNavigationView = binding.navView
 
@@ -143,25 +144,43 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
         }
-        val searchView = binding.searchbar.searchView
+
+        val searchView = binding.searchbar.searchView // Acceso correcto a SearchView
         searchView.clearFocus()
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                // Acá se ejecuta cuando el usuario presiona "Enter" o el ícono de buscar
-                query?.let {
-                    // Podés usar el texto ingresado para buscar, filtrar, etc.
-                    Log.d("Busqueda", "Se buscó: $query")
+                query?.let { searchText ->
+                    Log.d("Busqueda", "Se buscó: $searchText (por Submit)")
+                    // Crea un Bundle para pasar el argumento
+                    val bundle = Bundle().apply {
+                        putString("query", searchText) // "query" debe coincidir con el nombre del argumento en nav_graph.xml
+                    }
+                    // Navega al fragmento ResultadoBusqueda con el argumento
+                    navController.navigate(R.id.ResultadoBusqueda, bundle)
                 }
-                // Evita que se borre el texto
                 searchView.clearFocus()
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                // Opcional: para mostrar resultados mientras se escribe
                 return false
             }
         })
+
+        // Agregando el FocusChangeListener que discutimos antes, por si se quiere activar al perder el foco
+        searchView.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                val currentQuery = searchView.query?.toString()
+                if (!currentQuery.isNullOrBlank()) {
+                    Log.d("Busqueda", "Se buscó: $currentQuery (por perder Focus)")
+                    // Opcional: navegar al ResultadoBusqueda también al perder el foco si la consulta no está vacía
+                    val bundle = Bundle().apply {
+                        putString("query", currentQuery)
+                    }
+                    navController.navigate(R.id.ResultadoBusqueda, bundle)
+                }
+            }
+        }
 
 
     }

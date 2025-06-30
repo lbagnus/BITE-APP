@@ -22,7 +22,10 @@ import com.oasis.bite.databinding.FragmentRecetaBinding
 import com.oasis.bite.domain.models.User
 import com.oasis.bite.presentation.adapters.MediaAdapter
 import com.oasis.bite.presentation.adapters.ComentarioAdapter
+import com.oasis.bite.presentation.ui.home.HomeViewModel
+import com.oasis.bite.presentation.ui.home.HomeViewModelFactory
 import com.oasis.bite.presentation.viewmodel.RecetaViewModel
+import com.oasis.bite.presentation.viewmodel.RecetaViewModelFactory
 
 class RecetaFragment : Fragment() {
 
@@ -36,7 +39,9 @@ class RecetaFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentRecetaBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(this).get(RecetaViewModel::class.java)
+
+        val factory = RecetaViewModelFactory(requireContext().applicationContext)
+        viewModel = ViewModelProvider(this, factory).get(RecetaViewModel::class.java)
         val usuario = getUsuarioLogueado(requireContext())
         usuario?.let {
             viewModel.getRecetasFavoritos(it.email) { favoritos ->

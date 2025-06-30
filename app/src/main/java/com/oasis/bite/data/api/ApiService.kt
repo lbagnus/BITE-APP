@@ -3,18 +3,24 @@ package com.oasis.bite.data.api
 import com.oasis.bite.data.model.CodeRequest
 import com.oasis.bite.data.model.CommentRequest
 import com.oasis.bite.data.model.FavRequest
+import com.oasis.bite.data.model.ImageUploadResponse
 import com.oasis.bite.data.model.LoginRequest
 import com.oasis.bite.data.model.LoginResponse
 import com.oasis.bite.data.model.PassRequest
+import com.oasis.bite.data.model.PassResetRequest
 import com.oasis.bite.data.model.RecetaDTO
 import com.oasis.bite.data.model.RecetaRequest
 import com.oasis.bite.data.model.RecetaSimpleResponse
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.HTTP
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -69,4 +75,18 @@ interface ApiService {
 
     @POST("recetas")
     suspend fun addReceta(@Body params: RecetaRequest): Response<Unit>
+
+    @Multipart
+    @POST("upload/recipe-image")
+    suspend fun uploadRecipeImage(@Part image: MultipartBody.Part): Response<ImageUploadResponse>
+
+    @DELETE("recetas/{id}") // Removed hasBody = false
+    suspend fun deleteReceta(@Path("id") id: String): Response<Unit>
+
+    @PUT("users/newPassword")
+    suspend fun resetearPassword(@Body params: PassResetRequest): Response<Unit>
+
+    @GET("recetas/home") // Remove {termino} from the path
+    suspend fun getBusquedaBarra(@Query("term") termino: String): Response<List<RecetaSimpleResponse>>
+
 }

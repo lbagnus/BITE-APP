@@ -52,6 +52,10 @@
             android:name="com.oasis.bite.AgregarRecetaActivity"
             />
 
+        <activity
+            android:name="com.oasis.bite.AgregarTituloRecetaActivty"
+            />
+
 
     </application>
 

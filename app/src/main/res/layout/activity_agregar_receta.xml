@@ -1,235 +1,254 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/primerRenglon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:id="@+id/primerRenglon">
-        <ImageButton
-            android:id="@+id/btnVolver"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="Back"
-            android:src="@drawable/baseline_arrow_back_24"
-            android:scaleX="1.5"
-            android:scaleY="1.5"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="10dp"
-            />
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"> <ImageButton
+        android:id="@+id/btnVolver"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="Back"
+        android:src="@drawable/baseline_arrow_back_24" />
+
         <TextView
             android:id="@+id/recetaTitulo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Agregar una Receta"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
             android:paddingStart="25dp"
-            android:paddingTop="5dp"/>
+            android:paddingTop="5dp"
+            android:text="Agregar una Receta"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
-    <ScrollView
+    <Button
+        android:id="@+id/continuarButton"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/amarillo"
+        android:text="@string/continuar"
+        android:textColor="#FFFFFF"
+        app:cornerRadius="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"       app:layout_constraintEnd_toEndOf="parent"           app:layout_constraintStart_toStartOf="parent" />    <ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="0dp"                              android:fillViewport="true"                            app:layout_constraintBottom_toTopOf="@id/continuarButton" app:layout_constraintTop_toBottomOf="@id/primerRenglon">   <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="25dp"
+    android:orientation="vertical"
+    android:paddingBottom="20dp"> <EditText
+    android:id="@+id/titulo"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:layout_marginTop="10dp"
+    android:background="@drawable/text_background"
+    android:backgroundTint="@color/beige"
+    android:hint="Titulo"
+    android:inputType="text"
+    android:paddingHorizontal="20dp"
+    android:textColor="@color/gris"
+    android:textColorHint="@color/gris" />
+
+    <EditText
+        android:id="@+id/descripcion"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/text_background"
+        android:backgroundTint="@color/beige"
+        android:hint="Comparte un poco más sobre la receta"
+        android:inputType="text"
+        android:paddingHorizontal="20dp"
+        android:textColor="@color/gris"
+        android:textColorHint="@color/gris" />
+
+    <TextView
+        android:id="@+id/tituloMultimedia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Agregá una bella imagen de tu receta:"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnSubirImagen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/amarillo"
+        android:text="Subir Imagen"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white" />
+
+    <ImageView
+        android:id="@+id/imagenSeleccionada"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="Imagen seleccionada"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/primerRenglon">
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginHorizontal="25dp">
-            <EditText
-                android:id="@+id/titulo"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/text_background"
+        <EditText
+            android:id="@+id/porciones"
+            android:layout_width="180dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/text_background"
+            android:backgroundTint="@color/beige"
+            android:hint="Nro Porciones"
+            android:inputType="text"
+            android:paddingHorizontal="20dp"
+            android:textColor="@color/gris"
+            android:textColorHint="@color/gris" />
+
+        <EditText
+            android:id="@+id/tiempo"
+            android:layout_width="180dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/text_background"
+            android:backgroundTint="@color/beige"
+            android:hint="Tiempo (Min)"
+            android:inputType="text"
+            android:paddingHorizontal="20dp"
+            android:textColor="@color/gris"
+            android:textColorHint="@color/gris" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_marginTop="10dp" >
+            <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/dropdownCategoriaLayout"
+            style="@style/NoLineDropdown"
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:hint="Categoría" android:layout_weight="1"
+            app:boxBackgroundMode="filled"
+            app:boxStrokeColor="@android:color/transparent"
+            android:layout_marginEnd="8dp">
+                <AutoCompleteTextView
+                android:id="@+id/dropdownCategoria"
+                android:layout_width="match_parent" android:layout_height="50dp"
+                android:background="@drawable/bg_rounded_beige"
                 android:backgroundTint="@color/beige"
-                android:hint="Titulo"
-                android:inputType="text"
-                android:paddingHorizontal="20dp"
-                android:textColor="@color/gris"
-                android:textColorHint="@color/gris"/>
-            <EditText
-                android:id="@+id/descripcion"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/text_background"
-                android:backgroundTint="@color/grisdeshabilitado"
-                android:hint="Comparte un poco más sobre la receta"
-                android:inputType="text"
-                android:paddingHorizontal="20dp"
-                android:textColor="@color/gris"
-                android:textColorHint="@color/gris"
-                android:enabled="false"/>
-            <TextView
-                android:id="@+id/tituloMultimedia"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="Agregá imagenes o video de tu receta:"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+                android:inputType="none"
+                android:paddingStart="15dp"
+                app:boxStrokeColor="@color/beige"
+                app:boxStrokeWidth="0dp"
+                app:boxStrokeWidthFocused="0dp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerMultimedia"
-                android:layout_width="0dp"
-                android:layout_height="120dp"
-                android:orientation="horizontal"
-                android:clipToPadding="false"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:overScrollMode="never"
-                android:background="#EEEEEE"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintTop_toBottomOf="@id/tituloMultimedia"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                tools:listitem="@layout/item_multimedia" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <EditText
-
-                    android:id="@+id/porciones"
-                    android:layout_width="180dp"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/text_background"
-                    android:backgroundTint="@color/grisdeshabilitado"
-                    android:hint="Nro Porciones"
-                    android:inputType="text"
-                    android:paddingHorizontal="20dp"
-                    android:textColor="@color/gris"
-                    android:textColorHint="@color/gris"
-                    android:enabled="false"/>
-                <EditText
-                    android:id="@+id/tiempo"
-                    android:layout_width="180dp"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/text_background"
-                    android:backgroundTint="@color/grisdeshabilitado"
-                    android:hint="Tiempo (Min)"
-                    android:inputType="text"
-                    android:paddingHorizontal="20dp"
-                    android:textColor="@color/gris"
-                    android:textColorHint="@color/gris"
-                    android:enabled="false"/>
-            </LinearLayout>
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/dropdownLayout"
                 style="@style/NoLineDropdown"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:hint="Dificultad"
+                android:layout_weight="1"
                 app:boxBackgroundMode="filled"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                app:boxStrokeColor="@android:color/transparent"
-                android:hint="Dificultad">
+                app:boxStrokeColor="@android:color/transparent">
 
                 <AutoCompleteTextView
                     android:id="@+id/dropdown"
-                    android:paddingStart="15dp"
-                    android:layout_width="180dp"
-                    android:layout_height="50dp"
-                    app:boxStrokeWidth="0dp"
-                    app:boxStrokeWidthFocused="0dp"
-                    app:boxStrokeColor="@color/grisdeshabilitado"
+                    android:layout_width="match_parent" android:layout_height="50dp"
                     android:background="@drawable/bg_rounded_beige"
+                    android:backgroundTint="@color/beige"
                     android:inputType="none"
-                    android:enabled="false"
-
-                    android:backgroundTint="@color/grisdeshabilitado"/>
+                    android:paddingStart="15dp"
+                    app:boxStrokeColor="@color/beige"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp" />
             </com.google.android.material.textfield.TextInputLayout>
-            <TextView
-                android:id="@+id/IngredientesTitulo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Agrega los ingredientes"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:paddingTop="5dp"/>
-            <LinearLayout
-                android:id="@+id/layoutIngredientes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                 />
-            <TextView
-                android:id="@+id/btnAgregarIngrediente"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:drawableStartCompat="@drawable/add_outlined"
-                android:drawableTint="@color/grisdeshabilitado"
-                android:text="Ej: 250g de harina"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:padding="8dp"
-                android:clickable="true"
-                android:enabled="false"/>
 
-            <TextView
-                android:id="@+id/PasosTitulo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Agrega los pasos"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:paddingTop="5dp"/>
-            <LinearLayout
-                android:id="@+id/layoutPasos"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                />
-            <TextView
-                android:id="@+id/btnAgregarPasos"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:drawableStartCompat="@drawable/add_outlined"
-                android:drawableTint="@color/grisdeshabilitado"
-                android:text="Ej: Cortar cebollas en julianas"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:padding="8dp"
-                android:clickable="true"
-                android:enabled="false"/>
-            <Button
-                android:id="@+id/continuarButton"
-                android:layout_width="150dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="16dp"
-                android:text="@string/continuar"
-                android:textColor="#FFFFFF"
-                app:cornerRadius="25dp"
-                android:backgroundTint="@color/amarillo"
-                android:layout_gravity="center"
-                />
+    </LinearLayout>
 
+    <TextView
+        android:id="@+id/IngredientesTitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:paddingTop="5dp"
+        android:text="Agrega los ingredientes"
+        android:textColor="@color/black"
+        android:textSize="22sp"
+        android:textStyle="bold" />
 
-        </LinearLayout>
+    <LinearLayout
+        android:id="@+id/layoutIngredientes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
 
+    <TextView
+        android:id="@+id/btnAgregarIngrediente"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:padding="8dp"
+        android:text="Ej: 250g de harina"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:drawableStartCompat="@drawable/add_outlined"
+        app:drawableTint="@color/orange" />
 
-    </ScrollView>
+    <TextView
+        android:id="@+id/PasosTitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:paddingTop="5dp"
+        android:text="Agrega los pasos"
+        android:textColor="@color/black"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/layoutPasos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    <TextView
+        android:id="@+id/btnAgregarPasos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:padding="8dp"
+        android:text="Ej: Cortar cebollas en julianas"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:drawableStartCompat="@drawable/add_outlined"
+        app:drawableTint="@color/orange" />
+
+</LinearLayout>
+</ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

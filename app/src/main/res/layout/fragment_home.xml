@@ -65,4 +65,45 @@
             android:layout_height="wrap_content" />
     </androidx.core.widget.NestedScrollView>
 
+    <LinearLayout
+        android:id="@+id/noInternetLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="#DDFFFFFF" android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/add_outlined"
+            android:contentDescription="No internet"
+            app:tint="@color/gris" />
+
+        <TextView
+            android:id="@+id/noInternetMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No hay conexión a internet. Por favor, revisa tu conexión."
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:paddingHorizontal="24dp" />
+
+        <Button
+            android:id="@+id/btnRetryInternet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reintentar"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/orange"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
 </LinearLayout>

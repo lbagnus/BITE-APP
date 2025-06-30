@@ -13,13 +13,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.oasis.bite.presentation.viewmodel.UsersViewModel
+import com.oasis.bite.presentation.viewmodel.UsersViewModelFactory
 import kotlinx.coroutines.launch
 
 class ResetPasswordActivity : AppCompatActivity() {
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            val viewModel = ViewModelProvider(this).get(UsersViewModel::class.java);
+            val factory = UsersViewModelFactory(applicationContext)
+            val viewModel = ViewModelProvider(this, factory).get(UsersViewModel::class.java)
             setContentView(R.layout.activity_reset_password)
             supportActionBar?.hide()
 
@@ -42,10 +44,11 @@ class ResetPasswordActivity : AppCompatActivity() {
                     password2.error = "Las contraseñas no coinciden"
                 } else {
                     lifecycleScope.launch {
-                        val response = viewModel.updatePassword(email, pass1)
+                        val response = viewModel.resetPassword(email, pass1)
                         if (response.isSuccessful) {
                             Toast.makeText(this@ResetPasswordActivity, "Contraseña actualizada", Toast.LENGTH_SHORT).show()
-                            showCustomNoInternetDialog() // volver al login
+                            showCustomNoInternetDialog()
+                            // volver al login
                         } else {
                             Toast.makeText(this@ResetPasswordActivity, "Error al actualizar", Toast.LENGTH_SHORT).show()
                         }

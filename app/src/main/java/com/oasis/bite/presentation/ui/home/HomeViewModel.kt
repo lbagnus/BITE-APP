@@ -12,12 +12,11 @@ import com.oasis.bite.data.model.RecetaSearchParams
 import com.oasis.bite.data.repository.RecetaRepository
 import com.oasis.bite.domain.models.Category
 import com.oasis.bite.domain.models.Receta
+import com.oasis.bite.localdata.database.dao.RecetaDao
 import kotlinx.coroutines.launch
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel( private val repositoryReceta: RecetaRepository) : ViewModel() {
     private val apiService = RetrofitInstance.apiService
-
-    private val repositoryReceta = RecetaRepository(apiService)
 
     val recetasLiveData = MutableLiveData<List<Receta>?>()
 
@@ -82,6 +81,19 @@ class HomeViewModel : ViewModel() {
     }
 
 
+    fun syncRecetasLocales() {
+        viewModelScope.launch {
+            repositoryReceta.sincronizarPendientes()
+        }
+    }
+
+    fun cargarRecetasSearch(termino: String) {
+        viewModelScope.launch {
+            val recetas = repositoryReceta.getBySearch(termino) // desde tu API
+            recetasLiveData.postValue(recetas)
+        }
+    }
+    
 }
 
 
