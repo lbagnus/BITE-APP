@@ -23,8 +23,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-
+import com.oasis.bite.presentation.viewmodel.UsersViewModel
+import com.oasis.bite.presentation.viewmodel.UsersViewModelFactory
 
 
 class MainActivity : AppCompatActivity() {
@@ -37,6 +39,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
+        val factory = UsersViewModelFactory(applicationContext)
+        val userViewModel = ViewModelProvider(this, factory).get(UsersViewModel::class.java)
 
         val cerrarSesionView = findViewById<TextView>(R.id.opcionCerrarSesion)
         cerrarSesionView.setOnClickListener {
@@ -48,6 +52,9 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
+
+            // Hacer logout de base local.
+            userViewModel.logout()
         }
 
         // Obtener el DrawerLayout

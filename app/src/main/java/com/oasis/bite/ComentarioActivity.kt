@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.oasis.bite.databinding.ActivityComentarioBinding
 import com.oasis.bite.databinding.FragmentRecetaBinding
 import com.oasis.bite.presentation.viewmodel.RecetaViewModel
+import com.oasis.bite.presentation.viewmodel.RecetaViewModelFactory
 
 class ComentarioActivity : AppCompatActivity() {
     //tiene q traer la info de la receta, el id, el titulo y por quien esta hecha
@@ -25,7 +26,8 @@ class ComentarioActivity : AppCompatActivity() {
         Log.d("ComentarioActivity333", "ENTRÓ EN onCreate")
 
         _binding = ActivityComentarioBinding.inflate(layoutInflater)
-        viewModel = ViewModelProvider(this).get(RecetaViewModel::class.java)
+        val factory = RecetaViewModelFactory(applicationContext)
+        viewModel = ViewModelProvider(this, factory).get(RecetaViewModel::class.java)
         setContentView(binding.root)
         supportActionBar?.hide()
 
