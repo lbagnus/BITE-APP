@@ -37,12 +37,16 @@
     <fragment
         android:id="@+id/ResultadoBusqueda"
         android:name="com.oasis.bite.presentation.ui.ResultadoBusqueda"
-        android:label="busqueda"
+        android:label="Resultados de Búsqueda"
         tools:layout="@layout/resultados_busquedas">
-    <argument
-        android:name="nombre"
+        <argument
+            android:name="query"
+            app:argType="string"
+            app:nullable="true" /> <argument
+        android:name="categorianombre"
         app:argType="string"
-        android:defaultValue="0" />
-
+        app:nullable="true" />
     </fragment>
+
+
 </navigation>

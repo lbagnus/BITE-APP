@@ -86,6 +86,7 @@ interface ApiService {
     @PUT("users/newPassword")
     suspend fun resetearPassword(@Body params: PassResetRequest): Response<Unit>
 
-    @GET("recetas/home?term={termino}")
-    suspend fun getBusquedaBarra(@Path("termino") id: String): Response<List<RecetaSimpleResponse>>
+    @GET("recetas/home") // Remove {termino} from the path
+    suspend fun getBusquedaBarra(@Query("term") termino: String): Response<List<RecetaSimpleResponse>>
+
 }

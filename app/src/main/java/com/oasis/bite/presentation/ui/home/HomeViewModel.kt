@@ -80,6 +80,13 @@ class HomeViewModel( private val repositoryReceta: RecetaRepository) : ViewModel
             repositoryReceta.addFavorito(params)}
     }
 
+    fun cargarRecetasSearch(termino: String) {
+        viewModelScope.launch {
+            val recetas = repositoryReceta.getBySearch(termino) // desde tu API
+            recetasLiveData.postValue(recetas)
+        }
+    }
+
 
 }
 

@@ -44,6 +44,18 @@ class RecetaRepository(
         }
     }
 
+    suspend fun getBySearch(termino: String): List<Receta> ?{
+        val response = apiService.getBusquedaBarra(termino)
+        return if (response.isSuccessful && response.body() != null) {
+            Log.d("RecetasRepository", "Receta recibida correctamente")
+            return response.body()!!.map { it.toReceta() }
+        } else {
+            Log.e("RecetasRepository", "Error al obtener receta: ${response.code()} - ${response.message()}")
+            null
+        }
+    }
+
+
 
     suspend fun getRecetasHome(): List<Receta> ?{
         val response = apiService.getRecetasHome()
