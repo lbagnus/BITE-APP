@@ -16,6 +16,7 @@ data class LocalReceta(
     val porciones: String,
     val dificultad: String, // guardamos como String por simplicidad
     val imagen: String?,
+    val imagenes: String,
     val username: String,
     val categoria: String,
 

@@ -1,6 +1,9 @@
 package com.oasis.bite
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -44,35 +47,53 @@ class AgregarTituloRecetaActivty: AppCompatActivity() {
                 Toast.makeText(this, "Ingresá un título", Toast.LENGTH_SHORT).show()
                 return@setOnFocusChangeListener
             }
+
+            if (!isInternetAvailable(this)) {
+                // 👉 Sin internet, ir directo a la siguiente actividad
+                val intent = Intent(this, AgregarRecetaActivity::class.java).apply {
+                    putExtra("tituloReceta", titulo)
+                    putExtra("usuarioEmail", usuarioEmail)
+                    putExtra("isEditando", false)
+                    putExtra("reemplaza", false)
+                    putExtra("idReceta", "0")
+                }
+                startActivity(intent)
+                finish()
+                return@setOnFocusChangeListener
+            }
+
+            // ✅ Con internet, verificar si la receta ya existe
             viewModel.verificarSiRecetaExiste(
-                inputTitulo.text.toString(),
+                titulo,
                 usuarioUserName.toString()
             ) { idReceta ->
                 if (idReceta != 0) {
-                    showCustomNoInternetDialog{ quiereEditar ->
+                    showCustomNoInternetDialog { quiereEditar ->
                         val intent = Intent(this, AgregarRecetaActivity::class.java).apply {
                             putExtra("tituloReceta", titulo)
                             putExtra("usuarioEmail", usuarioEmail)
                             putExtra("isEditando", quiereEditar)
                             putExtra("idReceta", idReceta.toString())
-                            putExtra("reemplaza", true)// true o false según decisión
+                            putExtra("reemplaza", true)
                         }
                         startActivity(intent)
                         finish()
                     }
                 } else {
-                    val intent = Intent(this, AgregarRecetaActivity::class.java)
-                    intent.putExtra("tituloReceta", titulo)
-                    intent.putExtra("usuarioEmail", usuarioEmail)
-                    intent.putExtra("isEditando", false)
-                    intent.putExtra("reemplaza", false)
-                    intent.putExtra("idReceta", idReceta.toString())
+                    val intent = Intent(this, AgregarRecetaActivity::class.java).apply {
+                        putExtra("tituloReceta", titulo)
+                        putExtra("usuarioEmail", usuarioEmail)
+                        putExtra("isEditando", false)
+                        putExtra("reemplaza", false)
+                        putExtra("idReceta", idReceta.toString())
+                    }
                     startActivity(intent)
                     finish()
                 }
             }
         }
-            binding.btnVolver.setOnClickListener {
+
+        binding.btnVolver.setOnClickListener {
                 finish()
             }
         }
@@ -100,6 +121,12 @@ class AgregarTituloRecetaActivty: AppCompatActivity() {
         }
 
         dialog.show()
+    }
+
+    private fun isInternetAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnected
     }
 }
 

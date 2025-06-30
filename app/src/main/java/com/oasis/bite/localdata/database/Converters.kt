@@ -3,6 +3,7 @@ package com.oasis.bite.localdata.database
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.oasis.bite.data.model.PasoRecetaRequest
 import com.oasis.bite.domain.models.Ingrediente
 import com.oasis.bite.domain.models.PasoReceta
 
@@ -22,13 +23,13 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromPasos(pasos: List<PasoReceta>): String {
+    fun fromPasos(pasos: List<PasoRecetaRequest>): String {
         return gson.toJson(pasos)
     }
 
     @TypeConverter
     fun toPasos(data: String): List<PasoReceta> {
-        val type = object : TypeToken<List<PasoReceta>>() {}.type
+        val type = object : TypeToken<List<PasoRecetaRequest>>() {}.type
         return gson.fromJson(data, type)
     }
 }

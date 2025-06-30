@@ -80,6 +80,11 @@ class HomeViewModel( private val repositoryReceta: RecetaRepository) : ViewModel
             repositoryReceta.addFavorito(params)}
     }
 
+    fun syncRecetasLocales() {
+        viewModelScope.launch {
+            repositoryReceta.sincronizarPendientes()
+        }
+    }
 
 }
 

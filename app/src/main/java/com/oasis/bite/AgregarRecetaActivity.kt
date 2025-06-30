@@ -1,7 +1,10 @@
 package com.oasis.bite
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -30,6 +33,8 @@ import com.oasis.bite.domain.models.PasoReceta
 import com.oasis.bite.presentation.adapters.MultimediaAdapter
 import com.oasis.bite.presentation.viewmodel.RecetaViewModel
 import com.oasis.bite.presentation.viewmodel.RecetaViewModelFactory
+import java.io.File
+import java.io.FileOutputStream
 
 class AgregarRecetaActivity : AppCompatActivity() {
     private var _binding: ActivityAgregarRecetaBinding? = null
@@ -47,6 +52,7 @@ class AgregarRecetaActivity : AppCompatActivity() {
 
     // Un único ActivityResultLauncher para todas las selecciones de imagen (receta y pasos)
     private lateinit var globalPickMediaLauncher: ActivityResultLauncher<Intent>
+    var isInternetConnected = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +60,7 @@ class AgregarRecetaActivity : AppCompatActivity() {
         val factory = RecetaViewModelFactory(applicationContext)
         val viewModel = ViewModelProvider(this, factory).get(RecetaViewModel::class.java)
         setContentView(binding.root)
+        isInternetConnected = isInternetAvailable(this)
         supportActionBar?.hide()
 
         binding.btnVolver.setOnClickListener {
@@ -72,47 +79,79 @@ class AgregarRecetaActivity : AppCompatActivity() {
                             setImageURI(uri)
                             visibility = View.VISIBLE
                         }
-                        viewModel.subirImagen(this, uri) { url ->
-                            if (url != null) {
-                                recetaImagenPrincipalUrl = url
-                                if (!recetaImagenesUrlsList.contains(url)) { // Si quieres permitir múltiples imágenes para la receta en el array
-                                    recetaImagenesUrlsList.add(url)
+                        if(isInternetConnected){
+                            viewModel.subirImagen(this, uri) { url ->
+                                if (url != null) {
+                                    recetaImagenPrincipalUrl = url
+                                    if (!recetaImagenesUrlsList.contains(url)) { // Si quieres permitir múltiples imágenes para la receta en el array
+                                        recetaImagenesUrlsList.add(url)
+                                    }
+                                    Log.d("UPLOAD_RECETA", "Imagen principal subida: $url")
+                                } else {
+                                    Toast.makeText(this, "Error al subir la imagen principal", Toast.LENGTH_SHORT).show()
                                 }
-                                Log.d("UPLOAD_RECETA", "Imagen principal subida: $url")
-                            } else {
-                                Toast.makeText(this, "Error al subir la imagen principal", Toast.LENGTH_SHORT).show()
                             }
+                        } else {
+                            val localPath = guardarImagenLocalmente(this, uri, "receta_${System.currentTimeMillis()}")
+                            recetaImagenPrincipalUrl = localPath
+                            if (!recetaImagenesUrlsList.contains(localPath)) {
+                                recetaImagenesUrlsList.add(localPath)
+                            }
+                            Log.d("UPLOAD_OFFLINE", "Imagen principal guardada localmente: $localPath")
+
                         }
                     } else { // Es para un paso
                         currentImageViewForImage.apply { // Usamos la referencia guardada del ImageView
                             setImageURI(uri)
                             visibility = View.VISIBLE
                         }
-                        viewModel.subirImagen(this, uri) { url ->
-                            if (url != null) {
-                                val pasoToUpdateIndex = listaPasos.indexOfFirst {
-                                    it.numeroDePaso == currentPasoIndexForImage.toString()
-                                }
-                                if (pasoToUpdateIndex != -1) {
-                                    val currentPaso = listaPasos[pasoToUpdateIndex]
-                                    // Asigna la URL al campo singular 'archivoFoto'
-                                    val updatedPasoWithArchivoFoto = currentPaso.copy(archivoFoto = url)
-
-                                    // Agrega la URL a la lista 'imagenesPasos' (List<String>)
-                                    val updatedImagenesPasosUrls = (currentPaso.imagenesPasos?.toMutableList() ?: mutableListOf()).apply {
-                                        if (!contains(url)) {
-                                            add(url)
-                                        }
+                        if(isInternetConnected){
+                            viewModel.subirImagen(this, uri) { url ->
+                                if (url != null) {
+                                    val pasoToUpdateIndex = listaPasos.indexOfFirst {
+                                        it.numeroDePaso == currentPasoIndexForImage.toString()
                                     }
-                                    val finalUpdatedPaso = updatedPasoWithArchivoFoto.copy(imagenesPasos = updatedImagenesPasosUrls)
+                                    if (pasoToUpdateIndex != -1) {
+                                        val currentPaso = listaPasos[pasoToUpdateIndex]
+                                        // Asigna la URL al campo singular 'archivoFoto'
+                                        val updatedPasoWithArchivoFoto = currentPaso.copy(archivoFoto = url)
 
-                                    listaPasos[pasoToUpdateIndex] = finalUpdatedPaso
-                                    Log.d("UPLOAD_PASO", "Imagen para el paso ${currentPasoIndexForImage} actualizada: $url")
+                                        // Agrega la URL a la lista 'imagenesPasos' (List<String>)
+                                        val updatedImagenesPasosUrls = (currentPaso.imagenesPasos?.toMutableList() ?: mutableListOf()).apply {
+                                            if (!contains(url)) {
+                                                add(url)
+                                            }
+                                        }
+                                        val finalUpdatedPaso = updatedPasoWithArchivoFoto.copy(imagenesPasos = updatedImagenesPasosUrls)
+
+                                        listaPasos[pasoToUpdateIndex] = finalUpdatedPaso
+                                        Log.d("UPLOAD_PASO", "Imagen para el paso ${currentPasoIndexForImage} actualizada: $url")
+                                    }
+                                }  else {
+                                    Toast.makeText(this, "Error al subir la imagen para el paso", Toast.LENGTH_SHORT).show()
                                 }
-                            }  else {
-                                Toast.makeText(this, "Error al subir la imagen para el paso", Toast.LENGTH_SHORT).show()
+                                currentPasoIndexForImage = -1
+                            }
+                        } else {
+                            val localPath = guardarImagenLocalmente(this, uri, "paso_${currentPasoIndexForImage}_${System.currentTimeMillis()}")
+                            val pasoToUpdateIndex = listaPasos.indexOfFirst {
+                                it.numeroDePaso == currentPasoIndexForImage.toString()
+                            }
+                            if (pasoToUpdateIndex != -1) {
+                                val currentPaso = listaPasos[pasoToUpdateIndex]
+                                val updatedPasoWithArchivoFoto = currentPaso.copy(archivoFoto = localPath)
+
+                                val updatedImagenesPasosUrls = (currentPaso.imagenesPasos?.toMutableList() ?: mutableListOf()).apply {
+                                    if (!contains(localPath)) {
+                                        add(localPath)
+                                    }
+                                }
+                                val finalUpdatedPaso = updatedPasoWithArchivoFoto.copy(imagenesPasos = updatedImagenesPasosUrls)
+                                listaPasos[pasoToUpdateIndex] = finalUpdatedPaso
+                                Log.d("UPLOAD_OFFLINE", "Imagen de paso $currentPasoIndexForImage guardada localmente: $localPath")
                             }
                             currentPasoIndexForImage = -1
+
                         }
                     }
                 }
@@ -325,8 +364,14 @@ class AgregarRecetaActivity : AppCompatActivity() {
                         Toast.makeText(this, "Error al eliminar la receta: ID no encontrado.", Toast.LENGTH_SHORT).show()
                     }
                 }
-                viewModel.agregarReceta(titulo, descripcion, tiempo, porciones, dificultad, imagenPrincipalReceta, imagenesRecetaParaEnvio,
-                    usuarioEmail.toString(), listaIngredientes, pasosValidos, categoria)
+                if (isInternetConnected){
+                    viewModel.agregarReceta(titulo, descripcion, tiempo, porciones, dificultad, imagenPrincipalReceta, imagenesRecetaParaEnvio,
+                        usuarioEmail.toString(), listaIngredientes, pasosValidos, categoria)
+                } else {
+                    viewModel.agregarRecetaOffline(titulo, descripcion, tiempo, porciones, dificultad, imagenPrincipalReceta, imagenesRecetaParaEnvio,
+                        usuarioEmail.toString(), listaIngredientes, pasosValidos, categoria)
+                }
+
                 finish()
             }
         }
@@ -336,6 +381,28 @@ class AgregarRecetaActivity : AppCompatActivity() {
         super.onDestroy()
         _binding = null
     }
+
+    // Función para verificar la conexión a Internet
+    private fun isInternetAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnected
+    }
+
+    private fun guardarImagenLocalmente(context: Context, uri: Uri, nombreArchivo: String): String {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        val archivo = File(context.filesDir, "$nombreArchivo.jpg")
+        val outputStream = FileOutputStream(archivo)
+
+        inputStream?.use { input ->
+            outputStream.use { output ->
+                input.copyTo(output)
+            }
+        }
+
+        return archivo.absolutePath // Devuelve la ruta local que luego podrás usar
+    }
+
 }
 
 
