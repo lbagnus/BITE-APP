@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Agrega el título de tu nueva receta"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/black"
             android:paddingStart="25dp"
@@ -55,7 +55,7 @@
             />
         <Button
             android:id="@+id/continuarButton"
-            android:layout_width="150dp"
+            android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_marginTop="16dp"
             android:text="@string/continuar"

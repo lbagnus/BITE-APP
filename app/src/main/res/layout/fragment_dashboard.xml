@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
+        android:layout_marginTop="10dp"
         >
         <!-- 2. Título comentario-->
         <TextView
@@ -22,6 +23,7 @@
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@color/black"
+            android:layout_marginStart="16dp"
             />
         <View
             android:layout_width="0dp"
@@ -37,13 +39,17 @@
             android:layout_marginEnd="15dp"/>
     </LinearLayout>
     <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="10dp"
         android:id="@+id/recyclerRecetas"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:overScrollMode="never"
         android:layout_marginBottom="24dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         android:layout_weight="1"
-        app:layout_constraintTop_toBottomOf="@id/renglon1"/>
+        app:layout_constraintTop_toBottomOf="@id/renglon1"
+        tools:listitem="@layout/vista_recetas"/>
 
     <LinearLayout
         android:id="@+id/noInternetLayout"
@@ -62,7 +68,7 @@
         <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/add_outlined"
+            android:src="@drawable/nowifi"
             android:contentDescription="No internet"
             app:tint="@color/gris" />
 

@@ -17,194 +17,163 @@
 
     <ImageButton
         android:id="@+id/btnVolver"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@android:color/transparent"
+        android:layout_width="48dp" android:layout_height="48dp" android:background="@android:color/transparent"
         android:contentDescription="Back"
         android:src="@drawable/baseline_arrow_back_24"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginStart="8dp" android:layout_marginTop="8dp" android:padding="4dp"
         />
     <ImageButton
         android:id="@+id/btnFavorito"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@android:color/transparent"
-        android:contentDescription="Back"
+        android:layout_width="48dp" android:layout_height="48dp" android:background="@android:color/transparent"
+        android:contentDescription="Favorito"
         android:src="@drawable/favorite_border"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginRight="15dp"
-        android:layout_marginTop="10dp"
-        app:tint="@color/amarillo"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="8dp" android:layout_marginTop="8dp" app:tint="@color/amarillo"
+        android:padding="4dp"
         />
     <ImageButton
         android:id="@+id/btnFavoritoApretado"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@android:color/transparent"
-        android:contentDescription="Back"
+        android:layout_width="48dp" android:layout_height="48dp" android:background="@android:color/transparent"
+        android:contentDescription="Favorito"
         android:visibility="gone"
         android:src="@drawable/favorite_filled"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginRight="15dp"
-        android:layout_marginTop="10dp"
-        app:tint="@color/amarillo"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="8dp" android:layout_marginTop="8dp" app:tint="@color/amarillo"
+        android:padding="4dp"
         />
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/mainContentScrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="0dp"
         app:layout_constraintTop_toBottomOf="@id/btnVolver"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:paddingStart="20dp">
-        <!-- encasilla todu el scroll -->
+        android:paddingHorizontal="16dp" android:fillViewport="true">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            >
-            <!-- encasilla la seccion del titulo con la info rapida -->
+            android:paddingBottom="16dp"> <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:baselineAligned="false" > <LinearLayout
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp">
+            <TextView
+            android:id="@+id/recetaTitulo"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Pasta a la Carbonara"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
+
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="0dp"> <TextView
+                android:id="@+id/recetaAutor"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <!-- encasilla el titulo con el autor y demas -->
-                <LinearLayout
-                    android:layout_width="300dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <!-- 2. Título -->
-                    <TextView
-                        android:id="@+id/recetaTitulo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Pasta a la Carbonara"
-                        android:textSize="28sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/black"/>
+                android:text="Por Julia Roberts"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
 
-                    <!-- encasilla el autor con dificultad -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingStart="10dp">
-
-                        <!-- Autor -->
-
-                        <!-- Guion -->
-                        <TextView
-                            android:id="@+id/recetaAutor"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Por Julia Roberts"
-                            android:textColor="@color/black"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:id="@+id/guion"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text=" - "
-                            android:textColor="@color/black"
-                            android:textSize="17sp" />
-
-                        <!-- dificultad -->
-                        <TextView
-                            android:id="@+id/dificultad"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-
-                            android:text="Fácil"
-                            android:textColor="@color/black"
-                            android:textSize="18sp"
-                            android:paddingStart="5dp"
-                            />
-                    </LinearLayout>
-                </LinearLayout>
-                <!-- encasilla la info rapida -->
-                <LinearLayout
+                <TextView
+                    android:id="@+id/guion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    >
+                    android:text=" - "
+                    android:textColor="@color/black"
+                    android:textSize="17sp" />
 
-                    <!-- puntuacion -->
-                    <TextView
-                        android:id="@+id/puntuacion"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="4.5"
-                        android:drawablePadding="4dp"
-                        android:textColor="@color/black"
-                        android:textSize="14sp"
-                        android:gravity="center_vertical"
-                        app:drawableStartCompat="@drawable/star_outline" />
-                    <!-- porciones -->
-                    <TextView
-                        android:id="@+id/porciones"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="4"
-                        android:drawablePadding="4dp"
-                        android:textColor="@color/black"
-                        android:textSize="14sp"
-                        android:gravity="center_vertical"
-                        app:drawableStartCompat="@drawable/person_outline" />
-                    <!-- tiempo -->
-                    <TextView
-                        android:id="@+id/tiempo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="25 min"
-                        android:drawablePadding="4dp"
-                        android:textColor="@color/black"
-                        android:textSize="14sp"
-                        android:gravity="center_vertical"
-                        app:drawableStartCompat="@drawable/access_time" />
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/dificultad"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fácil"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    />
             </LinearLayout>
-            <!-- 4. Descripción -->
+        </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="end"
+                >
+                <TextView
+                    android:id="@+id/puntuacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4.5"
+                    android:drawablePadding="4dp"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:gravity="center_vertical"
+                    app:drawableStartCompat="@drawable/star_outline" />
+                <TextView
+                    android:id="@+id/porciones"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4"
+                    android:drawablePadding="4dp"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:gravity="center_vertical"
+                    app:drawableStartCompat="@drawable/person_outline" />
+                <TextView
+                    android:id="@+id/tiempo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="25 min"
+                    android:drawablePadding="4dp"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:gravity="center_vertical"
+                    app:drawableStartCompat="@drawable/access_time" />
+            </LinearLayout>
+        </LinearLayout>
             <TextView
                 android:id="@+id/recetaDescripcion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="En España, cuando la gente piensa en la carbonara, la elabora con nata, beicon e incluso con champiñones, cuando la salsa carbonara en su versión más tradicional, es una salsa sencilla y humilde que se elabora con tres ingredientes básicos: huevos, queso y panceta "
+                android:layout_marginTop="16dp" android:text="En España, cuando la gente piensa en la carbonara, la elabora con nata, beicon e incluso con champiñones, cuando la salsa carbonara en su versión más tradicional, es una salsa sencilla y humilde que se elabora con tres ingredientes básicos: huevos, queso y panceta "
                 android:textColor="@color/black"
-                android:layout_marginEnd="10dp" />
-
-            <!-- scroll imagen -->
-            <androidx.recyclerview.widget.RecyclerView
+                android:layout_marginEnd="0dp" /> <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerMedia"
                 android:layout_width="match_parent"
-                android:layout_height="180dp"
-                android:layout_marginTop="16dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                android:layout_height="wrap_content" android:minHeight="180dp" android:layout_marginTop="16dp"
                 android:clipToPadding="false"
-                android:scrollbars="horizontal" />
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:scrollbars="horizontal"
+                android:paddingHorizontal="4dp"
+                />
 
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="24dp"
+                android:paddingEnd="16dp"
                 >
-                <!-- 2. Título comentario-->
                 <TextView
                     android:id="@+id/comentariosTitulo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
                     android:text="Comentarios"
                     android:textSize="24sp"
                     android:textStyle="bold"
@@ -213,21 +182,21 @@
                 <View
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_weight="1" />
-                <TextView
-                    android:id="@+id/botonAgregarResenia"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Agregar Reseña"
-                    android:textColor="@color/orange"
-                    android:clickable="true"
-                    android:layout_marginEnd="15dp"/>
-            </LinearLayout>
-            <LinearLayout
+                    android:layout_weight="1" /> <TextView
+                android:id="@+id/botonAgregarResenia"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Agregar Reseña"
+                android:textColor="@color/orange"
+                android:clickable="true"
+                android:layout_marginEnd="0dp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="10dp">
+                android:layout_marginTop="4dp"
+                >
                 <TextView
                     android:id="@+id/puntuacion2"
                     android:layout_width="wrap_content"
@@ -235,48 +204,39 @@
                     android:text="4.5"
                     android:drawablePadding="4dp"
                     android:textColor="@color/black"
-                    android:textSize="16dp"
-                    android:gravity="center_vertical"
+                    android:textSize="16sp" android:gravity="center_vertical"
                     app:drawableStartCompat="@drawable/star_outline" />
                 <TextView
                     android:id="@+id/parentesis"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
                     android:text="("
                     android:textColor="@color/black"
-                    android:textSize="16dp"
-                    android:paddingStart="5dp"
+                    android:textSize="16sp" android:paddingStart="5dp"
                     />
                 <TextView
                     android:id="@+id/reviews"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
                     android:text="100"
                     android:textColor="@color/black"
-                    android:textSize="16dp"
-                    />
+                    android:textSize="16sp" />
                 <TextView
                     android:id="@+id/reviewsWord"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
                     android:text=" Reviews)"
                     android:textColor="@color/black"
-                    android:textSize="16dp"
-                    />
+                    android:textSize="16sp" />
             </LinearLayout>
-            <!-- scroll reseñas -->
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerResenia"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:clipToPadding="false"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 android:scrollbars="horizontal" />
             <TextView
                 android:id="@+id/tvSinComentarios"
@@ -294,14 +254,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="24dp"
+                android:paddingEnd="16dp"
                 >
-                <!-- 2. Título comentario-->
                 <TextView
                     android:id="@+id/IngredientesTitulo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
                     android:text="Ingredientes"
                     android:textSize="24sp"
                     android:textStyle="bold"
@@ -312,12 +272,10 @@
                     android:layout_height="0dp"
                     android:layout_weight="1" />
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:focusable="true"
-                    android:src="@drawable/calculadora"
-                    android:clickable="true"
-                    android:layout_marginEnd="15dp"/>
+                android:layout_width="30dp" android:layout_height="30dp" android:focusable="true"
+                android:src="@drawable/calculadora"
+                android:clickable="true"
+                android:layout_marginEnd="0dp" />
             </LinearLayout>
             <TextView
                 android:id="@+id/personas2"
@@ -326,11 +284,9 @@
                 android:text="Para 4 personas"
                 android:drawablePadding="4dp"
                 android:textColor="@color/black"
-                android:textSize="16dp"
-                android:gravity="center_vertical"
+                android:textSize="16sp" android:gravity="center_vertical"
                 app:drawableStartCompat="@drawable/person_outline" />
 
-            <!-- 5. Ingredientes -->
             <LinearLayout
                 android:id="@+id/layoutIngredientes"
                 android:layout_width="match_parent"
@@ -339,18 +295,15 @@
                 android:padding="8dp" />
 
 
-            <!-- 6. titulo Pasos -->
             <TextView
                 android:id="@+id/pasosTitulo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Pasos"
+                android:layout_marginTop="24dp" android:text="Pasos"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="@color/black"
                 />
-            <!--  pasos -->
             <LinearLayout
                 android:id="@+id/layoutPasos"
                 android:layout_width="match_parent"

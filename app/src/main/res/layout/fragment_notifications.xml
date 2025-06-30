@@ -8,6 +8,7 @@
     android:orientation="vertical">
 
     <TextView
+        android:layout_marginTop="10dp"
         android:id="@+id/fraseDestacada"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -16,7 +17,8 @@
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerRecetas"
@@ -24,7 +26,10 @@
         android:layout_height="wrap_content"
         android:overScrollMode="never"
         android:layout_marginBottom="24dp"
-        android:layout_weight="1"/>
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_weight="1"
+        tools:listitem="@layout/vista_recetas"/>
 
     <LinearLayout
         android:id="@+id/noInternetLayout"
@@ -41,7 +46,7 @@
         <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/add_outlined"
+            android:src="@drawable/nowifi"
             android:contentDescription="No internet"
             app:tint="@color/gris" />
 

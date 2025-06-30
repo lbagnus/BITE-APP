@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.text.Html
 import android.util.Log
 import android.view.View
 import android.widget.TextView
@@ -16,15 +15,10 @@ import androidx.core.view.GravityCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
 import com.oasis.bite.databinding.ActivityMainBinding
 import com.oasis.bite.databinding.FiltroPopupBinding
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import com.oasis.bite.presentation.viewmodel.UsersViewModel
 import com.oasis.bite.presentation.viewmodel.UsersViewModelFactory
 
@@ -96,6 +90,10 @@ class MainActivity : AppCompatActivity() {
                     findViewById<View>(R.id.toolbar).visibility = View.GONE
                     findViewById<View>(R.id.searchbar).visibility = View.GONE
                     findViewById<View>(R.id.btnAbrirPopup).visibility = View.GONE
+                } R.id.navigation_notifications, R.id.navigation_dashboard-> {
+                // Ocultamos frase y searchbar
+                findViewById<View>(R.id.searchbar).visibility = View.GONE
+                findViewById<View>(R.id.btnAbrirPopup).visibility = View.GONE
                 }
                 else -> {
                     // Los mostramos nuevamente en el resto de pantallas

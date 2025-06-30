@@ -11,7 +11,8 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
-        android:paddingHorizontal="16dp" android:paddingTop="16dp"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,33 +42,31 @@
                 android:layout_marginBottom="24dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 android:orientation="horizontal"
-                tools:listitem="@layout/item_categoria" />
+                tools:listitem="@layout/item_categoria" /> <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/fraseDestacada2"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:text="¡Últimas recetas!"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_weight="1"/>
 
-                <TextView
-                    android:id="@+id/fraseDestacada2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="¡Últimas recetas!"
-                    android:textColor="@color/black"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_weight="1"/>
-
-                <TextView
-                    android:id="@+id/verTodasButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ver todas"
-                    android:textColor="@color/orange"
-                    android:textSize="15sp"
-                    android:layout_gravity="end" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/verTodasButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ver todas"
+                android:textColor="@color/orange"
+                android:textSize="15sp"
+                android:layout_gravity="end" />
+        </LinearLayout>
 
             <include
                 android:id="@+id/includeRecetas"
@@ -92,11 +91,11 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
-            android:layout_width="0dp" android:layout_height="0dp"
-            android:src="@drawable/nowifi"
+            android:id="@+id/noInternetImage"
+            android:layout_width="match_parent" android:layout_height="0dp"          android:src="@drawable/nowifi"
             android:contentDescription="No internet"
             app:tint="@color/gris"
-            app:layout_constraintDimensionRatio="1:1" app:layout_constraintWidth_percent="0.25" android:layout_marginBottom="16dp" />
+            android:layout_weight="1"            android:adjustViewBounds="true"      android:scaleType="fitCenter"        android:layout_marginBottom="16dp" />
 
         <TextView
             android:id="@+id/noInternetMessage"
