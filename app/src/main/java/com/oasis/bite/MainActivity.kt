@@ -87,14 +87,12 @@ class MainActivity : AppCompatActivity() {
                 R.id.recetaFragment -> {
                     // Ocultamos barra, frase y searchbar
                     findViewById<View>(R.id.toolbar).visibility = View.GONE
-                    findViewById<View>(R.id.fraseDestacada1).visibility = View.GONE
                     findViewById<View>(R.id.searchbar).visibility = View.GONE
                     findViewById<View>(R.id.btnAbrirPopup).visibility = View.GONE
                 }
                 else -> {
                     // Los mostramos nuevamente en el resto de pantallas
                     findViewById<View>(R.id.toolbar).visibility = View.VISIBLE
-                    findViewById<View>(R.id.fraseDestacada1).visibility = View.VISIBLE
                     findViewById<View>(R.id.searchbar).visibility = View.VISIBLE
                     findViewById<View>(R.id.btnAbrirPopup).visibility = View.VISIBLE
                 }
@@ -124,8 +122,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val textoHtml = "Hoy es un <font color='#FFD700'>hermoso día</font>, para una <font color='#FFD700'>deliciosa comida</font>"
-        binding.fraseDestacada1.text = Html.fromHtml(textoHtml, Html.FROM_HTML_MODE_LEGACY)
 
         binding.btnAbrirPopup.setOnClickListener {
             // Inflamos el binding del layout del popup
