@@ -44,8 +44,6 @@ class LoginActivity : AppCompatActivity() {
         // Observador para verificar si hay sesión local
         viewModel.localSessionExists.observe(this) { localSessionExists ->
             if (localSessionExists) {
-                // Si hay sesión local, intentar ir directamente al MainActivity
-                Toast.makeText(this, "Sesión local encontrada. Redirigiendo...", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, MainActivity::class.java)
                 viewModel.usuarioLogueado.value?.let { user ->
                     intent.putExtra("username", user.username)

@@ -97,6 +97,7 @@ class AgregarTituloRecetaActivty: AppCompatActivity() {
                 finish()
             }
         }
+    
     private fun showCustomNoInternetDialog(onDecision: (Boolean) -> Unit) {
         val inflater = LayoutInflater.from(this)
         val customView = inflater.inflate(R.layout.popup_receta_existe, null)
@@ -129,6 +130,7 @@ class AgregarTituloRecetaActivty: AppCompatActivity() {
         return networkInfo != null && networkInfo.isConnected
     }
 }
+
 
 
 
