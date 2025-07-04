@@ -163,7 +163,11 @@ class AgregarRecetaActivity : AppCompatActivity() {
         val isEditando = intent.getBooleanExtra("isEditando", false)
         if (isEditando) {
             val receta = viewModel.cargarReceta(intent.getStringExtra("recetaId").toString())
-            // ... lógica de edición ...
+            val botonContinuar = binding.continuarButton
+            val usuarioEmail = intent.getStringExtra("usuarioEmail")
+            val inputTitulo = binding.titulo
+            binding.titulo.setText(intent.getStringExtra("tituloReceta"))
+            binding.titulo.isEnabled = false
         } else {
             val botonContinuar = binding.continuarButton
             val usuarioEmail = intent.getStringExtra("usuarioEmail")

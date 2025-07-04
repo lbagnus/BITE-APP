@@ -30,6 +30,7 @@ class ResultadoBusqueda : Fragment() {
     private lateinit var recetaAdapter: RecetaAdapter
 
     private var idsFavoritos: List<Int> = emptyList()
+    val contextForAdapter = requireContext()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,7 +51,7 @@ class ResultadoBusqueda : Fragment() {
                             }
                             findNavController().navigate(R.id.recetaFragment, bundle)
                         },
-                        { receta -> idsFavoritos?.contains(receta.id) == true }, usuario, homeViewModel, false // esta es la validación dinámica
+                        { receta -> idsFavoritos?.contains(receta.id) == true }, usuario, homeViewModel, false ,contextForAdapter// esta es la validación dinámica
                     )
         val recyclerRecetas = binding.recyclerRecetas
         recyclerRecetas.layoutManager =

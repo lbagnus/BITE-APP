@@ -40,6 +40,7 @@ class HomeFragment : Fragment() {
     private lateinit var noInternetLayout: LinearLayout
     private lateinit var noInternetMessage: TextView
     private lateinit var btnRetryInternet: Button
+    val contextForAdapter = requireContext()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,7 +70,7 @@ class HomeFragment : Fragment() {
                 }
                 findNavController().navigate(R.id.recetaFragment, bundle)
             },
-            { receta -> idsFavoritos.contains(receta.id)}, usuario, homeViewModel, false
+            { receta -> idsFavoritos.contains(receta.id)}, usuario, homeViewModel, false, contextForAdapter
         )
 
         // 3. Configurar recycler de recetas

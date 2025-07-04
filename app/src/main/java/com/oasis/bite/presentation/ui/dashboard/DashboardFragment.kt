@@ -38,6 +38,7 @@ class DashboardFragment : Fragment() {
     private lateinit var noInternetLayoutDashboard: LinearLayout
     private lateinit var noInternetMessageDashboard: TextView
     private lateinit var btnRetryInternetDashboard: Button
+    val contextForAdapter = requireContext()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,7 +65,7 @@ class DashboardFragment : Fragment() {
                 }
                 findNavController().navigate(R.id.recetaFragment, bundle)
             },
-            { receta -> idsFavoritos.contains(receta.id) }, usuario, homeViewModel, true
+            { receta -> idsFavoritos.contains(receta.id) }, usuario, homeViewModel, true, contextForAdapter
         )
 
         // Prueba de sincronizar las recetas

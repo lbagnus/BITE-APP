@@ -89,4 +89,9 @@ interface ApiService {
     @GET("recetas/home") // Remove {termino} from the path
     suspend fun getBusquedaBarra(@Query("term") termino: String): Response<List<RecetaSimpleResponse>>
 
+    @PUT("receta/{id}")
+    suspend fun editarReceta(@Body params: RecetaRequest, @Path("id") id: String): Response<Unit>
+
+    
+
 }

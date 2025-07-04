@@ -1,16 +1,21 @@
 package com.oasis.bite.presentation.adapters
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat.startActivity
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
+import com.oasis.bite.AgregarRecetaActivity
+import com.oasis.bite.ForgotPasswordActivity
 import com.oasis.bite.R
+import com.oasis.bite.VerifyCodeActivity
 import com.oasis.bite.domain.models.Receta
 import com.oasis.bite.domain.models.RecetaStatus
 import com.oasis.bite.domain.models.User
@@ -23,7 +28,8 @@ class RecetaAdapter(
     private var esFavorito: (Receta) -> Boolean,
     private val usuario : User,
     private val homeViewModel: HomeViewModel,
-    private val esPropio: Boolean
+    private val esPropio: Boolean,
+    private val context: Context
 
     ) :
     RecyclerView.Adapter<RecetaAdapter.RecetaViewHolder>() {
@@ -61,6 +67,16 @@ class RecetaAdapter(
                 if(receta.estado == RecetaStatus.APROBADA){
                 holder.favorito.setImageResource(R.drawable.delete_outlined)
                 holder.editar.visibility = View.VISIBLE
+                    holder.favorito.setOnClickListener {
+                        val intent = Intent(context, AgregarRecetaActivity::class.java).apply {
+                            putExtra("tituloReceta", receta.nombre)
+                            putExtra("usuarioEmail", usuario.email)
+                            putExtra("isEditando", true)
+                            putExtra("reemplaza", false)
+                            putExtra("idReceta", receta.id)
+                        }
+                        context.startActivity(intent)
+                    }
                 }else{
                     holder.favorito.setImageResource(R.drawable.eye)
                     holder.ranking.text = "Pendiente"

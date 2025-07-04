@@ -408,6 +408,31 @@ class RecetaRepository(
         }
     }
 
+    suspend fun editarReceta(params: RecetaRequest, id: String) {
+        val gson = Gson()
+        val recetaEntity = LocalReceta(
+            idRemoto = null,
+            nombre = params.nombre,
+            descripcion = params.descripcion,
+            tiempo = params.tiempo,
+            porciones = params.porciones,
+            dificultad = params.dificultad,
+            imagen = params.imagen,
+            imagenes = gson.toJson(params.imagenes),
+            username = params.creadorEmail,
+            categoria = params.categoriaId,
+            pasosJson = gson.toJson(params.pasos),
+            ingredientesJson = gson.toJson(params.ingredientes),
+            pendienteDeSync = true
+        )
+        val response =apiService.editarReceta(params,id)
+        if (response.isSuccessful) {
+            Log.i("AddReceta", "✅ Receta enviada correctamente al servidor")
+        } else {
+            recetaDao.insertarReceta(recetaEntity)
+            Log.i("AddReceta", "⚠️ Falló la respuesta del servidor, receta guardada localmente")
+        }
+    }
 }
 
 

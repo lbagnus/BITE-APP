@@ -38,6 +38,7 @@ class NotificationsFragment : Fragment() {
     private lateinit var noInternetLayoutFavorites: LinearLayout
     private lateinit var noInternetMessageFavorites: TextView
     private lateinit var btnRetryInternetFavorites: Button
+    val contextForAdapter = requireContext()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,7 +66,7 @@ class NotificationsFragment : Fragment() {
                 }
                 findNavController().navigate(R.id.recetaFragment, bundle)
             },
-            { receta -> idsFavoritos.contains(receta.id) }, usuario, homeViewModel, false
+            { receta -> idsFavoritos.contains(receta.id) }, usuario, homeViewModel, false, contextForAdapter
         )
 
         val recyclerRecetas = binding.recyclerRecetas
