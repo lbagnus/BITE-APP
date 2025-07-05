@@ -15,15 +15,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.oasis.bite.ComentarioActivity
-import com.oasis.bite.ForgotPasswordActivity
 import com.oasis.bite.R
-import com.oasis.bite.VerifyCodeActivity
 import com.oasis.bite.databinding.FragmentRecetaBinding
 import com.oasis.bite.domain.models.User
 import com.oasis.bite.presentation.adapters.MediaAdapter
 import com.oasis.bite.presentation.adapters.ComentarioAdapter
-import com.oasis.bite.presentation.ui.home.HomeViewModel
-import com.oasis.bite.presentation.ui.home.HomeViewModelFactory
 import com.oasis.bite.presentation.viewmodel.RecetaViewModel
 import com.oasis.bite.presentation.viewmodel.RecetaViewModelFactory
 

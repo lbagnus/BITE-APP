@@ -38,7 +38,7 @@ class DashboardFragment : Fragment() {
     private lateinit var noInternetLayoutDashboard: LinearLayout
     private lateinit var noInternetMessageDashboard: TextView
     private lateinit var btnRetryInternetDashboard: Button
-    val contextForAdapter = requireContext()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,6 +55,7 @@ class DashboardFragment : Fragment() {
 
         val factory = HomeViewModelFactory(requireContext().applicationContext)
         homeViewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
+        val contextForAdapter = requireContext()
 
         val usuario = getUsuarioLogueado(requireContext())
         recetaAdapter = RecetaAdapter(

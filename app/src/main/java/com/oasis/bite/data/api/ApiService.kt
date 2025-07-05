@@ -2,6 +2,7 @@ package com.oasis.bite.data.api
 
 import com.oasis.bite.data.model.CodeRequest
 import com.oasis.bite.data.model.CommentRequest
+import com.oasis.bite.data.model.EstadoRequest
 import com.oasis.bite.data.model.FavRequest
 import com.oasis.bite.data.model.ImageUploadResponse
 import com.oasis.bite.data.model.LoginRequest
@@ -89,9 +90,15 @@ interface ApiService {
     @GET("recetas/home") // Remove {termino} from the path
     suspend fun getBusquedaBarra(@Query("term") termino: String): Response<List<RecetaSimpleResponse>>
 
-    @PUT("receta/{id}")
+    @PUT("recetas/{id}")
     suspend fun editarReceta(@Body params: RecetaRequest, @Path("id") id: String): Response<Unit>
 
-    
+    @PUT("recetas/review/{id}")
+    suspend fun cambiarEstadoReceta(@Body params: EstadoRequest, @Path("id") id: String): Response<Unit>
+
+    @GET("recetas/pendientes")
+    suspend fun getRecetasPendientes(): Response<List<RecetaSimpleResponse>>
+
+
 
 }

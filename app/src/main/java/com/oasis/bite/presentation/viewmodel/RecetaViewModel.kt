@@ -35,6 +35,9 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
     private val _pasos = MutableLiveData<List<PasoReceta>>()
     val pasos: LiveData<List<PasoReceta>> get() = _pasos
     val favoritoLiveData = MutableLiveData<List<Receta>?>()
+    private val _recetaOperationStatus = MutableLiveData<Boolean>()
+    val recetaOperationStatus: LiveData<Boolean> get() = _recetaOperationStatus // True para éxito, False para fallo
+
 
     fun cargarReceta(id: String) {
         viewModelScope.launch {
@@ -98,17 +101,101 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
     }
 
 
-    fun agregarReceta(nombre: String, descripcion: String, tiempo: String, porciones: String, dificultad: String, imagen:String, imagenes: List<String>, creadorEmail: String, ingredientes: List<Ingrediente>, pasos : List<PasoRecetaRequest>, categoria: String){
-        viewModelScope.launch{
-            var params = RecetaRequest(nombre = nombre, descripcion =descripcion, tiempo = tiempo, porciones = porciones, dificultad = dificultad, imagen = imagen, imagenes =imagenes, creadorEmail = creadorEmail, ingredientes = ingredientes, pasos = pasos, estado = "Aprobada", categoriaId = categoria)
-             repository.addReceta(params)}
+    fun agregarReceta(
+        nombre: String,
+        descripcion: String,
+        tiempo: String,
+        porciones: String,
+        dificultad: String,
+        imagen: String, // Puede ser String? para URLs
+        imagenes: List<String>, // Lista de URLs
+        creadorEmail: String,
+        ingredientes: List<Ingrediente>,
+        pasos: List<PasoRecetaRequest>,
+        categoria: String
+    ) {
+        viewModelScope.launch {
+            try {
+                val params = RecetaRequest(
+                    nombre = nombre,
+                    descripcion = descripcion,
+                    tiempo = tiempo,
+                    porciones = porciones,
+                    dificultad = dificultad,
+                    imagen = imagen,
+                    imagenes = imagenes,
+                    creadorEmail = creadorEmail,
+                    ingredientes = ingredientes,
+                    pasos = pasos,
+                    estado = "Aprobada",
+                    categoriaId = categoria // Asumo que este es el nombre del campo en tu RecetaRequest
+                )
 
+                // Llama al método del repositorio que interactúa con la API remota
+                val success = repository.addReceta(params) // Asume que addReceta en el repo devuelve un Boolean
+
+                if (success) {
+                    Log.d("RecetaViewModel", "Receta '${nombre}' creada exitosamente en la API.")
+                    _recetaOperationStatus.postValue(true) // Notifica éxito a la UI
+                } else {
+                    Log.e("RecetaViewModel", "Fallo al crear la receta '${nombre}' en la API. El repositorio indicó fallo.")
+                    _recetaOperationStatus.postValue(false) // Notifica fallo a la UI
+                }
+            } catch (e: Exception) {
+                // Captura cualquier excepción que ocurra durante la llamada a la API (ej. red, JSON)
+                Log.e("RecetaViewModel", "Excepción al crear receta '${nombre}' en la API: ${e.message}", e)
+                _recetaOperationStatus.postValue(false) // Notifica fallo a la UI
+            }
+        }
     }
 
-    fun agregarRecetaOffline(nombre: String, descripcion: String, tiempo: String, porciones: String, dificultad: String, imagen:String, imagenes: List<String>, creadorEmail: String, ingredientes: List<Ingrediente>, pasos : List<PasoRecetaRequest>, categoria: String){
+    fun agregarRecetaOffline(
+        nombre: String,
+        descripcion: String,
+        tiempo: String,
+        porciones: String,
+        dificultad: String,
+        imagen: String, // Aquí imagen podría ser la URI local
+        imagenes: List<String>, // Aquí las imágenes podrían ser URIs locales
+        creadorEmail: String,
+        ingredientes: List<Ingrediente>,
+        pasos: List<PasoRecetaRequest>,
+        categoria: String
+    ) {
         viewModelScope.launch {
-            var params = RecetaRequest(nombre = nombre, descripcion =descripcion, tiempo = tiempo, porciones = porciones, dificultad = dificultad, imagen = imagen, imagenes =imagenes, creadorEmail = creadorEmail, ingredientes = ingredientes, pasos = pasos, estado = "Aprobada", categoriaId = categoria)
-            repository.addRecetaLocal(params)
+            try {
+                val params = RecetaRequest(
+                    nombre = nombre,
+                    descripcion = descripcion,
+                    tiempo = tiempo,
+                    porciones = porciones,
+                    dificultad = dificultad,
+                    imagen = imagen, // Se guarda la URI local
+                    imagenes = imagenes, // Se guardan las URIs locales
+                    creadorEmail = creadorEmail,
+                    ingredientes = ingredientes,
+                    pasos = pasos,
+                    estado = "Pendiente", // O un estado que indique que es offline y necesita sincronizar
+                    categoriaId = categoria
+                )
+
+                // Llama al método del repositorio que guarda localmente (Room/otra BD local)
+                val success = repository.addRecetaLocal(params) // Asume que addRecetaLocal devuelve un Boolean
+
+                if (success) {
+                    Log.d("RecetaViewModel", "Receta '${nombre}' guardada localmente exitosamente.")
+                    _recetaOperationStatus.postValue(true) // Notifica éxito a la UI
+                    // Opcional: Podrías tener un LiveData diferente para notificar éxito offline
+                    // _offlineSaveStatus.postValue(true)
+                } else {
+                    Log.e("RecetaViewModel", "Fallo al guardar la receta '${nombre}' localmente. El repositorio indicó fallo.")
+                    _recetaOperationStatus.postValue(false) // Notifica fallo a la UI
+                }
+            } catch (e: Exception) {
+                // Captura cualquier excepción que ocurra durante el guardado local
+                Log.e("RecetaViewModel", "Excepción al guardar receta '${nombre}' localmente: ${e.message}", e)
+                _recetaOperationStatus.postValue(false) // Notifica fallo a la UI
+            }
         }
     }
 
@@ -125,11 +212,56 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
         }
     }
 
-    fun editarReceta(id: String,nombre: String, descripcion: String, tiempo: String, porciones: String, dificultad: String, imagen:String, imagenes: List<String>, creadorEmail: String, ingredientes: List<Ingrediente>, pasos : List<PasoRecetaRequest>, categoria: String){
-        viewModelScope.launch{
-            var params = RecetaRequest(nombre = nombre, descripcion =descripcion, tiempo = tiempo, porciones = porciones, dificultad = dificultad, imagen = imagen, imagenes =imagenes, creadorEmail = creadorEmail, ingredientes = ingredientes, pasos = pasos, estado = "Aprobada", categoriaId = categoria)
-            repository.editarReceta(params,id)}
+    // En tu RecetaViewModel.kt
+    fun editarReceta(
+        id: String, // El ID de la receta a editar
+        nombre: String,
+        descripcion: String,
+        tiempo: String,
+        porciones: String,
+        dificultad: String,
+        imagen: String, // La URL de la imagen principal (puede ser nula)
+        imagenes: List<String>, // La lista de URLs de imágenes
+        creadorEmail: String,
+        ingredientes: List<Ingrediente>,
+        pasos: List<PasoRecetaRequest>,
+        categoria: String
+    ) {
+        viewModelScope.launch {
+            try {
+                val params = RecetaRequest(
+                    nombre = nombre,
+                    descripcion = descripcion,
+                    tiempo = tiempo,
+                    porciones = porciones,
+                    dificultad = dificultad,
+                    imagen = imagen,
+                    imagenes = imagenes,
+                    creadorEmail = creadorEmail,
+                    ingredientes = ingredientes,
+                    pasos = pasos,
+                    estado = "Aprobada",
+                    categoriaId = categoria // Asumo que `categoriaId` es el nombre del campo en tu RecetaRequest
+                )
 
+                // Llama al método del repositorio para editar la receta
+                val success = repository.editarReceta(params, id) // Asumo que editarReceta en el repositorio devuelve un Boolean
+
+                if (success) {
+                    // Si la edición fue exitosa
+                    Log.d("RecetaViewModel", "Receta ID $id editada exitosamente.")
+                    _recetaOperationStatus.postValue(true)
+                } else {
+                    // Si la edición falló (por ejemplo, el repositorio devolvió 'false')
+                    Log.e("RecetaViewModel", "Fallo al editar la receta ID $id. El repositorio indicó fallo.")
+                    _recetaOperationStatus.postValue(false)
+                }
+            } catch (e: Exception) {
+                // Si ocurre una excepción (ej. error de red, JSON malformado, etc.)
+                Log.e("RecetaViewModel", "Excepción al editar receta ID $id: ${e.message}", e)
+                _recetaOperationStatus.postValue(false)
+            }
+        }
     }
 }
 

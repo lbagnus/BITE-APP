@@ -36,8 +36,8 @@ data class RecetaDTO(
     @SerializedName("averageRating")
     val averageRating: Float?,
 
-    @SerializedName("Categorium")
-    val categoria: CategoriaDTO?,
+    @SerializedName("CategoriumCategoria")
+    val categoria: String,
 
     @SerializedName("IngredientesReceta")
     val ingredientes: List<IngredienteDTO>?,

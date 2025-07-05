@@ -19,11 +19,13 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
 import com.oasis.bite.data.model.PasoRecetaRequest
 import com.oasis.bite.databinding.ActivityAgregarRecetaBinding
 import com.oasis.bite.databinding.ItemPasoAgregarBinding
 import com.oasis.bite.domain.models.Dificultad
 import com.oasis.bite.domain.models.Ingrediente
+import com.oasis.bite.domain.models.PasoReceta
 import com.oasis.bite.presentation.viewmodel.RecetaViewModel
 import com.oasis.bite.presentation.viewmodel.RecetaViewModelFactory
 import java.io.File
@@ -59,6 +61,15 @@ class AgregarRecetaActivity : AppCompatActivity() {
         binding.btnVolver.setOnClickListener {
             finish()
         }
+        viewModel.recetaOperationStatus.observe(this) { success ->
+            if (success) {
+                Toast.makeText(this, "Operación de receta exitosa!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "La operación de receta falló. Inténtelo de nuevo.", Toast.LENGTH_LONG).show()
+            }
+            // Ahora, y solo ahora, finaliza la actividad
+            finish()
+        }
 
         // 3. Mejorar el manejo de imágenes en el ActivityResultLauncher
         globalPickMediaLauncher = registerForActivityResult(
@@ -85,16 +96,6 @@ class AgregarRecetaActivity : AppCompatActivity() {
             }
         }
 
-
-        val isEditando = intent.getBooleanExtra("isEditando", false)
-        if (isEditando) {
-            val receta = viewModel.cargarReceta(intent.getStringExtra("recetaId").toString())
-            val botonContinuar = binding.continuarButton
-            val usuarioEmail = intent.getStringExtra("usuarioEmail")
-            val inputTitulo = binding.titulo
-            binding.titulo.setText(intent.getStringExtra("tituloReceta"))
-            binding.titulo.isEnabled = false
-        } else {
             val botonContinuar = binding.continuarButton
             val usuarioEmail = intent.getStringExtra("usuarioEmail")
             val inputTitulo = binding.titulo
@@ -116,6 +117,13 @@ class AgregarRecetaActivity : AppCompatActivity() {
                 ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, categorias)
             dropdownCategoria.setAdapter(adapterDropCategoria)
 
+            dropdownCategoria.setOnClickListener {
+                dropdownCategoria.showDropDown()
+            }
+            dropdown.setOnClickListener {
+                dropdown.showDropDown()
+            }
+
             binding.btnSubirImagen.setOnClickListener {
                 currentPasoIndexForImage = -1 // Indica que la siguiente imagen es para la receta principal
                 val intent = Intent(Intent.ACTION_GET_CONTENT)
@@ -128,7 +136,7 @@ class AgregarRecetaActivity : AppCompatActivity() {
             val botonAgregarIngrediente = binding.btnAgregarIngrediente
             val inflater = LayoutInflater.from(this)
 
-            val unidades = listOf("g", "kg", "ml", "L", "cda", "cdta")
+            val unidades = listOf("g", "kg", "ml", "L", "cda", "cdta", "u")
             botonAgregarIngrediente.setOnClickListener {
                 val view =
                     inflater.inflate(R.layout.item_ingrediente_agregar, layoutIngredientes, false)
@@ -219,6 +227,91 @@ class AgregarRecetaActivity : AppCompatActivity() {
                 }
                 inputNombrePaso.onFocusChangeListener = focusListenerPaso
             }
+        val isEditando = intent.getBooleanExtra("isEditando", false)
+        if (isEditando) {
+            viewModel.cargarReceta(intent.getStringExtra("idReceta").toString())
+            viewModel.receta.observe(this) { receta ->
+                receta?.let {
+                    binding.descripcion.setText(receta.descripcion)
+                    binding.porciones.setText(receta.porciones.toString())
+                    binding.tiempo.setText(receta.tiempo)
+                    binding.dropdownCategoria.setText(receta.categoria, false)
+                    binding.dropdown.setText(receta.dificultad.label.toString(), false)
+                    val imageUrlToLoad = receta.imagen
+                        ?: receta.imagenes?.firstOrNull()?.url // Intenta obtener la primera URL de la lista si la principal es null
+                    imageUrlToLoad?.let { url ->
+                        Glide.with(this) // Usa 'this' (la Activity) como contexto para Glide
+                            .load(url) // `.load()` espera una URL (String)
+                            .into(binding.imagenSeleccionada) // Tu ImageView principal de la receta
+                        binding.imagenSeleccionada.visibility = View.VISIBLE // Asegura que se muestre
+                    }
+                    recetaImagenPrincipalUrl = imageUrlToLoad?: "Hola"
+                    recetaImagenesUrlsList.add(recetaImagenPrincipalUrl)
+
+                    // --- Cargar Ingredientes (si estás editando) ---
+                    // Tendrías que iterar sobre loadedReceta.ingredientes y añadirlos dinámicamente
+                    // a layoutIngredientes, similar a como agregas nuevos ingredientes.
+                    // Esto es más complejo y requeriría adaptar tu lógica de agregar ingredientes.
+                    // Por ejemplo:
+
+                    listaIngredientes.clear() // Limpiar la lista actual
+                    layoutIngredientes.removeAllViews() // Eliminar vistas existentes
+                    receta.ingredientes.forEach { ingrediente ->
+                        val view = LayoutInflater.from(this).inflate(R.layout.item_ingrediente_agregar, layoutIngredientes, false)
+                        val inputNombre = view.findViewById<EditText>(R.id.inputIngrediente)
+                        val inputCantidad = view.findViewById<EditText>(R.id.inputCantidad)
+                        val unidadDropdown = view.findViewById<AutoCompleteTextView>(R.id.inputUnidad)
+
+                        inputNombre.setText(ingrediente.nombre)
+                        inputCantidad.setText(ingrediente.cantidad.toString())
+                        unidadDropdown.setText(ingrediente.unidad, false) // `false` para no mostrar el dropdown al establecer
+                        // Añadir OnFocusChangeListener o TextWatcher para actualizar listaIngredientes si el usuario edita
+                        listaIngredientes.add(ingrediente) // Añadir al modelo interno
+                        layoutIngredientes.addView(view)
+                    }
+
+
+                    // --- Cargar Pasos (si estás editando) ---
+                    // Similar a ingredientes, iterar sobre loadedReceta.pasos
+                    // y añadir las vistas dinámicamente.
+                    // Y para las imágenes de los pasos, también usar Glide.
+
+                    listaPasos.clear()
+                    layoutPasos.removeAllViews()
+                    // Asegúrate de resetear pasoIndexCounter
+                    var currentLoadedPasoIndex = 0
+                    receta.pasos.forEach { paso ->
+                        currentLoadedPasoIndex++
+                        val view = LayoutInflater.from(this).inflate(R.layout.item_paso_agregar, layoutPasos, false)
+                        val itemPasoBinding = ItemPasoAgregarBinding.bind(view)
+                        itemPasoBinding.inputPaso.setText(paso.contenido)
+                        // Cargar imagen del paso si existe
+                        paso.archivoFoto?.let { pasoImageUrl ->
+                            Log.d("lleguepasorecetaaa", "$pasoImageUrl")
+                            Glide.with(this)
+                                .load(pasoImageUrl)
+                                .into(itemPasoBinding.imagenSeleccionada) // Asegúrate que el ID sea correcto en item_paso_agregar
+                            itemPasoBinding.imagenSeleccionada.visibility = View.VISIBLE
+                        }
+                        // También puedes iterar sobre paso.imagenesPasos si un paso tiene múltiples imágenes
+                        // Agrega el paso al modelo interno
+                        listaPasos.add(PasoRecetaRequest(
+                            numeroDePaso = paso.numeroDePaso,
+                            contenido = paso.contenido,
+                            archivoFoto = paso.archivoFoto,
+                            imagenesPasos = paso.imagenesPasos?.map { it.url } // O conviértelas si es necesario
+                        ))
+                        layoutPasos.addView(view)
+                    }
+                    // Asegúrate de que pasoIndexCounter refleje el último índice cargado
+                    // pasoIndexCounter = currentLoadedPasoIndex
+
+                    Log.d("editar", "llegue $receta")
+                }
+            }
+
+
+        }
 
             // 7. Mejorar la validación final en el botón continuar
             botonContinuar.setOnClickListener {
@@ -292,21 +385,49 @@ class AgregarRecetaActivity : AppCompatActivity() {
                     Log.d("BOTON_CONTINUAR", "    - Imágenes lista: ${paso.imagenesPasos}")
                 }
 
-                if (intent.getBooleanExtra("reemplaza", false)) {
-                    val idRecetaAEliminar = intent.getStringExtra("idReceta")
-                    Log.d("BOTON_CONTINUAR", "Eliminando receta anterior: $idRecetaAEliminar")
-                    idRecetaAEliminar?.let { id ->
-                        viewModel.eliminarReceta(id)
-                    } ?: run {
-                        Log.e("BOTON_CONTINUAR", "Error: idReceta es nulo al intentar eliminar.")
-                        Toast.makeText(this, "Error al eliminar la receta: ID no encontrado.", Toast.LENGTH_SHORT).show()
-                    }
-                }
+
 
                 if (isInternetConnected) {
                     Log.d("BOTON_CONTINUAR", "Guardando receta ONLINE")
-                    viewModel.agregarReceta(titulo, descripcion, tiempo, porciones, dificultad, imagenPrincipalReceta, imagenesRecetaParaEnvio,
-                        usuarioEmail.toString(), listaIngredientes, pasosFinales, categoria)
+                    if(isEditando){
+                        viewModel.editarReceta(intent.getStringExtra("idReceta").toString(),
+                            titulo,
+                            descripcion,
+                            tiempo,
+                            porciones,
+                            dificultad,
+                            imagenPrincipalReceta,
+                            imagenesRecetaParaEnvio,
+                            usuarioEmail.toString(),
+                            listaIngredientes,
+                            pasosFinales,
+                            categoria
+                        )
+                    }else {
+                        if (intent.getBooleanExtra("reemplaza", false)) {
+                            val idRecetaAEliminar = intent.getStringExtra("idReceta")
+                            Log.d("BOTON_CONTINUAR", "Eliminando receta anterior: $idRecetaAEliminar")
+                            idRecetaAEliminar?.let { id ->
+                                viewModel.eliminarReceta(id)
+                            } ?: run {
+                                Log.e("BOTON_CONTINUAR", "Error: idReceta es nulo al intentar eliminar.")
+                                Toast.makeText(this, "Error al eliminar la receta: ID no encontrado.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        viewModel.agregarReceta(
+                            titulo,
+                            descripcion,
+                            tiempo,
+                            porciones,
+                            dificultad,
+                            imagenPrincipalReceta,
+                            imagenesRecetaParaEnvio,
+                            usuarioEmail.toString(),
+                            listaIngredientes,
+                            pasosFinales,
+                            categoria
+                        )
+                    }
                 } else {
                     Log.d("BOTON_CONTINUAR", "Guardando receta OFFLINE")
                     viewModel.agregarRecetaOffline(titulo, descripcion, tiempo, porciones, dificultad, imagenPrincipalReceta, imagenesRecetaParaEnvio,
@@ -315,9 +436,9 @@ class AgregarRecetaActivity : AppCompatActivity() {
                 }
 
                 Log.d("BOTON_CONTINUAR", "=== FIN VALIDACIÓN FINAL ===")
-                finish()
+                //finish()
             }
-        }
+
     }
 
     override fun onDestroy() {

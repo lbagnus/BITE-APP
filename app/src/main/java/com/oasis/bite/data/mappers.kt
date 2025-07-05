@@ -42,7 +42,7 @@ fun RecetaDTO.toReceta(): Receta {
         imagen = this.imagen,
         estado = RecetaStatus.valueOf(this.estado.uppercase()),
         username = this.username.username ,
-        categoria = this.categoria?.nombre ?: "Sin categoría",
+        categoria = this.categoria,
         pasos = this.pasos?.map { it.toPasoReceta() } ?: emptyList(),
         reviewCount = this.reviewCount?: 0,
         averageRating = this.averageRating?: 0f,

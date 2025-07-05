@@ -164,10 +164,13 @@ class RecetaRepository(
         }*/
     }*/
 
-    suspend fun addReceta(params: RecetaRequest) {
+
+    // `addReceta` ahora devuelve un Boolean
+    suspend fun addReceta(params: RecetaRequest): Boolean {
         val gson = Gson()
-        val recetaEntity = LocalReceta(
-            idRemoto = null,
+        // Crear la entidad LocalReceta, inicialmente como pendiente de sync
+        var recetaEntity = LocalReceta(
+            idRemoto = null, // Inicialmente null, se actualizará si se sube a la API
             nombre = params.nombre,
             descripcion = params.descripcion,
             tiempo = params.tiempo,
@@ -179,29 +182,44 @@ class RecetaRepository(
             categoria = params.categoriaId,
             pasosJson = gson.toJson(params.pasos),
             ingredientesJson = gson.toJson(params.ingredientes),
-            pendienteDeSync = true
+            pendienteDeSync = true // Siempre se marca como pendiente al inicio, se cambia si se sube
         )
 
         if (isInternetAvailable(context)) {
             try {
-                val response = apiService.addReceta(params)
+                val response = apiService.addReceta(params) // Asumo que apiService.addReceta devuelve Response<Unit> o algo similar
                 if (response.isSuccessful) {
-                    Log.i("AddReceta", "✅ Receta enviada correctamente al servidor")
-                } else {
+                    Log.i("RecetaRepository", "✅ Receta enviada correctamente al servidor")
+                    // Si la receta se sube correctamente, obtén el ID remoto si la API lo devuelve
+                    // Y GUÁRDALA LOCALMENTE con el idRemoto y pendienteDeSync = false
+                    val remoteId = /* Obtén el ID remoto de la respuesta de la API si está disponible */ null
+                    recetaEntity = recetaEntity.copy(idRemoto = remoteId, pendienteDeSync = false)
                     recetaDao.insertarReceta(recetaEntity)
-                    Log.i("AddReceta", "⚠️ Falló la respuesta del servidor, receta guardada localmente")
+                    Log.i("RecetaRepository", "✅ Receta guardada localmente tras éxito en servidor. ID Remoto: $remoteId")
+                    return true // Éxito: se subió y se guardó localmente
+                } else {
+                    // Fallo de respuesta del servidor (ej. 4xx, 5xx)
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("RecetaRepository", "⚠️ Falló la respuesta del servidor (${response.code()}): ${response.message()}. Error body: $errorBody. Receta guardada localmente como pendiente.")
+                    recetaDao.insertarReceta(recetaEntity) // Guardar localmente como pendiente
+                    return false // Fallo
                 }
             } catch (e: Exception) {
-                recetaDao.insertarReceta(recetaEntity)
-                Log.i("AddReceta", "❌ Excepción al enviar receta, guardada localmente: ${e.message}")
+                // Excepción (ej. red, timeout, JSON malformado)
+                Log.e("RecetaRepository", "❌ Excepción al enviar receta al servidor: ${e.message}. Receta guardada localmente como pendiente.", e)
+                recetaDao.insertarReceta(recetaEntity) // Guardar localmente como pendiente
+                return false // Fallo
             }
         } else {
-            recetaDao.insertarReceta(recetaEntity)
-            Log.i("AddReceta", "📴 Sin conexión, receta guardada localmente")
+            // No hay internet
+            Log.i("RecetaRepository", "📴 Sin conexión, receta guardada localmente como pendiente.")
+            recetaDao.insertarReceta(recetaEntity) // Guardar localmente como pendiente
+            return false // Fallo (no se pudo subir, solo se guardó localmente)
         }
     }
 
-    suspend fun addRecetaLocal(params: RecetaRequest) {
+    // `addRecetaLocal` ahora devuelve un Boolean
+    suspend fun addRecetaLocal(params: RecetaRequest): Boolean {
         val gson = Gson()
         val recetaEntity = LocalReceta(
             idRemoto = null,
@@ -210,34 +228,40 @@ class RecetaRepository(
             tiempo = params.tiempo,
             porciones = params.porciones,
             dificultad = params.dificultad,
-            imagen = params.imagen,
-            imagenes = gson.toJson(params.imagenes),
+            imagen = params.imagen, // Aquí 'imagen' puede ser la URI local
+            imagenes = gson.toJson(params.imagenes), // Aquí 'imagenes' puede contener URIs locales
             username = params.creadorEmail,
             categoria = params.categoriaId,
             pasosJson = gson.toJson(params.pasos),
             ingredientesJson = gson.toJson(params.ingredientes),
-            pendienteDeSync = true
+            pendienteDeSync = true // Siempre es true si solo se guarda localmente
         )
 
-        recetaDao.insertarReceta(recetaEntity)
-
-        Log.d("AddReceta", "📴 Sin conexión, receta guardada localmente")
-        Log.d("AddReceta", """
-        🔒 Datos guardados:
-        - Nombre: ${recetaEntity.nombre}
-        - Descripción: ${recetaEntity.descripcion}
-        - Tiempo: ${recetaEntity.tiempo}
-        - Porciones: ${recetaEntity.porciones}
-        - Dificultad: ${recetaEntity.dificultad}
-        - Imagen principal (ruta o URL): ${recetaEntity.imagen}
-        - Imagenes: ${recetaEntity.imagenes}
-        - Creador: ${recetaEntity.username}
-        - Categoría: ${recetaEntity.categoria}
-        - Pasos (JSON): ${recetaEntity.pasosJson}
-        - Ingredientes (JSON): ${recetaEntity.ingredientesJson}
-        - Pendiente de sincronizar: ${recetaEntity.pendienteDeSync}
-    """.trimIndent())
+        return try {
+            recetaDao.insertarReceta(recetaEntity)
+            Log.d("RecetaRepository", "📴 Receta guardada localmente exitosamente.")
+            Log.d("RecetaRepository", """
+            🔒 Datos guardados LOCALMENTE:
+            - Nombre: ${recetaEntity.nombre}
+            - Descripción: ${recetaEntity.descripcion}
+            - Tiempo: ${recetaEntity.tiempo}
+            - Porciones: ${recetaEntity.porciones}
+            - Dificultad: ${recetaEntity.dificultad}
+            - Imagen principal (ruta o URL): ${recetaEntity.imagen}
+            - Imagenes: ${recetaEntity.imagenes}
+            - Creador: ${recetaEntity.username}
+            - Categoría: ${recetaEntity.categoria}
+            - Pasos (JSON): ${recetaEntity.pasosJson}
+            - Ingredientes (JSON): ${recetaEntity.ingredientesJson}
+            - Pendiente de sincronizar: ${recetaEntity.pendienteDeSync}
+        """.trimIndent())
+            true // Éxito al guardar localmente
+        } catch (e: Exception) {
+            Log.e("RecetaRepository", "❌ Excepción al guardar receta LOCALMENTE: ${e.message}", e)
+            false // Fallo al guardar localmente
+        }
     }
+
 
 
     suspend fun subirImagen(context: Context, uri: Uri): String? {
@@ -408,32 +432,40 @@ class RecetaRepository(
         }
     }
 
-    suspend fun editarReceta(params: RecetaRequest, id: String) {
-        val gson = Gson()
-        val recetaEntity = LocalReceta(
-            idRemoto = null,
-            nombre = params.nombre,
-            descripcion = params.descripcion,
-            tiempo = params.tiempo,
-            porciones = params.porciones,
-            dificultad = params.dificultad,
-            imagen = params.imagen,
-            imagenes = gson.toJson(params.imagenes),
-            username = params.creadorEmail,
-            categoria = params.categoriaId,
-            pasosJson = gson.toJson(params.pasos),
-            ingredientesJson = gson.toJson(params.ingredientes),
-            pendienteDeSync = true
-        )
-        val response =apiService.editarReceta(params,id)
-        if (response.isSuccessful) {
-            Log.i("AddReceta", "✅ Receta enviada correctamente al servidor")
-        } else {
-            recetaDao.insertarReceta(recetaEntity)
-            Log.i("AddReceta", "⚠️ Falló la respuesta del servidor, receta guardada localmente")
+    suspend fun editarReceta(params: RecetaRequest, id: String): Boolean {
+        return try {
+            val gson = Gson()
+            val recetaEntity = LocalReceta(
+                idRemoto = null,
+                nombre = params.nombre,
+                descripcion = params.descripcion,
+                tiempo = params.tiempo,
+                porciones = params.porciones,
+                dificultad = params.dificultad,
+                imagen = params.imagen,
+                imagenes = gson.toJson(params.imagenes),
+                username = params.creadorEmail,
+                categoria = params.categoriaId,
+                pasosJson = gson.toJson(params.pasos),
+                ingredientesJson = gson.toJson(params.ingredientes),
+                pendienteDeSync = true
+            )
+            val response =apiService.editarReceta(params,id)
+            if (response.isSuccessful) {
+                Log.i("AddReceta", "✅ Receta enviada correctamente al servidor")
+                true // Éxito
+            } else {
+                recetaDao.insertarReceta(recetaEntity)
+                Log.i("AddReceta", "⚠️ Falló la respuesta del servidor")
+                false // Fallo por respuesta de error de la API
+            }
+        } catch (e: Exception) {
+            Log.e("RecetaRepository", "Excepción de red/parseo al editar receta ID $id: ${e.message}", e)
+            false // Fallo por excepción
         }
     }
 }
+
 
 
 

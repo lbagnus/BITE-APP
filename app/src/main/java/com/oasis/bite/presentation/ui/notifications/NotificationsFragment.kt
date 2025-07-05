@@ -38,7 +38,7 @@ class NotificationsFragment : Fragment() {
     private lateinit var noInternetLayoutFavorites: LinearLayout
     private lateinit var noInternetMessageFavorites: TextView
     private lateinit var btnRetryInternetFavorites: Button
-    val contextForAdapter = requireContext()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,6 +55,7 @@ class NotificationsFragment : Fragment() {
 
         val factory = HomeViewModelFactory(requireContext().applicationContext)
         homeViewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
+        val contextForAdapter = requireContext()
 
         // --- Inicializar adapters ---
         val usuario = getUsuarioLogueado(requireContext())

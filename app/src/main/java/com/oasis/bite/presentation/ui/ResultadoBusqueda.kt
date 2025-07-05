@@ -30,7 +30,7 @@ class ResultadoBusqueda : Fragment() {
     private lateinit var recetaAdapter: RecetaAdapter
 
     private var idsFavoritos: List<Int> = emptyList()
-    val contextForAdapter = requireContext()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,6 +41,7 @@ class ResultadoBusqueda : Fragment() {
         _binding = ResultadosBusquedasBinding.inflate(inflater, container, false)
         val factory = HomeViewModelFactory(requireContext().applicationContext)
         homeViewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
+        val contextForAdapter = requireContext()
         // --- Inicializar adapters ---
         val usuario = getUsuarioLogueado(requireContext())
                     recetaAdapter = RecetaAdapter(

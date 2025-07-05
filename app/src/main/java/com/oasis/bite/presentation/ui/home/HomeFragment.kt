@@ -40,7 +40,7 @@ class HomeFragment : Fragment() {
     private lateinit var noInternetLayout: LinearLayout
     private lateinit var noInternetMessage: TextView
     private lateinit var btnRetryInternet: Button
-    val contextForAdapter = requireContext()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,6 +51,7 @@ class HomeFragment : Fragment() {
         val factory = HomeViewModelFactory(requireContext().applicationContext)
         homeViewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
         val view = binding.root
+        val contextForAdapter = requireContext()
 
         // Inicializar vistas de no internet
         noInternetLayout = binding.noInternetLayout
