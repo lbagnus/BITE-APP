@@ -7,3 +7,4 @@ data class User(
     val lastName: String,
     val role: Role
 )
+

@@ -23,8 +23,13 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
 import com.oasis.bite.domain.models.User
+import com.oasis.bite.presentation.ChangePasswordActivity
 import com.oasis.bite.presentation.viewmodel.UsersViewModel
 import com.oasis.bite.presentation.viewmodel.UsersViewModelFactory
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
+import com.google.android.material.chip.Chip
+import com.google.android.material.textfield.TextInputEditText
 
 
 class MainActivity : AppCompatActivity() {
@@ -71,7 +76,8 @@ class MainActivity : AppCompatActivity() {
 
 
         btnCambiarContrasena.setOnClickListener {
-            val intent = Intent(this, ResetPasswordActivity::class.java)
+            val intent = Intent(this, ChangePasswordActivity::class.java)
+            intent.putExtra("email", usuario.email)
             startActivity(intent)
         }
 
@@ -83,6 +89,7 @@ class MainActivity : AppCompatActivity() {
 
         val rolUsuario = intent.getStringExtra("rolUsuario")
         val opcionAutorizacion = findViewById<TextView>(R.id.opcionAutorizacion)
+        val opcionMisCalculos = findViewById<TextView>(R.id.opcionMisCalculos)
 
         if (rolUsuario == "ADMIN") {
             Log.d("EMAIL ADMIN", rolUsuario.toString())
@@ -91,6 +98,11 @@ class MainActivity : AppCompatActivity() {
 
         opcionAutorizacion.setOnClickListener {
             val intent = Intent(this, AutorizacionBoxesActivity::class.java)
+            startActivity(intent)
+        }
+
+        opcionMisCalculos.setOnClickListener {
+            val intent = Intent(this, MisCalculosActivity::class.java)
             startActivity(intent)
         }
         val wifiSwitch = findViewById<Switch>(R.id.switchWifi)
@@ -138,7 +150,7 @@ class MainActivity : AppCompatActivity() {
                 // Ocultamos frase y searchbar
                 findViewById<View>(R.id.searchbar).visibility = View.GONE
                 findViewById<View>(R.id.btnAbrirPopup).visibility = View.GONE
-                }
+            }
                 else -> {
                     // Los mostramos nuevamente en el resto de pantallas
                     findViewById<View>(R.id.toolbar).visibility = View.VISIBLE
@@ -171,9 +183,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
+// FILTRO
         binding.btnAbrirPopup.setOnClickListener {
-            // Inflamos el binding del layout del popup
             val popupBinding = FiltroPopupBinding.inflate(layoutInflater)
 
             val dialog = AlertDialog.Builder(this)
@@ -184,11 +195,79 @@ class MainActivity : AppCompatActivity() {
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.show()
 
-            // Ejemplo: si tenés un botón "Listo" en el popup, podés cerrarlo así:
-            popupBinding.root.findViewById<View>(R.id.btnListo)?.setOnClickListener {
+            // CHIPS: Ingredientes que contiene
+            popupBinding.tagInput.setOnEditorActionListener { v, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    val texto = (v as? EditText)?.text?.toString()?.trim()
+                    if (texto.isNotEmpty()) {
+                        val chip = Chip(this).apply {
+                            text = texto
+                            isCloseIconVisible = true
+                            setOnCloseIconClickListener {
+                                popupBinding.chipGroup.removeView(this)
+                            }
+                        }
+                        popupBinding.chipGroup.addView(chip)
+                        (v as? TextInputEditText)?.text?.clear()
+                    }
+                    true
+                } else false
+            }
+
+            // CHIPS: Ingredientes que NO contiene
+            popupBinding.tagInput2.setOnEditorActionListener { v, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    val texto = (v as? EditText)?.text?.toString()?.trim()
+                    if (texto.isNotEmpty()) {
+                        val chip = Chip(this).apply {
+                            text = texto
+                            isCloseIconVisible = true
+                            setOnCloseIconClickListener {
+                                popupBinding.chipGroup2.removeView(this)
+                            }
+                        }
+                        popupBinding.chipGroup2.addView(chip)
+                        (v as? TextInputEditText)?.text?.clear()
+                    }
+                    true
+                } else false
+            }
+
+            // Botones de antigüedad
+            popupBinding.btnFiltro.setOnClickListener {
+                popupBinding.btnFiltro.isChecked = true
+                popupBinding.btnFiltroviejo.isChecked = false
+            }
+
+            popupBinding.btnFiltroviejo.setOnClickListener {
+                popupBinding.btnFiltro.isChecked = false
+                popupBinding.btnFiltroviejo.isChecked = true
+            }
+
+            // Botón "Listo" para cerrar el popup y aplicar filtros
+            popupBinding.btnListo.setOnClickListener {
+                // Acá podrías recoger los filtros seleccionados
+                // Por ejemplo:
+                val incluye = (0 until popupBinding.chipGroup.childCount).mapNotNull {
+                    val chip = popupBinding.chipGroup.getChildAt(it) as? Chip
+                    chip?.text?.toString()
+                }
+
+                val excluye = (0 until popupBinding.chipGroup2.childCount).mapNotNull {
+                    val chip = popupBinding.chipGroup2.getChildAt(it) as? Chip
+                    chip?.text?.toString()
+                }
+
+                val ordenReciente = popupBinding.btnFiltro.isChecked
+
+                // Ahora podrías filtrar tu lista de recetas con esos datos
+
                 dialog.dismiss()
             }
+
+            // Si querés, también podés cargar cocineros dinámicamente en popupBinding.layoutCocineros
         }
+
 
         val searchView = binding.searchbar.searchView // Acceso correcto a SearchView
         searchView.clearFocus()
@@ -237,4 +316,3 @@ class MainActivity : AppCompatActivity() {
 
 
 }
-
