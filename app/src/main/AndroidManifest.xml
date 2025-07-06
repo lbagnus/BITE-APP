@@ -64,6 +64,14 @@
             android:name="com.oasis.bite.AutorizarActivity"
             android:exported="false"
             />
+        <activity
+            android:name="com.oasis.bite.presentation.ChangePasswordActivity"
+            android:exported="false"
+            />
+        <activity
+            android:name="com.oasis.bite.MisCalculosActivity"
+            android:exported="false"
+            />
 
 
     </application>

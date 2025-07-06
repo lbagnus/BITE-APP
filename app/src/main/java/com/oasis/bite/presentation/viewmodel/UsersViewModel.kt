@@ -113,8 +113,8 @@ class UsersViewModel(private val sessionRepository: UserSessionRepository) : Vie
         return repository.enviar(email)
     }
 
-    suspend fun updatePassword(email: String, password: String):Response<Unit>{
-        return repository.cambiarContraseña(email, password)
+    suspend fun updatePassword(email: String, oldpassword: String, newpassword: String):Response<Unit>{
+        return repository.cambiarContraseña(email, oldpassword, newpassword)
     }
 
     suspend fun resetPassword(email: String, password: String):Response<Unit>{

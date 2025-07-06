@@ -46,8 +46,8 @@ class UserRepository(private val apiService: ApiService) {
         return apiService.sendResetCode(email)
     }
 
-    suspend fun cambiarContraseña(email: String, password: String): Response<Unit> {
-        return apiService.cambiarPassword(PassRequest(email, password, password))
+    suspend fun cambiarContraseña(email: String, oldpassword: String, newpassword: String): Response<Unit> {
+        return apiService.cambiarPassword(PassRequest(email, oldpassword, newpassword))
     }
     suspend fun resetContraseña(email: String, password: String): Response<Unit> {
         return apiService.resetearPassword(PassResetRequest(email, password))

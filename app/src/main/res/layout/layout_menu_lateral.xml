@@ -85,6 +85,16 @@
         android:textColor="@color/brown" />
 
     <TextView
+        android:id="@+id/opcionMisCalculos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mis Calculos"
+        android:drawableEnd="@drawable/arrow_right_24px"
+        android:drawablePadding="8dp"
+        android:padding="12dp"
+        android:background="?attr/selectableItemBackground"
+        android:textColor="@color/brown" />
+    <TextView
         android:id="@+id/opcionAutorizacion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
