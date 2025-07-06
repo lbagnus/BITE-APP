@@ -23,6 +23,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
 import com.oasis.bite.domain.models.User
+import com.oasis.bite.presentation.ChangePasswordActivity
 import com.oasis.bite.presentation.viewmodel.UsersViewModel
 import com.oasis.bite.presentation.viewmodel.UsersViewModelFactory
 
@@ -71,7 +72,8 @@ class MainActivity : AppCompatActivity() {
 
 
         btnCambiarContrasena.setOnClickListener {
-            val intent = Intent(this, ResetPasswordActivity::class.java)
+            val intent = Intent(this, ChangePasswordActivity::class.java)
+            intent.putExtra("email", usuario.email)
             startActivity(intent)
         }
 
@@ -83,6 +85,7 @@ class MainActivity : AppCompatActivity() {
 
         val rolUsuario = intent.getStringExtra("rolUsuario")
         val opcionAutorizacion = findViewById<TextView>(R.id.opcionAutorizacion)
+        val opcionMisCalculos = findViewById<TextView>(R.id.opcionMisCalculos)
 
         if (rolUsuario == "ADMIN") {
             Log.d("EMAIL ADMIN", rolUsuario.toString())
@@ -91,6 +94,11 @@ class MainActivity : AppCompatActivity() {
 
         opcionAutorizacion.setOnClickListener {
             val intent = Intent(this, AutorizacionBoxesActivity::class.java)
+            startActivity(intent)
+        }
+
+        opcionMisCalculos.setOnClickListener {
+            val intent = Intent(this, MisCalculosActivity::class.java)
             startActivity(intent)
         }
         val wifiSwitch = findViewById<Switch>(R.id.switchWifi)
