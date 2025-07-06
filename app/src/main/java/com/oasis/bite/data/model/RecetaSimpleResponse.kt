@@ -15,6 +15,10 @@ data class RecetaSimpleResponse(
     val averageRating: Float?,
     val createdAt: String?,
     val updatedAt: String?,
-    val username: String,
+    val Usuario: UsuarioRecetaResponse2,
     val CategoriumCategoria: String?
 )
+data class UsuarioRecetaResponse2(
+    val username: String
+)
+

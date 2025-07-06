@@ -49,6 +49,8 @@ class LoginActivity : AppCompatActivity() {
                     intent.putExtra("username", user.username)
                     val gson = Gson()
                     intent.putExtra("usuario_json", gson.toJson(user))
+                    intent.putExtra("rolUsuario", user.role.toString())
+                    Log.d("rolusuario", user.role.toString())
                 }
                 startActivity(intent)
                 finish() // Cierra LoginActivity después de redirigir
@@ -69,6 +71,7 @@ class LoginActivity : AppCompatActivity() {
         val loginButton: Button = findViewById(R.id.loginButton)
         val emailEditText: EditText = findViewById(R.id.emailEditText)
         val passwordEditText: EditText = findViewById(R.id.passwordEditText)
+        val registerButton: TextView = findViewById(R.id.registerText)
 
         loginButton.setOnClickListener {
             val email = emailEditText.text.toString()
@@ -82,6 +85,10 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
+        registerButton.setOnClickListener {
+            showRegister(true)
+        }
+
         viewModel.usuarioLogueado.observe(this) { usuario ->
             if (usuario != null) {
                 Toast.makeText(this, "Bienvenido ${usuario.username}", Toast.LENGTH_SHORT).show()
@@ -93,13 +100,14 @@ class LoginActivity : AppCompatActivity() {
 
                 val nombreCompleto = "${usuario.firstName} ${usuario.lastName}"
                 val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("emailUsuario", usuario.email)
                 intent.putExtra("nombreUsuario", nombreCompleto)
-                startActivity(intent)
-                finish()
-
                 intent.putExtra("nombre", usuario.firstName + " " + usuario.lastName)
                 intent.putExtra("rolUsuario", usuario.role.name)
+
+                Log.d("EMAIL LOGIN", usuario.email)
                 startActivity(intent)
+                finish()
 
             }
         }
@@ -129,6 +137,38 @@ class LoginActivity : AppCompatActivity() {
     private fun showCustomNoInternetDialog(canProceedOffline: Boolean) {
         val inflater = LayoutInflater.from(this)
         val customView = inflater.inflate(R.layout.popup_no_internet, null)
+
+        val messageTextView: TextView = customView.findViewById(R.id.popupMessage)
+        val closeButton: Button = customView.findViewById(R.id.closeButton)
+
+        messageTextView.text = if (canProceedOffline) {
+            "No hay conexión a internet. Puedes usar la aplicación sin conexión."
+        } else {
+            "No hay conexión a internet. No puedes iniciar sesión sin conexión."
+        }
+
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(customView)
+            .setCancelable(false)
+            .create()
+
+        closeButton.setOnClickListener {
+            if (canProceedOffline) {
+                // Si puede proceder offline, simplemente cierra el diálogo
+                dialog.dismiss()
+            } else {
+                // Si no puede proceder offline, cierra la actividad
+                finish()
+            }
+        }
+
+        dialog.show()
+    }
+
+    private fun showRegister(canProceedOffline: Boolean) {
+        val inflater = LayoutInflater.from(this)
+        val customView = inflater.inflate(R.layout.pop_up_registro, null)
 
         val messageTextView: TextView = customView.findViewById(R.id.popupMessage)
         val closeButton: Button = customView.findViewById(R.id.closeButton)

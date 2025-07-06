@@ -10,10 +10,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.oasis.bite.R
 import com.oasis.bite.domain.models.Receta
+import com.oasis.bite.domain.models.RecetaStatus
+import com.oasis.bite.presentation.ui.home.HomeViewModel
 
 class AutorizarRecetaAdapter (
     private var listaRecetas: List<Receta>,
-    private val onItemClick: (Receta)-> Unit
+    private val onItemClick: (Receta)-> Unit,
+    private val  homeViewModel: HomeViewModel
 
     ) :
     RecyclerView.Adapter<AutorizarRecetaAdapter.RecetaViewHolder>() {
@@ -38,7 +41,7 @@ class AutorizarRecetaAdapter (
 
         override fun onBindViewHolder(holder: RecetaViewHolder, position: Int) {
             val receta = listaRecetas[position]
-
+            var estado : RecetaStatus
             holder.titulo.text = receta.nombre
             holder.detalles.text = "${receta.tiempo} - ${receta.dificultad} - Por ${receta.username}"
             Glide.with(holder.itemView.context)
@@ -47,9 +50,14 @@ class AutorizarRecetaAdapter (
             holder.itemView.setOnClickListener {
                 onItemClick(receta)
             }
-
-            holder.aprobar.setOnClickListener {  }
-            holder.rechazar.setOnClickListener {  }
+            holder.aprobar.setOnClickListener {
+                estado = RecetaStatus.APROBADA
+                homeViewModel.editarEstadoReceta(receta.id,estado.label.toString()) // cambiar a RECETA
+            }
+            holder.rechazar.setOnClickListener {
+                estado = RecetaStatus.RECHAZADA
+                homeViewModel.editarEstadoReceta(receta.id,estado.label.toString()) // CAMBIAR A RECETA
+            }
         }
 
         //Le dice al Recycler cuántos elementos tiene que mostrar en total. si devuelve 0 no muestra nada

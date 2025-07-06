@@ -56,6 +56,15 @@
             android:name="com.oasis.bite.AgregarTituloRecetaActivty"
             />
 
+        <activity
+            android:name="com.oasis.bite.AutorizacionBoxesActivity"
+            />
+
+        <activity
+            android:name="com.oasis.bite.AutorizarActivity"
+            android:exported="false"
+            />
+
 
     </application>
 

@@ -6,7 +6,9 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Switch
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +21,8 @@ import com.oasis.bite.databinding.ActivityMainBinding
 import com.oasis.bite.databinding.FiltroPopupBinding
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
+import com.google.gson.Gson
+import com.oasis.bite.domain.models.User
 import com.oasis.bite.presentation.viewmodel.UsersViewModel
 import com.oasis.bite.presentation.viewmodel.UsersViewModelFactory
 
@@ -52,6 +56,8 @@ class MainActivity : AppCompatActivity() {
             userViewModel.logout()
         }
 
+        val usuario = getUsuarioLogueado(this)
+
         // Obtener el DrawerLayout
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
 
@@ -63,25 +69,57 @@ class MainActivity : AppCompatActivity() {
 
         val btnCambiarContrasena = findViewById<TextView>(R.id.opcionCambiarContrasena)
 
+
         btnCambiarContrasena.setOnClickListener {
             val intent = Intent(this, ResetPasswordActivity::class.java)
             startActivity(intent)
         }
 
-        val nombreUsuario = intent.getStringExtra("nombreUsuario") ?: "Usuario"
+        val nombreUsuario = intent.getStringExtra("username") ?: "Usuario"
+        val userEmail = usuario.email
+        Log.d("nombreUsuario", nombreUsuario.toString())
         findViewById<TextView>(R.id.saludoText)?.text = "¡Hola $nombreUsuario!"
         findViewById<TextView>(R.id.nombreUsuario)?.text = nombreUsuario
 
-        val rolUsuario = intent.getStringExtra("rolUsuario") ?: "USER"
+        val rolUsuario = intent.getStringExtra("rolUsuario")
         val opcionAutorizacion = findViewById<TextView>(R.id.opcionAutorizacion)
 
         if (rolUsuario == "ADMIN") {
+            Log.d("EMAIL ADMIN", rolUsuario.toString())
             opcionAutorizacion.visibility = View.VISIBLE
         }
 
         opcionAutorizacion.setOnClickListener {
             val intent = Intent(this, AutorizacionBoxesActivity::class.java)
             startActivity(intent)
+        }
+        val wifiSwitch = findViewById<Switch>(R.id.switchWifi)
+
+        userViewModel.loadWifiPreference(userEmail)
+        Log.d("EMAIL USUAERIO", userEmail)
+        userViewModel.wifiPreference.observe(this) { isEnabled ->
+            // Se usa setOnCheckedChangeListener(null) para evitar que se dispare
+            // el listener cuando actualizamos el estado programáticamente.
+            wifiSwitch.setOnCheckedChangeListener(null) // Desactiva temporalmente el listener
+            wifiSwitch.isChecked = isEnabled // Actualiza el estado del Switch en la UI
+            wifiSwitch.setOnCheckedChangeListener { _, checked ->
+                // Este listener se dispara cuando el usuario CAMBIA el Switch
+                Log.d("SettingsFragment", "Switch cambiado por el usuario a: $checked")
+                userViewModel.toggleWifiPreference(userEmail.toString()) // Envía el cambio a la API
+            }
+        }
+
+        // Observar el estado de la actualización para dar feedback al usuario
+        userViewModel.preferenceUpdateStatus.observe(this) { isSuccess ->
+            if (isSuccess) {
+                // El estado del LiveData 'wifiPreference' ya se habrá actualizado en el ViewModel
+                // por lo que el switch en la UI se actualizará automáticamente.
+                Toast.makeText(this, "Preferencia guardada.", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Error al guardar preferencia.", Toast.LENGTH_SHORT).show()
+                // Opcional: Revertir el estado visual del switch si la API falla
+                // wifiSwitch.isChecked = !(wifiSwitch.isChecked)
+            }
         }
 
         val navView: BottomNavigationView = binding.navView
@@ -93,10 +131,10 @@ class MainActivity : AppCompatActivity() {
             when (destination.id) {
                 R.id.recetaFragment -> {
                     // Ocultamos barra, frase y searchbar
-                    findViewById<View>(R.id.toolbar).visibility = View.GONE
+                    findViewById<View>(R.id.toolbarMain).visibility = View.GONE
                     findViewById<View>(R.id.searchbar).visibility = View.GONE
                     findViewById<View>(R.id.btnAbrirPopup).visibility = View.GONE
-                } R.id.navigation_notifications, R.id.navigation_dashboard-> {
+                } R.id.navigation_notifications, R.id.navigation_dashboard, R.id.CalculadoraFragment-> {
                 // Ocultamos frase y searchbar
                 findViewById<View>(R.id.searchbar).visibility = View.GONE
                 findViewById<View>(R.id.btnAbrirPopup).visibility = View.GONE
@@ -191,7 +229,12 @@ class MainActivity : AppCompatActivity() {
 
 
     }
-
-
+    fun getUsuarioLogueado(context: Context): User {
+        val prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val json = prefs.getString("usuario_logueado", null)
+        return json.let { Gson().fromJson(it, User::class.java) }
     }
+
+
+}
 

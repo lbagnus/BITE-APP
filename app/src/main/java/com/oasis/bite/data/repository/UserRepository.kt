@@ -52,4 +52,35 @@ class UserRepository(private val apiService: ApiService) {
     suspend fun resetContraseña(email: String, password: String): Response<Unit> {
         return apiService.resetearPassword(PassResetRequest(email, password))
     }
+
+    suspend fun getWifiPreference(userEmail: String): Boolean {
+        return try {
+            val response = apiService.getFormatoCarga(userEmail) // Asumo que devuelve Response<WifiPreferenceResponse>
+            if (response.isSuccessful && response.body() != null) {
+                response.body()!!
+            } else {
+                Log.e("UserRepository", "Error GET preferencia WiFi: ${response.code()} - ${response.message()}")
+                false // Por defecto a false en caso de error o no exitoso
+            }
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Excepción GET preferencia WiFi: ${e.message}", e)
+            false // Por defecto a false en caso de excepción
+        }
+    }
+    suspend fun cambiarWifiSwitch(userEmail: String): Boolean {
+        return try {
+            val response = apiService.cambiarFormatoCarga(userEmail)
+            if (response.isSuccessful) {
+                Log.d("UserRepository", "Preferencia WiFi cambiada en la API exitosamente.")
+               response.body()!!
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.e("UserRepository", "Error al cambiar preferencia WiFi en API: ${response.code()} - ${response.message()}. Cuerpo: $errorBody")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Excepción al cambiar preferencia WiFi en API: ${e.message}", e)
+            false
+        }
+    }
 }

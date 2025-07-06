@@ -1,6 +1,7 @@
 package com.oasis.bite.data.api
 
 import com.oasis.bite.data.model.CodeRequest
+import com.oasis.bite.data.model.ComentarioResponse
 import com.oasis.bite.data.model.CommentRequest
 import com.oasis.bite.data.model.EstadoRequest
 import com.oasis.bite.data.model.FavRequest
@@ -94,11 +95,21 @@ interface ApiService {
     suspend fun editarReceta(@Body params: RecetaRequest, @Path("id") id: String): Response<Unit>
 
     @PUT("recetas/review/{id}")
+    suspend fun cambiarEstadoComentario(@Body params: EstadoRequest, @Path("id") id: String): Response<Unit>
+
+    @POST("recetas/aprobar/{id}")
     suspend fun cambiarEstadoReceta(@Body params: EstadoRequest, @Path("id") id: String): Response<Unit>
 
     @GET("recetas/pendientes")
     suspend fun getRecetasPendientes(): Response<List<RecetaSimpleResponse>>
 
+    @GET("recetas/review/pendientes")
+    suspend fun getComentariosPendientes(): Response<List<ComentarioResponse>>
 
+    @PUT("users/usaDatos/{email}")
+    suspend fun cambiarFormatoCarga(@Path("email") email: String): Response<Boolean>
+
+    @GET("users/usaDatos/{email}")
+    suspend fun getFormatoCarga(@Path("email") email: String): Response<Boolean>
 
 }

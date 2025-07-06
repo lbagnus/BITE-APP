@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".presentation.ui.PendingObjectFragment">
+
+    <TextView
+        android:id="@+id/emptyMessageTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="No hay elementos pendientes de autorización."
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:layout_marginTop="32dp"
+        android:paddingHorizontal="24dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.3" />
+
+    <androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/recyclerRecetasPending"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:visibility="gone" app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    tools:listitem="@layout/item_receta_autorizar" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerComentariosPending"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/item_comentario_autorizar" />
+    <LinearLayout
+    android:id="@+id/noInternetLayoutFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#DDFFFFFF"
+    android:visibility="gone"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent">
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/nowifi"
+        android:contentDescription="No internet"
+        app:tint="@color/gris" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No hay conexión a internet. No se pueden cargar los elementos."
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        android:paddingHorizontal="24dp" />
+
+    <Button
+        android:id="@+id/btnRetryInternetFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reintentar"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="@color/orange"
+        android:textColor="@color/white" />
+</LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

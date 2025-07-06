@@ -11,7 +11,7 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
         <ImageButton
-            android:id="@+id/btnVolver"
+            android:id="@+id/cancelar"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@android:color/transparent"
@@ -39,7 +39,7 @@
         android:id="@+id/opcionreceta"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Autorizaciones"
+        android:text="Autorizar Receta"
         android:drawableEnd="@drawable/arrow_right_24px"
         android:drawablePadding="8dp"
         android:layout_marginTop="12dp"
@@ -52,7 +52,7 @@
         android:id="@+id/opcioncomentario"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Autorizaciones"
+        android:text="Autorizar Comentario"
         android:drawableEnd="@drawable/arrow_right_24px"
         android:drawablePadding="8dp"
         android:layout_marginTop="12dp"

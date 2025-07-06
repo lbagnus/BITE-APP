@@ -9,12 +9,15 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.oasis.bite.data.api.ApiService
 import com.oasis.bite.data.model.CommentRequest
+import com.oasis.bite.data.model.EstadoRequest
 import com.oasis.bite.data.model.FavParams
 import com.oasis.bite.data.model.FavRequest
 import com.oasis.bite.data.model.PasoRecetaRequest
 import com.oasis.bite.data.model.RecetaRequest
 import com.oasis.bite.data.model.RecetaSearchParams
+import com.oasis.bite.data.toComentario
 import com.oasis.bite.data.toReceta
+import com.oasis.bite.domain.models.Comentario
 import com.oasis.bite.domain.models.Ingrediente
 import com.oasis.bite.domain.models.PasoReceta
 import com.oasis.bite.domain.models.Receta
@@ -335,7 +338,7 @@ class RecetaRepository(
     }
 
     suspend fun sincronizarPendientes() {
-        if (!isInternetAvailable(context)) return
+        if (!isInternetAvailable(context) ) return
 
         val pendientes = recetaDao.obtenerPendientes()
         for (receta in pendientes) {
@@ -464,6 +467,89 @@ class RecetaRepository(
             false // Fallo por excepción
         }
     }
+
+    suspend fun editarEstadoComentario(estadoParams: EstadoRequest,id: Int): Boolean{
+        return try {
+            // Asumo que apiService.cambiarEstadoComentario devuelve Response<Unit> o Response<SomeSuccessDto>
+            val response = apiService.cambiarEstadoComentario(estadoParams, id.toString())
+
+            if (response.isSuccessful) {
+                // La API respondió con un código de éxito (ej. 200, 204)
+                Log.d("RecetaRepository", "✅ Estado de la receta ID $id cambiado exitosamente a ${estadoParams.estado}")
+                true // Éxito
+            } else {
+                // La API respondió con un código de error (ej. 4xx, 5xx)
+                val errorBody = response.errorBody()?.string()
+                Log.e("RecetaRepository", "⚠️ Fallo al cambiar estado de receta ID $id: ${response.code()} - ${response.message()}. Cuerpo de error: $errorBody")
+                false // Fallo por respuesta de error de la API
+            }
+        } catch (e: Exception) {
+            // Ocurrió una excepción (ej. error de red, timeout, JSON malformado)
+            Log.e("RecetaRepository", "❌ Excepción al cambiar estado de receta ID $id: ${e.message}", e)
+            false // Fallo por excepción
+        }
+    }
+
+    suspend fun editarEstadoReceta(estadoParams: EstadoRequest, id: Int): Boolean {
+        return try {
+            // Asumo que apiService.cambiarEstadoComentario devuelve Response<Unit> o Response<SomeSuccessDto>
+            val response = apiService.cambiarEstadoReceta(estadoParams, id.toString())
+
+            if (response.isSuccessful) {
+                // La API respondió con un código de éxito (ej. 200, 204)
+                Log.d("RecetaRepository", "✅ Estado de la receta ID $id cambiado exitosamente a ${estadoParams.estado}")
+                true // Éxito
+            } else {
+                // La API respondió con un código de error (ej. 4xx, 5xx)
+                val errorBody = response.errorBody()?.string()
+                Log.e("RecetaRepository", "⚠️ Fallo al cambiar estado de receta ID $id: ${response.code()} - ${response.message()}. Cuerpo de error: $errorBody")
+                false // Fallo por respuesta de error de la API
+            }
+        } catch (e: Exception) {
+            // Ocurrió una excepción (ej. error de red, timeout, JSON malformado)
+            Log.e("RecetaRepository", "❌ Excepción al cambiar estado de receta ID $id: ${e.message}", e)
+            false // Fallo por excepción
+        }
+    }
+
+    suspend fun getComentariosPendientes(): List<Comentario> ?{
+        val response = apiService.getComentariosPendientes()
+        return if (response.isSuccessful && response.body() != null) {
+            Log.d("RecetasRepository", "Comentario recibida correctamente")
+            //Log.d("RecetaRepositoryComentario", response.body().toString())
+            return response.body()!!.map { it.toComentario() }
+        } else {
+            Log.e("RecetasRepository", "Error al obtener Comentario: ${response.code()} - ${response.message()}")
+            null
+        }
+    }
+
+    suspend fun getRecetasPendientes(): List<Receta> ?{
+        val response = apiService.getRecetasPendientes()
+        return if (response.isSuccessful && response.body() != null) {
+            Log.d("RecetasRepository", "Receta recibida correctamente")
+            return response.body()!!.map { it.toReceta() }
+
+        } else {
+            Log.e("RecetasRepository", "Error al obtener Receta: ${response.code()} - ${response.message()}")
+            null
+        }
+    }
+    suspend fun getWifiPreference(userEmail: String): Boolean {
+        return try {
+            val response = apiService.getFormatoCarga(userEmail) // Asumo que devuelve Response<WifiPreferenceResponse>
+            if (response.isSuccessful && response.body() != null) {
+                response.body()!!
+            } else {
+                Log.e("UserRepository", "Error GET preferencia WiFi: ${response.code()} - ${response.message()}")
+                false // Por defecto a false en caso de error o no exitoso
+            }
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Excepción GET preferencia WiFi: ${e.message}", e)
+            false // Por defecto a false en caso de excepción
+        }
+    }
+
 }
 
 

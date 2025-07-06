@@ -1,7 +1,9 @@
 package com.oasis.bite.data
 
+import android.util.Log
 import com.oasis.bite.data.model.CategoriaDTO
 import com.oasis.bite.data.model.ComentarioDTO
+import com.oasis.bite.data.model.ComentarioResponse
 import com.oasis.bite.data.model.IngredienteDTO
 import com.oasis.bite.data.model.LoginResponse
 import com.oasis.bite.data.model.PasoRecetaDTO
@@ -89,7 +91,7 @@ fun RecetaSimpleResponse.toReceta(): Receta{
         dificultad = Dificultad.valueOf(this.dificultad?.uppercase() ?: "MEDIA"),
         imagen = this.imagen,
         estado = RecetaStatus.valueOf(this.estado.uppercase()),
-        username = this.username,
+        username = this.Usuario.username,
         categoria = this.CategoriumCategoria?: "Sin categoría",
         pasos = emptyList(),
         reviewCount = this.reviewCount?:0,
@@ -111,6 +113,16 @@ fun String.toMedia(): MediaItem{
     return MediaItem(
         url = this,
         type = getMediaTypeFromUrl(this)
+    )
+}
+
+fun ComentarioResponse.toComentario(): Comentario {
+    return Comentario(
+        id = this.id,
+        titulo = this.titulo,
+        valoracion = this.valoracion,
+        reseña = this.reseña,
+        userName = this.Usuario.username
     )
 }
 

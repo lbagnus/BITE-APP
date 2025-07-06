@@ -42,10 +42,22 @@
         <argument
             android:name="query"
             app:argType="string"
-            app:nullable="true" /> <argument
+            app:nullable="true" />
+        <argument
         android:name="categorianombre"
         app:argType="string"
         app:nullable="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/CalculadoraFragment"
+        android:name="com.oasis.bite.presentation.ui.CalculadoraFragment"
+        android:label="Receta"
+        tools:layout="@layout/fragment_receta">
+        <argument
+            android:name="recetaId"
+            app:argType="integer"
+            android:defaultValue="0" />
     </fragment>
 
 

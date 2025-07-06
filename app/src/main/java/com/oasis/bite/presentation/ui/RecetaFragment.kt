@@ -48,6 +48,13 @@ class RecetaFragment : Fragment() {
             viewModel.cargarReceta(recetaId.toString())
         }
         Log.d("RecetaFragment", "Receta ID recibido: $recetaId")
+        val botonCalculadora = binding.calculadora
+        botonCalculadora.setOnClickListener {
+            val bundle = Bundle().apply {
+                putInt("recetaId", recetaId)
+            }
+            findNavController().navigate(R.id.CalculadoraFragment, bundle)
+        }
 
         viewModel.receta.observe(viewLifecycleOwner) { receta ->
             receta?.let {

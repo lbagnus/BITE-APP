@@ -4,19 +4,24 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.NetworkInfo
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
@@ -59,7 +64,15 @@ class AgregarRecetaActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         binding.btnVolver.setOnClickListener {
-            finish()
+            showMensajeAtras { accion ->
+                when (accion) {
+                    AccionDialogoAtras.VOLVER -> {
+                        finish()
+                    }
+                    AccionDialogoAtras.PERMANECER -> {
+                        // no hace nada
+                    }
+                }}
         }
         viewModel.recetaOperationStatus.observe(this) { success ->
             if (success) {
@@ -414,6 +427,7 @@ class AgregarRecetaActivity : AppCompatActivity() {
                                 Toast.makeText(this, "Error al eliminar la receta: ID no encontrado.", Toast.LENGTH_SHORT).show()
                             }
                         }
+                        if (getConnectionType(this) == ConnectionType.WIFI || viewModel.loadWifiPreference(usuarioEmail.toString()) == true ){
                         viewModel.agregarReceta(
                             titulo,
                             descripcion,
@@ -426,7 +440,12 @@ class AgregarRecetaActivity : AppCompatActivity() {
                             listaIngredientes,
                             pasosFinales,
                             categoria
-                        )
+                        )}else{
+                            Log.d("BOTON_CONTINUAR", "Guardando receta OFFLINE")
+                            viewModel.agregarRecetaOffline(titulo, descripcion, tiempo, porciones, dificultad, imagenPrincipalReceta, imagenesRecetaParaEnvio,
+                                usuarioEmail.toString(), listaIngredientes, pasosFinales, categoria)
+                            Toast.makeText(this, "Receta guardada localmente, se subirá cuando tengas WIFI", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 } else {
                     Log.d("BOTON_CONTINUAR", "Guardando receta OFFLINE")
@@ -447,10 +466,50 @@ class AgregarRecetaActivity : AppCompatActivity() {
     }
 
     // Función para verificar la conexión a Internet
-    private fun isInternetAvailable(context: Context): Boolean {
+    enum class ConnectionType {
+        WIFI,
+        MOBILE_DATA,
+        ETHERNET, // Podrías añadir otros tipos si son relevantes (VPN, Bluetooth, etc.)
+        NO_INTERNET
+    }
+
+    private fun getConnectionType(context: Context): ConnectionType {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
-        return networkInfo != null && networkInfo.isConnected
+
+        // Para Android 10 (API 29) y superior, NetworkInfo está deprecado.
+        // Se recomienda usar NetworkCapabilities.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { // API 23+
+            val network = connectivityManager.activeNetwork ?: return ConnectionType.NO_INTERNET
+            val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return ConnectionType.NO_INTERNET
+
+            return when {
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> ConnectionType.WIFI
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> ConnectionType.MOBILE_DATA
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> ConnectionType.ETHERNET
+                // Puedes añadir más TRANSPORT_ aquí para otros tipos (VPN, Bluetooth)
+                else -> ConnectionType.NO_INTERNET
+            }
+        } else {
+            // Para versiones de Android anteriores a Marshmallow (API 23)
+            // NetworkInfo todavía se usa
+            val networkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
+            return if (networkInfo != null && networkInfo.isConnected) {
+                when (networkInfo.type) {
+                    ConnectivityManager.TYPE_WIFI -> ConnectionType.WIFI
+                    ConnectivityManager.TYPE_MOBILE -> ConnectionType.MOBILE_DATA
+                    ConnectivityManager.TYPE_ETHERNET -> ConnectionType.ETHERNET
+                    else -> ConnectionType.NO_INTERNET
+                }
+            } else {
+                ConnectionType.NO_INTERNET
+            }
+        }
+    }
+
+    // Puedes mantener tu función isInternetAvailable si la usas mucho,
+// o simplemente llamar a getConnectionType y verificar si no es NO_INTERNET
+    private fun isInternetAvailable(context: Context): Boolean {
+        return getConnectionType(context) != ConnectionType.NO_INTERNET
     }
 
     private fun guardarImagenLocalmente(context: Context, uri: Uri, nombreArchivo: String): String {
@@ -587,6 +646,42 @@ class AgregarRecetaActivity : AppCompatActivity() {
             Log.e("ACTUALIZAR_IMAGEN", "✗ No se encontró el paso con ID: $pasoId")
             Log.e("ACTUALIZAR_IMAGEN", "  Pasos disponibles: ${listaPasos.map { "${it.numeroDePaso}:'${it.contenido}'" }}")
         }
+    }
+
+    private fun showMensajeAtras(callback: (AccionDialogoAtras) -> Unit) {
+        val inflater = LayoutInflater.from(this)
+        val customView = inflater.inflate(R.layout.popup_atras_receta, null)
+
+        val messageTextView: TextView = customView.findViewById(R.id.popupMessage)
+        val editarButton: Button = customView.findViewById(R.id.editarButton)
+        val reemplazarButton: Button = customView.findViewById(R.id.reemplazarButton)
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(customView)
+            .setCancelable(false) // Si es false, el usuario DEBE elegir una opción.
+            .create()
+
+        editarButton.setOnClickListener {
+            dialog.dismiss()
+            callback(AccionDialogoAtras.PERMANECER) // Llama al callback con la acción EDITAR
+        }
+
+        reemplazarButton.setOnClickListener {
+            dialog.dismiss()
+            callback(AccionDialogoAtras.VOLVER) // Llama al callback con la acción REEMPLAZAR
+        }
+
+
+        dialog.setOnCancelListener {
+            callback(AccionDialogoAtras.PERMANECER)
+        }
+
+        dialog.show()
+        Log.d("showMensajeAtras", "Diálogo mostrado. Esperando acción del usuario.")
+
+    }
+    enum class AccionDialogoAtras {
+         VOLVER, PERMANECER // CANCELAR si el diálogo es cancelable y se descarta
     }
 
 }

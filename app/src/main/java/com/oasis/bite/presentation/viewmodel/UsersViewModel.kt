@@ -31,6 +31,14 @@ class UsersViewModel(private val sessionRepository: UserSessionRepository) : Vie
     private val _localSessionExists = MutableLiveData<Boolean>()
     val localSessionExists: LiveData<Boolean> = _localSessionExists
 
+    private val _wifiPreference = MutableLiveData<Boolean>()
+    val wifiPreference: LiveData<Boolean> get() = _wifiPreference
+
+    // LiveData para el estado de la operación (opcional, pero útil para feedback)
+    private val _preferenceUpdateStatus = MutableLiveData<Boolean>()
+    val preferenceUpdateStatus: LiveData<Boolean> get() = _preferenceUpdateStatus
+
+
     init {
         // Llama a inicializarSesion tan pronto como el ViewModel se crea
         // para que el estado de la sesión local esté disponible desde el principio.
@@ -112,4 +120,44 @@ class UsersViewModel(private val sessionRepository: UserSessionRepository) : Vie
     suspend fun resetPassword(email: String, password: String):Response<Unit>{
         return repository.resetContraseña(email, password)
     }
+
+    fun loadWifiPreference(userEmail: String) {
+        viewModelScope.launch {
+            try {
+                // Asumo que tu UserRepository tiene un método para obtener la preferencia del switch
+                val preference = repository.getWifiPreference(userEmail)
+                _wifiPreference.postValue(preference)
+                Log.d("UsersViewModel", "Preferencia WiFi cargada: $preference")
+            } catch (e: Exception) {
+                Log.e("UsersViewModel", "Error al cargar preferencia WiFi: ${e.message}", e)
+                // Podrías poner un valor por defecto o manejar el error en la UI
+                _wifiPreference.postValue(false) // Por defecto a false en caso de error
+                _preferenceUpdateStatus.postValue(false) // Indica que la carga falló
+            }
+        }
+    }
+
+    // Método para cambiar la preferencia del switch en la API
+    fun toggleWifiPreference(userEmail: String) { // No necesitas pasar el valor, la API lo invierte
+        viewModelScope.launch {
+            try {
+                // Asumo que tu UserRepository.toggleWifiPreference ya invierte el valor en la API
+                val success = repository.cambiarWifiSwitch(userEmail)
+                if (success) {
+                    // Si la API responde con éxito, actualiza el LiveData local invirtiendo el valor actual
+                    _wifiPreference.value = !(_wifiPreference.value ?: false) // Invierte el valor actual, si es null usa false
+                    _preferenceUpdateStatus.postValue(true) // Notifica éxito
+                    Log.d("UsersViewModel", "Preferencia WiFi cambiada exitosamente. Nuevo valor: ${_wifiPreference.value}")
+                } else {
+                    Log.e("UsersViewModel", "Fallo al cambiar preferencia WiFi en la API.")
+                    _preferenceUpdateStatus.postValue(false) // Notifica fallo
+                }
+            } catch (e: Exception) {
+                Log.e("UsersViewModel", "Excepción al cambiar preferencia WiFi: ${e.message}", e)
+                _preferenceUpdateStatus.postValue(false) // Notifica fallo por excepción
+            }
+        }
+    }
+
+
 }

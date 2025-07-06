@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/authorization_navigation"
+    app:startDestination="@+id/pendingObjectFragment">
+
+    <fragment
+        android:id="@+id/pendingObjectFragment"
+        android:name="com.oasis.bite.presentation.ui.PendingObjectFragment"
+        android:label="Autorización de Objetos"
+        tools:layout="@layout/fragment_pending_object">
+
+        <argument
+            android:name="objectType"
+            app:argType="string"
+            android:defaultValue="receta" /> <action
+        android:id="@+id/action_pendingObjectFragment_to_recetaFragment"
+        app:destination="@id/recetaFragment" />
+    </fragment>
+
+    <include app:graph="@navigation/mobile_navigation" />
+
+</navigation>

@@ -15,6 +15,7 @@ import com.oasis.bite.data.model.PasoRecetaRequest
 import com.oasis.bite.data.model.RecetaRequest
 import com.oasis.bite.data.model.RecetaSearchParams
 import com.oasis.bite.data.repository.RecetaRepository
+import com.oasis.bite.data.repository.UserRepository
 import com.oasis.bite.domain.models.Receta
 import com.oasis.bite.domain.models.Ingrediente
 import com.oasis.bite.domain.models.MediaItem
@@ -24,7 +25,6 @@ import kotlinx.coroutines.launch
 
 class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
 
-    private val apiService = RetrofitInstance.apiService
 
     private val _receta = MutableLiveData<Receta?>()
     val receta: MutableLiveData<Receta?> get() = _receta
@@ -263,5 +263,23 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
             }
         }
     }
+    fun loadWifiPreference(userEmail: String): Boolean {
+        var preference = false
+        viewModelScope.launch {
+            try {
+                // Asumo que tu UserRepository tiene un método para obtener la preferencia del switch
+                 preference = repository.getWifiPreference(userEmail)
+
+                Log.d("UsersViewModel", "Preferencia WiFi cargada: $preference")
+            } catch (e: Exception) {
+                Log.e("UsersViewModel", "Error al cargar preferencia WiFi: ${e.message}", e)
+                // Podrías poner un valor por defecto o manejar el error en la UI
+
+            }
+        }
+        return preference
+    }
+
+
 }
 

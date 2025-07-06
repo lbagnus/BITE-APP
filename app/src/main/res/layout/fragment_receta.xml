@@ -272,6 +272,7 @@
                     android:layout_height="0dp"
                     android:layout_weight="1" />
                 <ImageView
+                    android:id="@+id/calculadora"
                 android:layout_width="30dp" android:layout_height="30dp" android:focusable="true"
                 android:src="@drawable/calculadora"
                 android:clickable="true"
