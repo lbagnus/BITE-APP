@@ -78,7 +78,7 @@ class DashboardFragment : Fragment() {
         recyclerRecetas.adapter = recetaAdapter
         recyclerRecetas.itemAnimator = null
 
-        homeViewModel.recetasLiveData.observe(viewLifecycleOwner) { recetas ->
+        homeViewModel.misRecetasLiveData.observe(viewLifecycleOwner) { recetas ->
             if (recetas != null && recetas.isNotEmpty()) {
                 Log.d("DashboardFragment", "Mis Recetas recibidas: ${recetas.size}")
                 recetaAdapter.actualizarRecetas(recetas)
@@ -137,7 +137,7 @@ class DashboardFragment : Fragment() {
         if (isInternetAvailable(requireContext())) {
             showContent() // Mostrar el contenido normal
             val usuario = getUsuarioLogueado(requireContext())
-            homeViewModel.cargarRecetasUsuario(usuario.username)
+            homeViewModel.cargarRecetasUsuario(usuario.email)
         } else {
             showNoInternetMessage() // Mostrar el mensaje de no internet
             Toast.makeText(requireContext(), "No hay conexión a internet.", Toast.LENGTH_SHORT).show()

@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -65,7 +66,7 @@ class AgregarTituloRecetaActivty: AppCompatActivity() {
             // ✅ Con internet, verificar si la receta ya existe
             viewModel.verificarSiRecetaExiste(
                 titulo,
-                usuarioUserName.toString()
+                usuarioEmail.toString(),
             ) { idReceta ->
                 if (idReceta != 0) {
                     showCustomNoInternetDialog { quiereEditar ->
@@ -105,7 +106,7 @@ class AgregarTituloRecetaActivty: AppCompatActivity() {
         val messageTextView: TextView = customView.findViewById(R.id.popupMessage)
         val editarButton: Button = customView.findViewById(R.id.editarButton)
         val reemplazarButton: Button = customView.findViewById(R.id.reemplazarButton)
-
+        val cerrar : ImageButton = customView.findViewById(R.id.btnClosePopup)
         val dialog = AlertDialog.Builder(this)
             .setView(customView)
             .setCancelable(false)
@@ -121,6 +122,9 @@ class AgregarTituloRecetaActivty: AppCompatActivity() {
             onDecision(false) // false = REEMPLAZAR
         }
 
+        cerrar.setOnClickListener {
+            dialog.dismiss()
+        }
         dialog.show()
     }
 

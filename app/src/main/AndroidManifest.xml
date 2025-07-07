@@ -72,6 +72,8 @@
             android:name="com.oasis.bite.MisCalculosActivity"
             android:exported="false"
             />
+        <activity android:name="com.oasis.bite.RecetaLocalDetailActivity"
+            android:exported="false" />
 
 
     </application>

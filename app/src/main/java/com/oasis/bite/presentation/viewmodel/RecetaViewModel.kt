@@ -37,7 +37,14 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
     val favoritoLiveData = MutableLiveData<List<Receta>?>()
     private val _recetaOperationStatus = MutableLiveData<Boolean>()
     val recetaOperationStatus: LiveData<Boolean> get() = _recetaOperationStatus // True para éxito, False para fallo
+    private val _saveAdjustedRecipeStatus = MutableLiveData<Boolean>()
+    val saveAdjustedRecipeStatus: LiveData<Boolean> get() = _saveAdjustedRecipeStatus
+    private val _localAdjustedRecetas = MutableLiveData<List<Receta>>()
+    val localAdjustedRecetas: LiveData<List<Receta>> get() = _localAdjustedRecetas
 
+    private val _messageForUser =
+        MutableLiveData<String>() // Para mensajes al usuario (éxito/límite)
+    val messageForUser: LiveData<String> get() = _messageForUser
 
     fun cargarReceta(id: String) {
         viewModelScope.launch {
@@ -55,27 +62,42 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
     fun getRecetasFavoritos(email: String, onResult: (List<Receta>) -> Unit) {
         viewModelScope.launch {
             val favoritos = repository.getRecetasFavoritos(email)
-            favoritoLiveData.postValue(favoritos ?:emptyList())
+            favoritoLiveData.postValue(favoritos ?: emptyList())
         }
     }
 
-    fun eliminarRecetaFavorito(email: String, receta: Int){
-        viewModelScope.launch{
-            var params = FavParams(email = email, recetaId =receta)
-            repository.deleteFavorito(params)}
+    fun eliminarRecetaFavorito(email: String, receta: Int) {
+        viewModelScope.launch {
+            var params = FavParams(email = email, recetaId = receta)
+            repository.deleteFavorito(params)
+        }
     }
 
-    fun agregarRecetaFavorito(email: String, receta: Int){
-        viewModelScope.launch{
-            var params = FavParams(email = email, recetaId =receta)
-            repository.addFavorito(params)}
+    fun agregarRecetaFavorito(email: String, receta: Int) {
+        viewModelScope.launch {
+            var params = FavParams(email = email, recetaId = receta)
+            repository.addFavorito(params)
+        }
     }
 
-    fun agregarComentario(email: String, titulo: String, reseña: String, valoracion: Int, receta: Int): Int{
+    fun agregarComentario(
+        email: String,
+        titulo: String,
+        reseña: String,
+        valoracion: Int,
+        receta: Int
+    ): Int {
         var response = 0
-        viewModelScope.launch{
-            var params = CommentRequest(usuarioEmail = email, recetaId =receta, titulo = titulo, reseña = reseña, valoracion = valoracion)
-                response =  repository.addComentario(params)}
+        viewModelScope.launch {
+            var params = CommentRequest(
+                usuarioEmail = email,
+                recetaId = receta,
+                titulo = titulo,
+                reseña = reseña,
+                valoracion = valoracion
+            )
+            response = repository.addComentario(params)
+        }
         return response
     }
 
@@ -85,12 +107,7 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
         callback: (Int) -> Unit
     ) {
         viewModelScope.launch {
-            val params = RecetaSearchParams(
-                userName = usuario,
-                limit = 20,
-                offset = 0
-            )
-            val recetas = repository.getRecetasSearch(params)
+            val recetas = repository.getRecetasUsuario(usuario)
             Log.d("verificarReceta", titulo)
             val recetaExistente = recetas?.find {
                 it.nombre.equals(titulo, ignoreCase = true)
@@ -132,18 +149,26 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
                 )
 
                 // Llama al método del repositorio que interactúa con la API remota
-                val success = repository.addReceta(params) // Asume que addReceta en el repo devuelve un Boolean
+                val success =
+                    repository.addReceta(params) // Asume que addReceta en el repo devuelve un Boolean
 
                 if (success) {
                     Log.d("RecetaViewModel", "Receta '${nombre}' creada exitosamente en la API.")
                     _recetaOperationStatus.postValue(true) // Notifica éxito a la UI
                 } else {
-                    Log.e("RecetaViewModel", "Fallo al crear la receta '${nombre}' en la API. El repositorio indicó fallo.")
+                    Log.e(
+                        "RecetaViewModel",
+                        "Fallo al crear la receta '${nombre}' en la API. El repositorio indicó fallo."
+                    )
                     _recetaOperationStatus.postValue(false) // Notifica fallo a la UI
                 }
             } catch (e: Exception) {
                 // Captura cualquier excepción que ocurra durante la llamada a la API (ej. red, JSON)
-                Log.e("RecetaViewModel", "Excepción al crear receta '${nombre}' en la API: ${e.message}", e)
+                Log.e(
+                    "RecetaViewModel",
+                    "Excepción al crear receta '${nombre}' en la API: ${e.message}",
+                    e
+                )
                 _recetaOperationStatus.postValue(false) // Notifica fallo a la UI
             }
         }
@@ -180,7 +205,8 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
                 )
 
                 // Llama al método del repositorio que guarda localmente (Room/otra BD local)
-                val success = repository.addRecetaLocal(params) // Asume que addRecetaLocal devuelve un Boolean
+                val success =
+                    repository.addRecetaLocal(params) // Asume que addRecetaLocal devuelve un Boolean
 
                 if (success) {
                     Log.d("RecetaViewModel", "Receta '${nombre}' guardada localmente exitosamente.")
@@ -188,12 +214,19 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
                     // Opcional: Podrías tener un LiveData diferente para notificar éxito offline
                     // _offlineSaveStatus.postValue(true)
                 } else {
-                    Log.e("RecetaViewModel", "Fallo al guardar la receta '${nombre}' localmente. El repositorio indicó fallo.")
+                    Log.e(
+                        "RecetaViewModel",
+                        "Fallo al guardar la receta '${nombre}' localmente. El repositorio indicó fallo."
+                    )
                     _recetaOperationStatus.postValue(false) // Notifica fallo a la UI
                 }
             } catch (e: Exception) {
                 // Captura cualquier excepción que ocurra durante el guardado local
-                Log.e("RecetaViewModel", "Excepción al guardar receta '${nombre}' localmente: ${e.message}", e)
+                Log.e(
+                    "RecetaViewModel",
+                    "Excepción al guardar receta '${nombre}' localmente: ${e.message}",
+                    e
+                )
                 _recetaOperationStatus.postValue(false) // Notifica fallo a la UI
             }
         }
@@ -206,7 +239,7 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
         }
     }
 
-    fun eliminarReceta(id: String){
+    fun eliminarReceta(id: String) {
         viewModelScope.launch {
             repository.deleteReceta(id = id)
         }
@@ -245,7 +278,10 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
                 )
 
                 // Llama al método del repositorio para editar la receta
-                val success = repository.editarReceta(params, id) // Asumo que editarReceta en el repositorio devuelve un Boolean
+                val success = repository.editarReceta(
+                    params,
+                    id
+                ) // Asumo que editarReceta en el repositorio devuelve un Boolean
 
                 if (success) {
                     // Si la edición fue exitosa
@@ -253,7 +289,10 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
                     _recetaOperationStatus.postValue(true)
                 } else {
                     // Si la edición falló (por ejemplo, el repositorio devolvió 'false')
-                    Log.e("RecetaViewModel", "Fallo al editar la receta ID $id. El repositorio indicó fallo.")
+                    Log.e(
+                        "RecetaViewModel",
+                        "Fallo al editar la receta ID $id. El repositorio indicó fallo."
+                    )
                     _recetaOperationStatus.postValue(false)
                 }
             } catch (e: Exception) {
@@ -263,12 +302,13 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
             }
         }
     }
+
     fun loadWifiPreference(userEmail: String): Boolean {
         var preference = false
         viewModelScope.launch {
             try {
                 // Asumo que tu UserRepository tiene un método para obtener la preferencia del switch
-                 preference = repository.getWifiPreference(userEmail)
+                preference = repository.getWifiPreference(userEmail)
 
                 Log.d("UsersViewModel", "Preferencia WiFi cargada: $preference")
             } catch (e: Exception) {
@@ -281,5 +321,67 @@ class RecetaViewModel(private val repository: RecetaRepository) : ViewModel() {
     }
 
 
+    fun saveAdjustedRecipe(recetaAjustada: Receta) {
+        viewModelScope.launch {
+            val success = repository.guardarRecetaAjustadaLocal(recetaAjustada)
+            if (success) {
+                _saveAdjustedRecipeStatus.postValue(true)
+                _messageForUser.postValue("Receta ajustada guardada exitosamente.")
+            } else {
+                _saveAdjustedRecipeStatus.postValue(false)
+                _messageForUser.postValue("No se pudo guardar la receta ajustada. Límite alcanzado o error interno.")
+            }
+        }
+    }
+
+    fun loadLocalAdjustedRecetas() {
+        viewModelScope.launch {
+            try {
+                val recetas = repository.obtenerRecetasAjustadasLocales()
+                _localAdjustedRecetas.postValue(recetas)
+                Log.d("RecetaViewModel", "Recetas ajustadas locales cargadas: ${recetas.size}")
+            } catch (e: Exception) {
+                Log.e(
+                    "RecetaViewModel",
+                    "Error al cargar recetas ajustadas locales: ${e.message}",
+                    e
+                )
+                _localAdjustedRecetas.postValue(emptyList())
+                _messageForUser.postValue("Error al cargar recetas guardadas.")
+            }
+        }
+    }
+
+    // Método para eliminar una receta localmente
+    fun deleteLocalAdjustedReceta(receta: Receta) {
+        viewModelScope.launch {
+            val success = repository.eliminarRecetaLocal(receta)
+            if (success) {
+                _messageForUser.postValue("Receta '${receta.nombre}' eliminada localmente.")
+                // Después de eliminar, recarga la lista para que la UI se actualice
+                loadLocalAdjustedRecetas()
+            } else {
+                _messageForUser.postValue("No se pudo eliminar la receta '${receta.nombre}' localmente.")
+            }
+        }
+    }
+
+    fun cargarRecetaLocal(localId: Int) {
+        viewModelScope.launch {
+            Log.d("RecetaViewModel", "Intentando cargar receta local con ID: $localId")
+            try {
+                val recetaLocal = repository.obtenerRecetaLocalPorLocalId(localId)
+                if (recetaLocal != null) {
+                    Log.d("RecetaViewModel", "Receta local cargada del repositorio: ${recetaLocal.nombre}")
+                } else {
+                    Log.w("RecetaViewModel", "Repositorio devolvió null para receta local con ID: $localId")
+                }
+                _receta.postValue(recetaLocal)
+            } catch (e: Exception) {
+                Log.e("RecetaViewModel", "Error al cargar receta local (ID $localId): ${e.message}", e)
+                _receta.postValue(null)
+            }
+        }
+    }
 }
 

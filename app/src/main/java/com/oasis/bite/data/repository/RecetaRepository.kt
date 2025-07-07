@@ -18,9 +18,13 @@ import com.oasis.bite.data.model.RecetaSearchParams
 import com.oasis.bite.data.toComentario
 import com.oasis.bite.data.toReceta
 import com.oasis.bite.domain.models.Comentario
+import com.oasis.bite.domain.models.Dificultad
 import com.oasis.bite.domain.models.Ingrediente
+import com.oasis.bite.domain.models.MediaItem
+import com.oasis.bite.domain.models.MediaType
 import com.oasis.bite.domain.models.PasoReceta
 import com.oasis.bite.domain.models.Receta
+import com.oasis.bite.domain.models.RecetaStatus
 import com.oasis.bite.localdata.database.dao.RecetaDao
 import com.oasis.bite.localdata.database.entities.LocalReceta
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -34,7 +38,7 @@ class RecetaRepository(
     private val recetaDao: RecetaDao,
     private val context: Context
 ) {
-
+    private val MAX_LOCAL_ADJUSTED_RECIPES = 10
     suspend fun getRecetaPorId(id: String): Receta? {
         Log.d("RecetasRepository", "Solicitando receta con id: $id")
         val response = apiService.getRecetaPorId(id)
@@ -58,7 +62,16 @@ class RecetaRepository(
         }
     }
 
-
+    suspend fun getRecetasUsuario(email: String): List<Receta> ?{
+        val response = apiService.getRecetasUsuarios(email)
+        return if (response.isSuccessful && response.body() != null) {
+            Log.d("RecetasRepository", "Receta recibida correctamente")
+            return response.body()!!.map { it.toReceta() }
+        } else {
+            Log.e("RecetasRepository", "Error al obtener receta: ${response.code()} - ${response.message()}")
+            null
+        }
+    }
 
     suspend fun getRecetasHome(): List<Receta> ?{
         val response = apiService.getRecetasHome()
@@ -129,44 +142,6 @@ class RecetaRepository(
 
         return 0
     }
-
-    /*suspend fun addReceta(params: RecetaRequest){
-        val response = apiService.addReceta(RecetaRequest(
-            params.nombre,
-            params.descripcion,
-            params.tiempo,
-            params.porciones,
-            params.dificultad,
-            params.categoriaId,
-            params.imagen,
-            params.imagenes,
-            params.creadorEmail,
-            params.ingredientes,
-            params.pasos,
-            params.estado))
-        /*Log.d("RecetaRepository", "Response code: ${response.code()}")
-        Log.d("RecetaRepository", "Response successful: ${response.isSuccessful}")
-        Log.d("RecetaRepository", "Response body: ${response.body()}")
-        Log.d("RecetaRepository", "Response error: ${response.errorBody()?.string()}")
-
-        return if (response.isSuccessful && response.body() != null) {
-            val recetaResponse = response.body()!!
-            Log.d("RecetaRepository", "LoginResponse: $recetaResponse")
-            try {
-                Log.d("RecetaRepository", "receta cargada con exito")
-                return recetaResponse
-
-            } catch (e: Exception) {
-                Log.e("RecetaRepository", "ERROR en agregarrecta: ${e.message}", e)
-                Log.e("RecetaRepository", "Stack trace completo: ${e.stackTrace.contentToString()}")
-               null
-            }
-        } else {
-            Log.e("RecetaRepository", "Response no exitosa o body null")
-           null
-        }*/
-    }*/
-
 
     // `addReceta` ahora devuelve un Boolean
     suspend fun addReceta(params: RecetaRequest): Boolean {
@@ -264,7 +239,6 @@ class RecetaRepository(
             false // Fallo al guardar localmente
         }
     }
-
 
 
     suspend fun subirImagen(context: Context, uri: Uri): String? {
@@ -550,6 +524,159 @@ class RecetaRepository(
         }
     }
 
+    // Nuevo método para guardar la receta ajustada localmente
+    suspend fun guardarRecetaAjustadaLocal(recetaAjustada: Receta): Boolean {
+        return try {
+            val currentLocalCount = recetaDao.contarRecetasLocales()
+
+            if (currentLocalCount >= MAX_LOCAL_ADJUSTED_RECIPES) {
+                Log.w("RecetaRepository", "Límite de recetas locales alcanzado ($MAX_LOCAL_ADJUSTED_RECIPES). No se puede guardar.")
+                // Opcional: Eliminar la receta más antigua si quieres un sistema FIFO (First-In, First-Out)
+                // val oldestRecipe = recetaDao.obtenerRecetaMasAntigua() // Necesitas implementar este método en DAO
+                // oldestRecipe?.let { recetaDao.eliminarReceta(it) }
+                // Log.i("RecetaRepository", "Receta más antigua eliminada para hacer espacio.")
+                // recetaDao.insertarReceta(recetaEntity) // Luego intenta insertar la nueva
+                return false // Indica que no se pudo guardar por el límite
+            }
+
+            val gson = Gson()
+            // Mapea tu Receta de dominio a tu LocalReceta de Room
+            val localReceta = LocalReceta(
+                idRemoto = recetaAjustada.id, // Guarda el ID remoto si existe (para referencia)
+                nombre = recetaAjustada.nombre,
+                descripcion = recetaAjustada.descripcion,
+                tiempo = recetaAjustada.tiempo,
+                porciones = recetaAjustada.porciones.toString(), // Convertir Int a String
+                dificultad = recetaAjustada.dificultad.label, // Convertir Enum a String
+                imagen = recetaAjustada.imagen,
+                imagenes = gson.toJson(recetaAjustada.imagenes?.map { it.url }), // Serializar List<MediaItem> a JSON String de URLs
+                username = recetaAjustada.username,
+                categoria = recetaAjustada.categoria,
+                pasosJson = gson.toJson(recetaAjustada.pasos), // Serializar List<PasoReceta>
+                ingredientesJson = gson.toJson(recetaAjustada.ingredientes), // Serializar List<Ingrediente>
+                pendienteDeSync = false // Estas recetas ajustadas NO están pendientes de sincronizar con la API remota
+                // Si quieres un campo 'esRecetaAjustada: Boolean' en LocalReceta, aquí iría a 'true'
+            )
+
+            recetaDao.insertarReceta(localReceta)
+            Log.d("RecetaRepository", "✅ Receta ajustada '${localReceta.nombre}' guardada localmente. Total: ${currentLocalCount + 1}")
+            return true
+        } catch (e: Exception) {
+            Log.e("RecetaRepository", "❌ Error al guardar receta ajustada localmente: ${e.message}", e)
+            return false
+        }
+    }
+
+    // Método para obtener solo las recetas ajustadas/guardadas localmente
+    // Esto es vital si quieres una sección "Mis Recetas Guardadas" offline
+    suspend fun obtenerRecetasAjustadasLocales(): List<Receta> {
+        return try {
+            val localRecetas = recetaDao.obtenerTodas().filter { !it.pendienteDeSync } // Filtra las que no están pendientes de sync
+            // Si solo guardas las ajustadas con pendienteDeSync=false, esto funciona.
+            // Si usas un campo 'esRecetaAjustada', tendrías que filtrarlas por ese campo.
+
+            val gson = Gson()
+            localRecetas.map { local ->
+                // Deserializar JSON strings de vuelta a objetos
+                val ingredientes = gson.fromJson(local.ingredientesJson, object : TypeToken<List<Ingrediente>>() {}.type) as List<Ingrediente>
+                val pasos = gson.fromJson(local.pasosJson, object : TypeToken<List<PasoReceta>>() {}.type) as List<PasoReceta>
+                val imagenesUrls = gson.fromJson(local.imagenes, object : TypeToken<List<String>>() {}.type) as List<String>
+                val mediaItems = imagenesUrls.map { MediaItem(url = it, type = MediaType.IMAGE) } // Convertir URLs a MediaItem
+
+                Receta(
+                    id = local.idRemoto ?: 0, // Si no tiene ID remoto, usa 0 (puede ser el de la API si se guardó una API-Receta)
+                    localId = local.localId,// Si no tiene ID remoto, usa 0 o maneja null
+                    nombre = local.nombre,
+                    descripcion = local.descripcion,
+                    tiempo = local.tiempo,
+                    porciones = local.porciones.toInt(),
+                    dificultad = Dificultad.valueOf(local.dificultad.uppercase()),
+                    imagen = local.imagen,
+                    estado = RecetaStatus.APROBADA, // O el estado que desees para las recetas guardadas
+                    username = local.username,
+                    categoria = local.categoria,
+                    reviewCount = 0, // Por defecto 0, ya que no son de la API
+                    averageRating = 0f, // Por defecto 0f
+                    pasos = pasos,
+                    ingredientes = ingredientes,
+                    comentarios = emptyList(), // No hay comentarios para estas recetas guardadas
+                    imagenes = mediaItems
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("RecetaRepository", "❌ Error al obtener recetas ajustadas localmente: ${e.message}", e)
+            emptyList()
+        }
+    }
+
+    suspend fun eliminarRecetaLocal(receta: Receta): Boolean {
+        return try {
+            // Necesitas el localId para eliminar de Room.
+            // Si tu Receta de dominio no tiene localId, necesitarás buscar la LocalReceta
+            // por un campo único como 'nombre' y 'username'.
+            // La forma más robusta es que tu Receta de dominio también guarde el localId si la obtuviste de Room.
+            // Por simplicidad, asumamos que puedes buscar la LocalReceta por nombre y username para eliminar.
+
+            // 1. Busca la LocalReceta correspondiente
+            val localRecetaToDelete = recetaDao.obtenerTodas()
+                .firstOrNull { it.nombre == receta.nombre && it.username == receta.username }
+
+            localRecetaToDelete?.let {
+                recetaDao.eliminarReceta(it)
+                Log.d("RecetaRepository", "✅ Receta local '${receta.nombre}' eliminada exitosamente.")
+                true
+            } ?: run {
+                Log.e("RecetaRepository", "❌ Receta local '${receta.nombre}' no encontrada para eliminar.")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("RecetaRepository", "❌ Error al eliminar receta local '${receta.nombre}': ${e.message}", e)
+            false
+        }
+    }
+
+    suspend fun obtenerRecetaLocalPorLocalId(localId: Int): Receta? {
+        return try {
+            val localReceta = recetaDao.obtenerPorLocalId(localId)
+            if (localReceta != null) {
+                Log.d("RecetaRepository", "DAO encontró LocalReceta con ID $localId: ${localReceta.nombre}")
+                // Mapear de LocalReceta a Receta de dominio
+                val gson = Gson()
+                val ingredientes = gson.fromJson<List<Ingrediente>>(localReceta.ingredientesJson, object : TypeToken<List<Ingrediente>>() {}.type)
+                val pasos = gson.fromJson<List<PasoReceta>>(localReceta.pasosJson, object : TypeToken<List<PasoReceta>>() {}.type)
+                val imagenesUrls = gson.fromJson<List<String>>(localReceta.imagenes, object : TypeToken<List<String>>() {}.type)
+                val mediaItems = imagenesUrls.map { MediaItem(url = it, type = MediaType.IMAGE) }
+
+                val mappedReceta = Receta(
+                    id = localReceta.idRemoto ?: 0,
+                    localId = localReceta.localId, // Asegúrate de que este campo está en tu Receta de dominio
+                    nombre = localReceta.nombre,
+                    descripcion = localReceta.descripcion,
+                    tiempo = localReceta.tiempo,
+                    porciones = localReceta.porciones.toInt(),
+                    dificultad = Dificultad.valueOf(localReceta.dificultad.uppercase()),
+                    imagen = localReceta.imagen,
+                    estado = RecetaStatus.APROBADA, // O el estado que decidas
+                    username = localReceta.username,
+                    categoria = localReceta.categoria,
+                    reviewCount = 0,
+                    averageRating = 0f,
+                    pasos = pasos,
+                    ingredientes = ingredientes,
+                    comentarios = emptyList(),
+                    imagenes = mediaItems
+                )
+                Log.d("RecetaRepository", "LocalReceta ID $localId mapeada a Receta: ${mappedReceta.nombre}")
+                mappedReceta
+            } else {
+                Log.w("RecetaRepository", "DAO no encontró LocalReceta con ID: $localId")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("RecetaRepository", "❌ Error al mapear LocalReceta a Receta para ID $localId: ${e.message}", e)
+            null
+        }
+    }
 }
 
 

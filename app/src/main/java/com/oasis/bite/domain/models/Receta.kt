@@ -2,6 +2,7 @@ package com.oasis.bite.domain.models
 
 data class Receta(
     val id: Int,
+    val localId: Int?,
     val nombre: String,
     val descripcion: String,
     val tiempo: String?,

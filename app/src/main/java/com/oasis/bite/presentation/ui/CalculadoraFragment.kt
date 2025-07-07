@@ -17,6 +17,8 @@ import androidx.navigation.fragment.findNavController
 import com.oasis.bite.R
 import com.oasis.bite.databinding.DivisionCalculadoraBinding
 import com.oasis.bite.databinding.ItemIngredienteDivisionBinding
+import com.oasis.bite.domain.models.Ingrediente
+import com.oasis.bite.domain.models.Receta
 import com.oasis.bite.presentation.viewmodel.RecetaViewModel
 import com.oasis.bite.presentation.viewmodel.RecetaViewModelFactory
 
@@ -32,7 +34,7 @@ class CalculadoraFragment: Fragment() {
     private var originalPortions: Float = 1.0f // Porciones originales de la receta
     private var currentPortions: Float = 1.0f // Porciones actuales calculadas
     private var ignoreTextChanges = false // Para evitar bucles infinitos en TextWatcher
-
+    private lateinit var originalReceta: Receta
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -48,7 +50,7 @@ class CalculadoraFragment: Fragment() {
         Log.d("RecetaFragment", "Receta ID recibido: $recetaId")
 
         inputPorciones = binding.inputPorciones
-        layoutIngredientesCalculadora = binding.layoutIngredientes
+        layoutIngredientesCalculadora = binding.layoutIngredientesCalculadora
         recetaTitulo = binding.recetaTitulo
         recetaAutor = binding.recetaAutor
         val botonCancelar = binding.btnVolver
@@ -57,7 +59,8 @@ class CalculadoraFragment: Fragment() {
         }
 
         viewModel.receta.observe(viewLifecycleOwner) { receta ->
-            receta?.let {
+            receta?.let {loadedReceta ->
+                originalReceta = loadedReceta
                 inputPorciones.setText(receta.porciones.toString())
                 recetaTitulo.text = receta.nombre
                 recetaAutor.text = receta.username
@@ -75,6 +78,23 @@ class CalculadoraFragment: Fragment() {
                 }.toMutableList()
                 setupListeners()
                 displayIngredients()
+            }
+        }
+        val btnGuardarReceta = binding.btnGuardarRecetaAjustada // Asegúrate de que el ID sea correcto
+        btnGuardarReceta.setOnClickListener {
+            saveAdjustedRecipe() // Llama a la función para guardar
+        }
+
+        // Observar el estado de guardado del ViewModel para feedback al usuario
+        viewModel.saveAdjustedRecipeStatus.observe(viewLifecycleOwner) { isSuccess ->
+            // Obtener el mensaje del ViewModel. Si es null, usar un mensaje por defecto.
+            val message = viewModel.messageForUser.value ?: "Operación completada. (Sin mensaje específico)" // <-- ¡CAMBIO CLAVE AQUÍ!
+
+            if (isSuccess) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                // Opcional: Podrías cerrar la calculadora o actualizar la UI
+            } else {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
             }
         }
 
@@ -233,6 +253,27 @@ class CalculadoraFragment: Fragment() {
             }
         }
         return -1
+    }
+
+    private fun saveAdjustedRecipe() {
+        // 1. Construir la Receta (dominio) con los valores recalculados
+        val adjustedIngredients = ingredientesCalculadora.map {
+            Ingrediente(nombre = it.nombre, cantidad = it.cantidadActual, unidad = it.unidad) // Mapea de nuevo a tu Ingrediente de dominio
+        }
+
+        // Es vital tener la receta original (originalReceta) para copiar sus demás propiedades
+        val recetaAjustada = originalReceta.copy(
+            porciones = currentPortions.toInt(), // Actualiza las porciones
+            ingredientes = adjustedIngredients, // Reemplaza los ingredientes con los ajustados
+            // Puedes añadir aquí un campo extra si quieres marcarla como "ajustada"
+            // Por ejemplo, si Receta tuviera un campo 'tipoReceta: String'
+            // tipoReceta = "ajustada_por_usuario"
+        )
+
+        Log.d("Calculadora", "Receta ajustada para guardar: $recetaAjustada")
+
+        // 2. Llamar al ViewModel para guardar
+        viewModel.saveAdjustedRecipe(recetaAjustada)
     }
 
 }

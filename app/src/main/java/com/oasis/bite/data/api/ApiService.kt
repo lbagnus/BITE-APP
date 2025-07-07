@@ -54,7 +54,8 @@ interface ApiService {
     @GET("favoritos/{email}")
     suspend fun getRecetaFavoritos(@Path("email") email: String): Response<List<RecetaSimpleResponse>>
 
-
+    @GET("recetas/misRecetas/{email}")
+    suspend fun getRecetasUsuarios(@Path("email") email: String): Response<List<RecetaSimpleResponse>>
 
     @HTTP(method = "DELETE", path = "favoritos/eliminar", hasBody = true)
     suspend fun deletefav(@Body params: FavRequest): Response<Unit>

@@ -36,6 +36,7 @@ fun LoginResponse.toUser(): User {
 fun RecetaDTO.toReceta(): Receta {
     return Receta(
         id = this.id,
+        localId = 0,
         nombre = this.nombre,
         descripcion = this.descripcion,
         tiempo = this.tiempo,
@@ -84,6 +85,7 @@ fun ComentarioDTO.toComentario(): Comentario {
 fun RecetaSimpleResponse.toReceta(): Receta{
     return Receta(
         id = this.id,
+        localId = 0,
         nombre = this.nombre,
         descripcion = this.descripcion,
         tiempo = this.tiempo,

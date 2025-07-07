@@ -35,10 +35,11 @@ class HomeViewModel(private val repositoryReceta: RecetaRepository) : ViewModel(
     private val _recetaOperationStatus = MutableLiveData<Boolean>()
     val recetaOperationStatus: LiveData<Boolean> get() = _recetaOperationStatus
 
+    val misRecetasLiveData = MutableLiveData<List<Receta>?>()
 
     fun cargarRecetas() {
         viewModelScope.launch {
-            val recetas = repositoryReceta.getRecetasHome()
+            val recetas = repositoryReceta.getRecetasHome() // desde tu API
             recetasLiveData.postValue(recetas)
         }
     }
@@ -46,7 +47,7 @@ class HomeViewModel(private val repositoryReceta: RecetaRepository) : ViewModel(
     fun cargarRecetasPorCategoria(categoria: String) {
         viewModelScope.launch {
             val params = RecetaSearchParams(
-                type = categoria,
+                type = categoria, // 👈 acá pasás la categoría
                 limit = 20,
                 offset = 0
             )
@@ -55,27 +56,18 @@ class HomeViewModel(private val repositoryReceta: RecetaRepository) : ViewModel(
             recetasLiveData.postValue(recetas ?: emptyList())
         }
     }
-
-    fun cargarRecetasUsuario(usuario: String) {
+    fun cargarRecetasUsuario(email: String) {
         viewModelScope.launch {
-            val params = RecetaSearchParams(
-                userName = usuario,
-                limit = 20,
-                offset = 0
-            )
-
-            val recetas = repositoryReceta.getRecetasSearch(params)
-            recetasLiveData.postValue(recetas ?: emptyList())
+            val recetas = repositoryReceta.getRecetasUsuario(email)
+            misRecetasLiveData.postValue(recetas ?: emptyList())
         }
     }
-
     fun cargarRecetasFavoritos(email: String){
         viewModelScope.launch {
             val recetas = repositoryReceta.getRecetasFavoritos(email)
             favoritoLiveData.postValue(recetas ?:emptyList())
         }
     }
-
     fun getRecetasFavoritos(email: String, onResult: (List<Receta>) -> Unit) {
         viewModelScope.launch {
             val favoritos = repositoryReceta.getRecetasFavoritos(email)
@@ -138,7 +130,7 @@ class HomeViewModel(private val repositoryReceta: RecetaRepository) : ViewModel(
 
     fun editarEstadoComentario(id:Int, estado: String){
         viewModelScope.launch{
-            val estadoParams = EstadoRequest(estado = estado)
+            var estadoParams = EstadoRequest(estado = estado)
             try {
                 val success = repositoryReceta.editarEstadoComentario(estadoParams,id)
                 if (success) {
@@ -158,21 +150,21 @@ class HomeViewModel(private val repositoryReceta: RecetaRepository) : ViewModel(
 
     fun editarEstadoReceta(id:Int, estado: String){
         viewModelScope.launch{
-            val estadoParams = EstadoRequest(estado = estado)
-            try {
-                val success = repositoryReceta.editarEstadoReceta(estadoParams,id)
-                if (success) {
-                    Log.d("HomeViewModel", "receta ID $id rechazado exitosamente.")
-                    _recetaOperationStatus.postValue(true)
-                    loadPendingComments() //
-                } else {
-                    Log.e("HomeViewModel", "Fallo al rechazar receta ID $id.")
+            var estadoParams = EstadoRequest(estado = estado)
+                try {
+                    val success = repositoryReceta.editarEstadoReceta(estadoParams,id)
+                    if (success) {
+                        Log.d("HomeViewModel", "receta ID $id rechazado exitosamente.")
+                        _recetaOperationStatus.postValue(true)
+                        loadPendingComments() //
+                    } else {
+                        Log.e("HomeViewModel", "Fallo al rechazar receta ID $id.")
+                        _recetaOperationStatus.postValue(false)
+                    }
+                } catch (e: Exception) {
+                    Log.e("HomeViewModel", "Excepción al rechazar receta ID $id: ${e.message}", e)
                     _recetaOperationStatus.postValue(false)
                 }
-            } catch (e: Exception) {
-                Log.e("HomeViewModel", "Excepción al rechazar receta ID $id: ${e.message}", e)
-                _recetaOperationStatus.postValue(false)
-            }
 
         }
     }
