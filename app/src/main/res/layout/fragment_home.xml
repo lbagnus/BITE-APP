@@ -43,10 +43,10 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 android:orientation="horizontal"
                 tools:listitem="@layout/item_categoria" /> <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
 
             <TextView
                 android:id="@+id/fraseDestacada2"
@@ -58,14 +58,6 @@
                 android:textStyle="bold"
                 android:layout_weight="1"/>
 
-            <TextView
-                android:id="@+id/verTodasButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ver todas"
-                android:textColor="@color/orange"
-                android:textSize="15sp"
-                android:layout_gravity="end" />
         </LinearLayout>
 
             <include

@@ -54,16 +54,24 @@
                 android:clickable="true"
                 app:tint="@color/amarillo"
                 android:visibility="gone"/>
-            <ImageView
-                android:id="@+id/iconoFavorito"
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/favorito"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_margin="12dp"
-                android:src="@drawable/favorite_border"
-                android:contentDescription="Icono favorito"
                 android:background="@drawable/bg_white_rounded_small"
+                android:src="@drawable/favorite_selector"
+                android:scaleType="centerInside"
+                android:contentDescription="Favorito"
                 android:clickable="true"
-                app:tint="@color/amarillo"/>
+                android:focusable="true"
+                android:tint="@color/amarillo"
+                android:padding="0dp" />
+
+
+
+
         </LinearLayout>
 
 

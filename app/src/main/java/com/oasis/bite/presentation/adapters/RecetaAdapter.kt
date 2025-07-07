@@ -42,7 +42,7 @@ class RecetaAdapter(
             val imagen: ImageView = itemView.findViewById(R.id.imagenReceta)
             val titulo: TextView = itemView.findViewById(R.id.tituloReceta)
             val detalles: TextView = itemView.findViewById(R.id.detallesReceta)
-            val favorito: ImageView = itemView.findViewById(R.id.iconoFavorito)
+            val favorito: ImageView = itemView.findViewById(R.id.favorito)
             val ranking : TextView = itemView.findViewById(R.id.reviewReceta)
             val editar : ImageView = itemView.findViewById(R.id.iconoEditar)
         }
@@ -59,6 +59,10 @@ class RecetaAdapter(
 
         override fun onBindViewHolder(holder: RecetaViewHolder, position: Int) {
             val receta = listaRecetas[position]
+
+            holder.itemView.setOnClickListener {
+                onItemClick(receta)
+            }
 
             holder.titulo.text = receta.nombre
             holder.detalles.text = "${receta.tiempo} - ${receta.dificultad} - Por ${receta.username}"
@@ -98,26 +102,22 @@ class RecetaAdapter(
                     holder.ranking.text = "Pendiente"
                 }
 
-            }else {
+            }else
+                holder.favorito.isSelected = esFavorito(receta)
 
+            holder.favorito.setOnClickListener {
                 if (esFavorito(receta)) {
-                    holder.favorito.setImageResource(R.drawable.favorite_filled)
-                } else {
-                    holder.favorito.setImageResource(R.drawable.ic_corazonvacio)
-                }
-                holder.favorito.setOnClickListener {
-                    if (esFavorito(receta)) {
-                        homeViewModel.eliminarRecetaFavorito(usuario.email.toString(), receta.id)
-                        holder.favorito.setImageResource(R.drawable.ic_corazonvacio)
-                    } else {
-                        homeViewModel.agregarRecetaFavorito(usuario.email.toString(), receta.id)
-                        holder.favorito.setImageResource(R.drawable.favorite_filled)
-                    }
-                }
-            }
+                    homeViewModel.eliminarRecetaFavorito(usuario.email.toString(), receta.id)
+                    holder.favorito.isSelected = false
+                    val index = listaRecetas.indexOf(receta)
+                    if (index != -1) {
+                        listaRecetas = listaRecetas.toMutableList().apply { removeAt(index) }
+                        notifyItemRemoved(index)}
 
-            holder.itemView.setOnClickListener {
-                onItemClick(receta)
+                } else {
+                    homeViewModel.agregarRecetaFavorito(usuario.email.toString(), receta.id)
+                    holder.favorito.isSelected = true
+                }
             }
         }
 

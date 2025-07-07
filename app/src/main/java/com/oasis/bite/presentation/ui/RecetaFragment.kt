@@ -71,11 +71,11 @@ class RecetaFragment : Fragment() {
 
                 if(idsFavoritos.contains(it.id)){
                 binding.btnFavorito.setImageResource(R.drawable.favorite_filled)}
-                else{binding.btnFavorito.setImageResource(R.drawable.ic_corazonvacio)}
+                else{binding.btnFavorito.setImageResource(R.drawable.favorite_border)}
                 binding.btnFavorito.setOnClickListener {
                     if (idsFavoritos.contains(receta.id)){
                         viewModel.eliminarRecetaFavorito(usuario?.email.toString(),receta.id)
-                        binding.btnFavorito.setImageResource(R.drawable.ic_corazonvacio)
+                        binding.btnFavorito.setImageResource(R.drawable.favorite_border)
                     }
                     else{
                         viewModel.agregarRecetaFavorito(usuario?.email.toString(),receta.id)
