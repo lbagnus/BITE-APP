@@ -16,4 +16,16 @@
         android:layout_weight="1"
         tools:listitem="@layout/vista_recetas"/>
 
+    <TextView
+        android:id="@+id/textoNoHayBusqueda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No se encontraron recetas para esa búsqueda"
+        android:textColor="@color/black"
+        android:textSize="18dp"
+        android:paddingHorizontal="18dp"
+        android:visibility="gone"/>
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

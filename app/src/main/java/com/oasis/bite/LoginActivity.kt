@@ -170,14 +170,7 @@ class LoginActivity : AppCompatActivity() {
         val inflater = LayoutInflater.from(this)
         val customView = inflater.inflate(R.layout.pop_up_registro, null)
 
-        val messageTextView: TextView = customView.findViewById(R.id.popupMessage)
         val closeButton: Button = customView.findViewById(R.id.closeButton)
-
-        messageTextView.text = if (canProceedOffline) {
-            "No hay conexión a internet. Puedes usar la aplicación sin conexión."
-        } else {
-            "No hay conexión a internet. No puedes iniciar sesión sin conexión."
-        }
 
 
         val dialog = AlertDialog.Builder(this)

@@ -81,6 +81,9 @@ class ResultadoBusqueda : Fragment() {
             Log.d("HomeFragment", "Recetas recibidas: $recetas")
             if (recetas != null) {
                 recetaAdapter.actualizarRecetas(recetas)
+                if (recetas.isEmpty()){
+                    binding.textoNoHayBusqueda.visibility = View.VISIBLE
+                }
             }
         }
 

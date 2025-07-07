@@ -150,13 +150,15 @@ class MainActivity : AppCompatActivity() {
             when (destination.id) {
                 R.id.recetaFragment -> {
                     // Ocultamos barra, frase y searchbar
-                    findViewById<View>(R.id.toolbarMain).visibility = View.GONE
+                    findViewById<View>(R.id.toolbar).visibility = View.GONE
                     findViewById<View>(R.id.searchbar).visibility = View.GONE
                     findViewById<View>(R.id.btnAbrirPopup).visibility = View.GONE
-                } R.id.navigation_notifications, R.id.navigation_dashboard, R.id.CalculadoraFragment-> {
+                }
+                R.id.navigation_notifications, R.id.navigation_dashboard, R.id.CalculadoraFragment-> {
                 // Ocultamos frase y searchbar
-                findViewById<View>(R.id.searchbar).visibility = View.GONE
-                findViewById<View>(R.id.btnAbrirPopup).visibility = View.GONE
+                    findViewById<View>(R.id.toolbar).visibility = View.VISIBLE
+                    findViewById<View>(R.id.searchbar).visibility = View.GONE
+                    findViewById<View>(R.id.btnAbrirPopup).visibility = View.GONE
             }
                 else -> {
                     // Los mostramos nuevamente en el resto de pantallas
