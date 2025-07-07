@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_rounded_beige"
@@ -40,7 +41,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Agregá un tag"
+            android:hint="Agregá un ingrediente"
             android:backgroundTint="@color/white">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -80,7 +81,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Agregá un tag">
+            android:hint="Agregá un ingrediente">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/tagInput2"
@@ -165,25 +166,52 @@
             android:paddingTop="5dp"
             android:textColor="@color/white"
             />
-        <LinearLayout
-            android:id="@+id/layoutCocineros"
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/white"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="8dp" />
+            android:hint="Agregá un cocinero"
+            android:backgroundTint="@color/white">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tagInput3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:lineSpacing="4dp"
+            app:chipSpacing="8dp"
+            android:paddingBottom="8dp"
+            android:paddingTop="4dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"/>
+
         <TextView
             android:id="@+id/btnListo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="end"
             android:layout_marginEnd="0dp"
             android:clickable="true"
             android:paddingTop="5dp"
             android:text="Listo"
             android:textColor="@color/white"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_gravity="end"
-            />
+            android:textStyle="bold" />
 
     </LinearLayout>
 

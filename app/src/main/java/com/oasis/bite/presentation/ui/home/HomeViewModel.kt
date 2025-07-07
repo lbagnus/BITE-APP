@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.oasis.bite.data.RetrofitInstance
 import com.oasis.bite.data.model.EstadoRequest
 import com.oasis.bite.data.model.FavParams
 import com.oasis.bite.data.model.FavRequest
@@ -18,13 +17,10 @@ import com.oasis.bite.domain.models.Receta
 import com.oasis.bite.localdata.database.dao.RecetaDao
 import kotlinx.coroutines.launch
 
-class HomeViewModel( private val repositoryReceta: RecetaRepository) : ViewModel() {
-    private val apiService = RetrofitInstance.apiService
+class HomeViewModel(private val repositoryReceta: RecetaRepository) : ViewModel() {
 
     val recetasLiveData = MutableLiveData<List<Receta>?>()
-
     val categoryLiveData = MutableLiveData<List<Category>?>()
-
     val favoritoLiveData = MutableLiveData<List<Receta>?>()
 
     private val _pendingComments = MutableLiveData<List<Comentario>?>()
@@ -33,16 +29,16 @@ class HomeViewModel( private val repositoryReceta: RecetaRepository) : ViewModel
     private val _pendingRecetas = MutableLiveData<List<Receta>?>()
     val pendingReceta: LiveData<List<Receta>> get() = _pendingRecetas as LiveData<List<Receta>>
 
-    // LiveData para notificar el estado de la operación de comentario (opcional, pero útil)
     private val _commentOperationStatus = MutableLiveData<Boolean>()
     val commentOperationStatus: LiveData<Boolean> get() = _commentOperationStatus
 
     private val _recetaOperationStatus = MutableLiveData<Boolean>()
     val recetaOperationStatus: LiveData<Boolean> get() = _recetaOperationStatus
 
+
     fun cargarRecetas() {
         viewModelScope.launch {
-            val recetas = repositoryReceta.getRecetasHome() // desde tu API
+            val recetas = repositoryReceta.getRecetasHome()
             recetasLiveData.postValue(recetas)
         }
     }
@@ -50,7 +46,7 @@ class HomeViewModel( private val repositoryReceta: RecetaRepository) : ViewModel
     fun cargarRecetasPorCategoria(categoria: String) {
         viewModelScope.launch {
             val params = RecetaSearchParams(
-                type = categoria, // 👈 acá pasás la categoría
+                type = categoria,
                 limit = 20,
                 offset = 0
             )
@@ -59,10 +55,11 @@ class HomeViewModel( private val repositoryReceta: RecetaRepository) : ViewModel
             recetasLiveData.postValue(recetas ?: emptyList())
         }
     }
+
     fun cargarRecetasUsuario(usuario: String) {
         viewModelScope.launch {
             val params = RecetaSearchParams(
-                userName = usuario, // 👈 acá pasás la categoría
+                userName = usuario,
                 limit = 20,
                 offset = 0
             )
@@ -71,12 +68,14 @@ class HomeViewModel( private val repositoryReceta: RecetaRepository) : ViewModel
             recetasLiveData.postValue(recetas ?: emptyList())
         }
     }
+
     fun cargarRecetasFavoritos(email: String){
         viewModelScope.launch {
             val recetas = repositoryReceta.getRecetasFavoritos(email)
             favoritoLiveData.postValue(recetas ?:emptyList())
         }
     }
+
     fun getRecetasFavoritos(email: String, onResult: (List<Receta>) -> Unit) {
         viewModelScope.launch {
             val favoritos = repositoryReceta.getRecetasFavoritos(email)
@@ -86,17 +85,17 @@ class HomeViewModel( private val repositoryReceta: RecetaRepository) : ViewModel
 
     fun eliminarRecetaFavorito(email: String, receta: Int){
         viewModelScope.launch{
-            var params = FavParams(email = email, recetaId =receta)
+            val params = FavParams(email = email, recetaId = receta)
             repositoryReceta.deleteFavorito(params)
-            }
+        }
     }
 
     fun agregarRecetaFavorito(email: String, receta: Int){
         viewModelScope.launch{
-            var params = FavParams(email = email, recetaId =receta)
-            repositoryReceta.addFavorito(params)}
+            val params = FavParams(email = email, recetaId = receta)
+            repositoryReceta.addFavorito(params)
+        }
     }
-
 
     fun syncRecetasLocales() {
         viewModelScope.launch {
@@ -106,14 +105,40 @@ class HomeViewModel( private val repositoryReceta: RecetaRepository) : ViewModel
 
     fun cargarRecetasSearch(termino: String) {
         viewModelScope.launch {
-            val recetas = repositoryReceta.getBySearch(termino) // desde tu API
+            val recetas = repositoryReceta.getBySearch(termino)
             recetasLiveData.postValue(recetas)
         }
     }
 
+    // --------- Método nuevo para filtrar recetas ---------
+    fun cargarRecetasConFiltro(
+        incluye: List<String>,
+        excluye: List<String>,
+        direction: String,
+        username: String? = null
+    ) {
+        viewModelScope.launch {
+            val params = RecetaSearchParams(
+                includeIngredients = incluye,
+                excludeIngredients = excluye,
+                orderBy = "newest",
+                direction = direction,
+                userName = username,
+                limit = 20,
+                offset = 0
+            )
+            Log.d("FiltroAPI", "Llamando API con filtros: $params")
+            val recetas = repositoryReceta.getRecetasSearch(params)
+            Log.d("FiltroAPI", "Recetas filtradas recibidas: ${recetas?.size}")
+            recetasLiveData.postValue(recetas ?: emptyList())
+        }
+    }
+    // ----------------------------------------------------
+
+
     fun editarEstadoComentario(id:Int, estado: String){
         viewModelScope.launch{
-            var estadoParams = EstadoRequest(estado = estado)
+            val estadoParams = EstadoRequest(estado = estado)
             try {
                 val success = repositoryReceta.editarEstadoComentario(estadoParams,id)
                 if (success) {
@@ -133,21 +158,21 @@ class HomeViewModel( private val repositoryReceta: RecetaRepository) : ViewModel
 
     fun editarEstadoReceta(id:Int, estado: String){
         viewModelScope.launch{
-            var estadoParams = EstadoRequest(estado = estado)
-                try {
-                    val success = repositoryReceta.editarEstadoReceta(estadoParams,id)
-                    if (success) {
-                        Log.d("HomeViewModel", "receta ID $id rechazado exitosamente.")
-                        _recetaOperationStatus.postValue(true)
-                        loadPendingComments() //
-                    } else {
-                        Log.e("HomeViewModel", "Fallo al rechazar receta ID $id.")
-                        _recetaOperationStatus.postValue(false)
-                    }
-                } catch (e: Exception) {
-                    Log.e("HomeViewModel", "Excepción al rechazar receta ID $id: ${e.message}", e)
+            val estadoParams = EstadoRequest(estado = estado)
+            try {
+                val success = repositoryReceta.editarEstadoReceta(estadoParams,id)
+                if (success) {
+                    Log.d("HomeViewModel", "receta ID $id rechazado exitosamente.")
+                    _recetaOperationStatus.postValue(true)
+                    loadPendingComments() //
+                } else {
+                    Log.e("HomeViewModel", "Fallo al rechazar receta ID $id.")
                     _recetaOperationStatus.postValue(false)
                 }
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Excepción al rechazar receta ID $id: ${e.message}", e)
+                _recetaOperationStatus.postValue(false)
+            }
 
         }
     }
@@ -182,7 +207,4 @@ class HomeViewModel( private val repositoryReceta: RecetaRepository) : ViewModel
             repositoryReceta.deleteReceta(id = id)
         }
     }
-    
 }
-
-

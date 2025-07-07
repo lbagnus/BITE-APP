@@ -28,14 +28,17 @@ import com.oasis.bite.presentation.viewmodel.UsersViewModel
 import com.oasis.bite.presentation.viewmodel.UsersViewModelFactory
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import com.google.android.material.chip.Chip
-import com.google.android.material.textfield.TextInputEditText
+import com.oasis.bite.presentation.viewmodel.FiltroViewModel
 
 
 class MainActivity : AppCompatActivity() {
 
 
     private lateinit var binding: ActivityMainBinding
+    val filtroViewModel: FiltroViewModel by viewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -183,9 +186,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-// FILTRO
+
+        // FILTRO
         binding.btnAbrirPopup.setOnClickListener {
             val popupBinding = FiltroPopupBinding.inflate(layoutInflater)
+            val colorSeleccionado = ContextCompat.getColor(this, R.color.amarillo)
+            val colorNormal = ContextCompat.getColor(this, android.R.color.transparent)
+            val textoActivo = ContextCompat.getColor(this, android.R.color.black)
+            val textoInactivo = ContextCompat.getColor(this, R.color.white)
+
 
             val dialog = AlertDialog.Builder(this)
                 .setView(popupBinding.root)
@@ -193,13 +202,87 @@ class MainActivity : AppCompatActivity() {
                 .create()
 
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+
+            // --- AQUI CARGAMOS LOS FILTROS GUARDADOS PARA MOSTRARLOS ---
+            filtroViewModel.filtros.value?.let { filtroGuardado ->
+                // Ingredientes que incluye
+                filtroGuardado.incluye.forEach { texto ->
+                    val chip = Chip(this).apply {
+                        this.text = texto
+                        isCloseIconVisible = true
+                        setOnCloseIconClickListener { popupBinding.chipGroup.removeView(this) }
+                    }
+                    popupBinding.chipGroup.addView(chip)
+                }
+
+                // Ingredientes que excluye
+                filtroGuardado.excluye.forEach { texto ->
+                    val chip = Chip(this).apply {
+                        this.text = texto
+                        isCloseIconVisible = true
+                        setOnCloseIconClickListener { popupBinding.chipGroup2.removeView(this) }
+                    }
+                    popupBinding.chipGroup2.addView(chip)
+                }
+
+                // Cocinero (username), solo uno
+                filtroGuardado.username?.let { usuario ->
+                    val chip = Chip(this).apply {
+                        this.text = usuario
+                        isCloseIconVisible = true
+                        setOnCloseIconClickListener { popupBinding.chipGroup3.removeView(this) }
+                    }
+                    popupBinding.chipGroup3.addView(chip)
+                }
+
+                // Estado botones orden
+                if (filtroGuardado.direction == "desc") {  // si es "desc" entonces botón "Más reciente"
+                    popupBinding.btnFiltro.isChecked = true
+                    popupBinding.btnFiltroviejo.isChecked = false
+                    popupBinding.btnFiltro.setBackgroundColor(colorSeleccionado)
+                    popupBinding.btnFiltro.setTextColor(textoActivo)
+                    popupBinding.btnFiltroviejo.setBackgroundColor(colorNormal)
+                    popupBinding.btnFiltroviejo.setTextColor(textoInactivo)
+                } else { // "asc" es botón "Más antiguo"
+                    popupBinding.btnFiltroviejo.isChecked = true
+                    popupBinding.btnFiltro.isChecked = false
+                    popupBinding.btnFiltroviejo.setBackgroundColor(colorSeleccionado)
+                    popupBinding.btnFiltroviejo.setTextColor(textoActivo)
+                    popupBinding.btnFiltro.setBackgroundColor(colorNormal)
+                    popupBinding.btnFiltro.setTextColor(textoInactivo)
+                }
+            }
             dialog.show()
 
-            // CHIPS: Ingredientes que contiene
+            //cocineros
+            popupBinding.tagInput3.setOnEditorActionListener { v, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    val texto = (v as? EditText)?.text?.toString()?.trim()
+                    if (!texto.isNullOrEmpty()) {
+                        if (popupBinding.chipGroup3.childCount == 0) {  // Solo permite uno
+                            val chip = Chip(this).apply {
+                                text = texto
+                                isCloseIconVisible = true
+                                setOnCloseIconClickListener {
+                                    popupBinding.chipGroup3.removeView(this)
+                                }
+                            }
+                            popupBinding.chipGroup3.addView(chip)
+                            popupBinding.tagInput3.text?.clear()
+                        } else {
+                            Toast.makeText(this, "Solo se puede buscar un cocinero.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    true
+                } else false
+            }
+
+            // Ingredientes que contiene
             popupBinding.tagInput.setOnEditorActionListener { v, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     val texto = (v as? EditText)?.text?.toString()?.trim()
-                    if (texto.isNotEmpty()) {
+                    if (!texto.isNullOrEmpty()) {
                         val chip = Chip(this).apply {
                             text = texto
                             isCloseIconVisible = true
@@ -208,17 +291,17 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                         popupBinding.chipGroup.addView(chip)
-                        (v as? TextInputEditText)?.text?.clear()
+                        popupBinding.tagInput.text?.clear()
                     }
                     true
                 } else false
             }
 
-            // CHIPS: Ingredientes que NO contiene
+            // Ingredientes que NO contiene
             popupBinding.tagInput2.setOnEditorActionListener { v, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     val texto = (v as? EditText)?.text?.toString()?.trim()
-                    if (texto.isNotEmpty()) {
+                    if (!texto.isNullOrEmpty()) {
                         val chip = Chip(this).apply {
                             text = texto
                             isCloseIconVisible = true
@@ -227,27 +310,35 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                         popupBinding.chipGroup2.addView(chip)
-                        (v as? TextInputEditText)?.text?.clear()
+                        popupBinding.tagInput2.text?.clear()
                     }
                     true
                 } else false
             }
 
-            // Botones de antigüedad
+            // Botones de orden
             popupBinding.btnFiltro.setOnClickListener {
                 popupBinding.btnFiltro.isChecked = true
                 popupBinding.btnFiltroviejo.isChecked = false
+
+                popupBinding.btnFiltro.setBackgroundColor(colorSeleccionado)
+                popupBinding.btnFiltroviejo.setBackgroundColor(colorNormal)
+                popupBinding.btnFiltro.setTextColor(textoActivo)
+                popupBinding.btnFiltroviejo.setTextColor(textoInactivo)
             }
 
             popupBinding.btnFiltroviejo.setOnClickListener {
                 popupBinding.btnFiltro.isChecked = false
                 popupBinding.btnFiltroviejo.isChecked = true
+
+                popupBinding.btnFiltroviejo.setBackgroundColor(colorSeleccionado)
+                popupBinding.btnFiltro.setBackgroundColor(colorNormal)
+
+                popupBinding.btnFiltroviejo.setTextColor(textoActivo)
+                popupBinding.btnFiltro.setTextColor(textoInactivo)
             }
 
-            // Botón "Listo" para cerrar el popup y aplicar filtros
             popupBinding.btnListo.setOnClickListener {
-                // Acá podrías recoger los filtros seleccionados
-                // Por ejemplo:
                 val incluye = (0 until popupBinding.chipGroup.childCount).mapNotNull {
                     val chip = popupBinding.chipGroup.getChildAt(it) as? Chip
                     chip?.text?.toString()
@@ -258,16 +349,35 @@ class MainActivity : AppCompatActivity() {
                     chip?.text?.toString()
                 }
 
+                val username = (popupBinding.chipGroup3.getChildAt(0) as? Chip)?.text?.toString()
                 val ordenReciente = popupBinding.btnFiltro.isChecked
+                val ordenAntiguo = popupBinding.btnFiltroviejo.isChecked
 
-                // Ahora podrías filtrar tu lista de recetas con esos datos
+                val direction = when {
+                    ordenReciente -> "desc"
+                    ordenAntiguo -> "asc"
+                    else -> "desc" // un default si ninguno está seleccionado
+                }
 
-                dialog.dismiss()
+                // Validar que haya al menos un filtro activo
+                val hayFiltros = incluye.isNotEmpty() || excluye.isNotEmpty() || ordenReciente || ordenAntiguo || !username.isNullOrEmpty()
+
+                if (hayFiltros) {
+                    val filtro = FiltroViewModel.Filtro(incluye, excluye, username, "newest",direction)
+                    filtroViewModel.filtros.value = filtro
+                    Log.d("FiltroViewModel", "Seteando filtros: $filtro")
+                    dialog.dismiss()
+                    val navController = findNavController(R.id.nav_host_fragment_activity_main)
+                    if (navController.currentDestination?.id != R.id.ResultadoBusqueda) {
+                        navController.navigate(R.id.ResultadoBusqueda)}
+
+                } else {
+                    Toast.makeText(this, "Por favor, seleccioná al menos un filtro.", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
             }
 
-            // Si querés, también podés cargar cocineros dinámicamente en popupBinding.layoutCocineros
         }
-
 
         val searchView = binding.searchbar.searchView // Acceso correcto a SearchView
         searchView.clearFocus()
