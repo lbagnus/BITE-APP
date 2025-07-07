@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Aquí se encuentran tus recetas Preferidas"
+        android:text="Aquí se encuentran tus recetas Favoritas"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -76,11 +76,10 @@
         android:id="@+id/fraseCarencia"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="¡Todavía no tienes recetas preferidas!"
+        android:text="¡Todavía no tienes recetas favoritas!"
         android:textColor="@color/black"
         android:textSize="20sp"
-        android:layout_marginBottom="16dp"
+        android:gravity="center"
         android:visibility="gone"/>
 
 </LinearLayout>

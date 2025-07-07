@@ -6,12 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".presentation.ui.dashboard.DashboardFragment">
 
+
+
     <LinearLayout
         android:id="@+id/renglon1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:layout_marginTop="10dp"
         >
         <!-- 2. Título comentario-->
         <TextView
