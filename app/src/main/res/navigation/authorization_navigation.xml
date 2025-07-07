@@ -19,6 +19,8 @@
         app:destination="@id/recetaFragment" />
     </fragment>
 
+
+
     <include app:graph="@navigation/mobile_navigation" />
 
 </navigation>

@@ -25,4 +25,11 @@ interface RecetaDao {
     // 5. (Opcional) Eliminar receta local
     @Delete
     suspend fun eliminarReceta(receta: LocalReceta)
+
+    @Query("SELECT COUNT(*) FROM recetas")
+    suspend fun contarRecetasLocales(): Int
+
+    // En RecetaDao.kt
+    @Query("SELECT * FROM recetas WHERE localId = :localId LIMIT 1")
+    suspend fun obtenerPorLocalId(localId: Int): LocalReceta?
 }

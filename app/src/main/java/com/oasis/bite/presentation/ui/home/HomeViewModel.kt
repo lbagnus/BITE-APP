@@ -40,6 +40,8 @@ class HomeViewModel( private val repositoryReceta: RecetaRepository) : ViewModel
     private val _recetaOperationStatus = MutableLiveData<Boolean>()
     val recetaOperationStatus: LiveData<Boolean> get() = _recetaOperationStatus
 
+    val misRecetasLiveData = MutableLiveData<List<Receta>?>()
+
     fun cargarRecetas() {
         viewModelScope.launch {
             val recetas = repositoryReceta.getRecetasHome() // desde tu API
@@ -59,16 +61,10 @@ class HomeViewModel( private val repositoryReceta: RecetaRepository) : ViewModel
             recetasLiveData.postValue(recetas ?: emptyList())
         }
     }
-    fun cargarRecetasUsuario(usuario: String) {
+    fun cargarRecetasUsuario(email: String) {
         viewModelScope.launch {
-            val params = RecetaSearchParams(
-                userName = usuario, // 👈 acá pasás la categoría
-                limit = 20,
-                offset = 0
-            )
-
-            val recetas = repositoryReceta.getRecetasSearch(params)
-            recetasLiveData.postValue(recetas ?: emptyList())
+            val recetas = repositoryReceta.getRecetasUsuario(email)
+            misRecetasLiveData.postValue(recetas ?: emptyList())
         }
     }
     fun cargarRecetasFavoritos(email: String){
