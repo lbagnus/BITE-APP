@@ -85,27 +85,35 @@ class AgregarRecetaActivity : AppCompatActivity() {
         }
 
         // 3. Mejorar el manejo de imágenes en el ActivityResultLauncher
+        // Cambiar el launcher para soportar múltiples imágenes
         globalPickMediaLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
+            ActivityResultContracts.StartActivityForResult()
         ) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.data?.let { uri ->
-                    Log.d("CALLBACK_IMAGEN", "Procesando imagen para paso: $currentPasoIndexForImage")
+                if (currentPasoIndexForImage == -1) {
+                    // Manejar múltiples imágenes para la receta principal
+                    val clipData = result.data?.clipData
+                    val singleData = result.data?.data
 
-                    if (currentPasoIndexForImage == -1) {
-                        Log.d("CALLBACK_IMAGEN", "→ Es imagen de receta principal")
-                        // Imagen para la receta principal
-                        manejarImagenRecetaPrincipal(uri)
-                    } else {
+                    if (clipData != null) {
+                        // Múltiples imágenes seleccionadas
+                        Log.d("CALLBACK_IMAGEN", "Procesando ${clipData.itemCount} imágenes para receta principal")
+                        for (i in 0 until clipData.itemCount) {
+                            val uri = clipData.getItemAt(i).uri
+                            manejarImagenRecetaPrincipal(uri, i == 0) // Solo la primera será la principal
+                        }
+                    } else if (singleData != null) {
+                        // Una sola imagen seleccionada
+                        Log.d("CALLBACK_IMAGEN", "Procesando 1 imagen para receta principal")
+                        manejarImagenRecetaPrincipal(singleData, true)
+                    }
+                } else {
+                    // Imagen para un paso específico (sin cambios)
+                    result.data?.data?.let { uri ->
                         Log.d("CALLBACK_IMAGEN", "→ Es imagen de paso $currentPasoIndexForImage")
-                        // Imagen para un paso específico
                         manejarImagenPaso(uri, currentPasoIndexForImage)
                     }
-                } ?: run {
-                    Log.e("CALLBACK_IMAGEN", "✗ URI de imagen es nulo")
                 }
-            } else {
-                Log.e("CALLBACK_IMAGEN", "✗ Result code no es OK: ${result.resultCode}")
             }
         }
 
@@ -138,11 +146,12 @@ class AgregarRecetaActivity : AppCompatActivity() {
             }
 
             binding.btnSubirImagen.setOnClickListener {
-                currentPasoIndexForImage = -1 // Indica que la siguiente imagen es para la receta principal
+                currentPasoIndexForImage = -1
                 val intent = Intent(Intent.ACTION_GET_CONTENT)
                 intent.type = "image/*"
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true) // Permitir múltiples selecciones
                 intent.addCategory(Intent.CATEGORY_OPENABLE)
-                globalPickMediaLauncher.launch(Intent.createChooser(intent, "Seleccioná una imagen para la receta"))
+                globalPickMediaLauncher.launch(Intent.createChooser(intent, "Seleccioná imágenes para la receta"))
             }
 
             val layoutIngredientes = binding.layoutIngredientes
@@ -548,36 +557,45 @@ class AgregarRecetaActivity : AppCompatActivity() {
     }
 
     // 4. Función para manejar imagen de receta principal
-    private fun manejarImagenRecetaPrincipal(uri: Uri) {
-        Log.d("IMAGEN_RECETA", "Procesando imagen principal de receta")
+    private fun manejarImagenRecetaPrincipal(uri: Uri, esPrincipal: Boolean) {
+        Log.d("IMAGEN_RECETA", "Procesando imagen de receta, esPrincipal: $esPrincipal")
 
-        binding.imagenSeleccionada.apply {
-            setImageURI(uri)
-            visibility = View.VISIBLE
+        if (esPrincipal) {
+            // Solo mostrar la primera imagen en el ImageView principal
+            binding.imagenSeleccionada.apply {
+                setImageURI(uri)
+                visibility = View.VISIBLE
+            }
         }
 
         if (isInternetConnected) {
-            Log.d("IMAGEN_RECETA", "Subiendo imagen principal online...")
+            Log.d("IMAGEN_RECETA", "Subiendo imagen online...")
             viewModel.subirImagen(this, uri) { url ->
                 if (url != null) {
-                    recetaImagenPrincipalUrl = url
+                    if (esPrincipal) {
+                        recetaImagenPrincipalUrl = url
+                    }
                     if (!recetaImagenesUrlsList.contains(url)) {
                         recetaImagenesUrlsList.add(url)
                     }
-                    Log.d("IMAGEN_RECETA", "✓ Imagen principal subida online: $url")
+                    Log.d("IMAGEN_RECETA", "✓ Imagen subida online: $url")
+                    actualizarVistaImagenesReceta()
                 } else {
-                    Log.e("IMAGEN_RECETA", "✗ Error al subir imagen principal online")
-                    Toast.makeText(this, "Error al subir la imagen principal", Toast.LENGTH_SHORT).show()
+                    Log.e("IMAGEN_RECETA", "✗ Error al subir imagen online")
+                    Toast.makeText(this, "Error al subir una imagen", Toast.LENGTH_SHORT).show()
                 }
             }
         } else {
-            Log.d("IMAGEN_RECETA", "Guardando imagen principal offline...")
+            Log.d("IMAGEN_RECETA", "Guardando imagen offline...")
             val localPath = guardarImagenLocalmente(this, uri, "receta_${System.currentTimeMillis()}")
-            recetaImagenPrincipalUrl = localPath
+            if (esPrincipal) {
+                recetaImagenPrincipalUrl = localPath
+            }
             if (!recetaImagenesUrlsList.contains(localPath)) {
                 recetaImagenesUrlsList.add(localPath)
             }
-            Log.d("IMAGEN_RECETA", "✓ Imagen principal guardada offline: $localPath")
+            Log.d("IMAGEN_RECETA", "✓ Imagen guardada offline: $localPath")
+            actualizarVistaImagenesReceta()
         }
     }
 
@@ -645,6 +663,15 @@ class AgregarRecetaActivity : AppCompatActivity() {
         } else {
             Log.e("ACTUALIZAR_IMAGEN", "✗ No se encontró el paso con ID: $pasoId")
             Log.e("ACTUALIZAR_IMAGEN", "  Pasos disponibles: ${listaPasos.map { "${it.numeroDePaso}:'${it.contenido}'" }}")
+        }
+    }
+
+    private fun actualizarVistaImagenesReceta() {
+        if (recetaImagenesUrlsList.size > 1) {
+            binding.contadorImagenes.text = "${recetaImagenesUrlsList.size} imágenes seleccionadas"
+            binding.contadorImagenes.visibility = View.VISIBLE
+        } else {
+            binding.contadorImagenes.visibility = View.GONE
         }
     }
 
