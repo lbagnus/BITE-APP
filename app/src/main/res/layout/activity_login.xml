@@ -101,5 +101,16 @@
             android:textColor="#FF5722"
             android:textSize="14sp" />
 
+        <TextView
+            android:id="@+id/guestText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:focusable="true"
+            android:text="Ingresar como Invitado"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:clickable="true"/>
+
     </LinearLayout>
 </ScrollView>

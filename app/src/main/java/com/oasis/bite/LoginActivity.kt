@@ -72,6 +72,7 @@ class LoginActivity : AppCompatActivity() {
         val emailEditText: EditText = findViewById(R.id.emailEditText)
         val passwordEditText: EditText = findViewById(R.id.passwordEditText)
         val registerButton: TextView = findViewById(R.id.registerText)
+        val invitadoButton: TextView = findViewById(R.id.guestText)
 
         loginButton.setOnClickListener {
             val email = emailEditText.text.toString()
@@ -82,6 +83,15 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 // Si no hay internet y no hay sesión local, no tiene sentido intentar login
                 Toast.makeText(this, "No hay conexión a internet para iniciar sesión.", Toast.LENGTH_LONG).show()
+            }
+        }
+
+        invitadoButton.setOnClickListener {
+            if (isInternetConnected || hasLocalSession) { // hasLocalSession para el caso de reintentar si se pierde la conexión
+                showGuest(true)
+                viewModel.login("visit@gmail.com", "1111")
+            }else{
+                showGuestNoWifi(true)
             }
         }
 
@@ -96,7 +106,6 @@ class LoginActivity : AppCompatActivity() {
                 val usuarioJson = gson.toJson(usuario)
                 val sharedPrefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
                 sharedPrefs.edit().putString("usuario_logueado", usuarioJson).apply()
-
 
                 val nombreCompleto = "${usuario.firstName} ${usuario.lastName}"
                 val intent = Intent(this, MainActivity::class.java)
@@ -115,7 +124,6 @@ class LoginActivity : AppCompatActivity() {
         viewModel.mensajeError.observe(this) { mensaje ->
             Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
         }
-
 
         // Vincular el TextView de "¿Olvidaste tu contraseña?" y agregarle comportamiento de link
         val forgotPasswordText: TextView = findViewById(R.id.forgotPasswordText)
@@ -159,7 +167,7 @@ class LoginActivity : AppCompatActivity() {
                 dialog.dismiss()
             } else {
                 // Si no puede proceder offline, cierra la actividad
-                finish()
+                dialog.dismiss()
             }
         }
 
@@ -169,6 +177,56 @@ class LoginActivity : AppCompatActivity() {
     private fun showRegister(canProceedOffline: Boolean) {
         val inflater = LayoutInflater.from(this)
         val customView = inflater.inflate(R.layout.pop_up_registro, null)
+
+        val closeButton: Button = customView.findViewById(R.id.closeButton)
+
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(customView)
+            .setCancelable(false)
+            .create()
+
+        closeButton.setOnClickListener {
+            if (canProceedOffline) {
+                // Si puede proceder offline, simplemente cierra el diálogo
+                dialog.dismiss()
+            } else {
+                // Si no puede proceder offline, cierra la actividad
+                finish()
+            }
+        }
+
+        dialog.show()
+    }
+
+    private fun showGuestNoWifi(canProceedOffline: Boolean) {
+        val inflater = LayoutInflater.from(this)
+        val customView = inflater.inflate(R.layout.popup_guest_nowifi, null)
+
+        val closeButton: Button = customView.findViewById(R.id.closeButton)
+
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(customView)
+            .setCancelable(false)
+            .create()
+
+        closeButton.setOnClickListener {
+            if (canProceedOffline) {
+                // Si puede proceder offline, simplemente cierra el diálogo
+                dialog.dismiss()
+            } else {
+                // Si no puede proceder offline, cierra la actividad
+                finish()
+            }
+        }
+
+        dialog.show()
+    }
+
+    private fun showGuest(canProceedOffline: Boolean) {
+        val inflater = LayoutInflater.from(this)
+        val customView = inflater.inflate(R.layout.popup_ingresa_guest, null)
 
         val closeButton: Button = customView.findViewById(R.id.closeButton)
 

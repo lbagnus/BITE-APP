@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:gravity="center"
-            android:text="Proceso de Registro"
+            android:text="Bienvenido Invitado"
             android:textColor="#FFFFFF"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="El registro de nuevos usuarios se gestiona directamente a través de la empresa. Por favor, contacta a tu representante para completar el proceso."
+            android:text="Como invitado unicamente podrás navegar para visualizar las recetas ¡Disfrute de la app!"
             android:textColor="#FFFFFF"
             android:textSize="16sp" />
 

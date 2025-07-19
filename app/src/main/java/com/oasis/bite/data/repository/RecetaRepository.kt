@@ -123,12 +123,38 @@ class RecetaRepository(
         }
     }
 
-    suspend fun deleteFavorito(params: FavParams){
-        apiService.deletefav(FavRequest(params.email.toString(),params.recetaId))
+    suspend fun deleteFavorito(params: FavParams): Boolean {
+        return try {
+            val response = apiService.deletefav(FavRequest(params.email.toString(), params.recetaId))
+            if (response.isSuccessful) {
+                Log.d("RecetaRepository", "Fav eliminado: API OK.")
+                true
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.e("RecetaRepository", "Error API eliminar fav: ${response.code()} - $errorBody")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("RecetaRepository", "Excepción al eliminar favorito: ${e.message}", e)
+            false
+        }
     }
 
-    suspend fun addFavorito(params: FavParams){
-        apiService.addfav(FavRequest(params.email.toString(),params.recetaId))
+    suspend fun addFavorito(params: FavParams): Boolean {
+        return try {
+            val response = apiService.addfav(FavRequest(params.email.toString(), params.recetaId))
+            if (response.isSuccessful) {
+                Log.d("RecetaRepository", "Fav agregado: API OK.")
+                true
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.e("RecetaRepository", "Error API agregar fav: ${response.code()} - $errorBody")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("RecetaRepository", "Excepción al agregar favorito: ${e.message}", e)
+            false
+        }
     }
 
     suspend fun addComentario(params: CommentRequest): Int{

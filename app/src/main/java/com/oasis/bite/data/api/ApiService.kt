@@ -62,7 +62,7 @@ interface ApiService {
 
 
     @POST("favoritos/agregar")
-    suspend fun addfav(@Body params : FavRequest)
+    suspend fun addfav(@Body params : FavRequest) : Response<Unit>
 
     @POST("users/recover/{email}")
     suspend fun sendResetCode(@Path("email") email: String): Response<Unit>

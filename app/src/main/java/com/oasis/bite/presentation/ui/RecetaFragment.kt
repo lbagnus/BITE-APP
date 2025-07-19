@@ -17,6 +17,7 @@ import com.google.gson.Gson
 import com.oasis.bite.ComentarioActivity
 import com.oasis.bite.R
 import com.oasis.bite.databinding.FragmentRecetaBinding
+import com.oasis.bite.domain.models.Role
 import com.oasis.bite.domain.models.User
 import com.oasis.bite.presentation.adapters.MediaAdapter
 import com.oasis.bite.presentation.adapters.ComentarioAdapter
@@ -68,6 +69,12 @@ class RecetaFragment : Fragment() {
                 binding.reviews.text = it.reviewCount.toString()
                 binding.puntuacion2.text = it.averageRating.toString()
                 binding.puntuacion.text = it.averageRating.toString()
+
+                if(usuario.role == Role.GUEST){
+                    binding.btnFavorito.isEnabled = false
+                    binding.calculadora.isEnabled = false
+                    binding.botonAgregarResenia.isEnabled = false
+                }
 
                 if(idsFavoritos.contains(it.id)){
                 binding.btnFavorito.setImageResource(R.drawable.favorite_filled)}
