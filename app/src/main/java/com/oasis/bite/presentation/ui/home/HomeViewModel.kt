@@ -21,7 +21,6 @@ class HomeViewModel(private val repositoryReceta: RecetaRepository) : ViewModel(
 
     val recetasLiveData = MutableLiveData<List<Receta>?>()
     val categoryLiveData = MutableLiveData<List<Category>?>()
-    val favoritoLiveData = MutableLiveData<List<Receta>?>()
 
     private val _pendingComments = MutableLiveData<List<Comentario>?>()
     val pendingComments: LiveData<List<Comentario>> get() = _pendingComments as LiveData<List<Comentario>>
@@ -36,6 +35,16 @@ class HomeViewModel(private val repositoryReceta: RecetaRepository) : ViewModel(
     val recetaOperationStatus: LiveData<Boolean> get() = _recetaOperationStatus
 
     val misRecetasLiveData = MutableLiveData<List<Receta>?>()
+
+    private val _favoritoLiveData = MutableLiveData<List<Receta>>()
+    val favoritoLiveData: LiveData<List<Receta>> get() = _favoritoLiveData as LiveData<List<Receta>>
+
+    // LiveData para feedback al usuario si la operación de favoritos falla (opcional, pero recomendado)
+    private val _favoritoOperationStatus = MutableLiveData<Boolean>()
+    val favoritoOperationStatus: LiveData<Boolean> get() = _favoritoOperationStatus
+    private val _favoritoOperationMessage = MutableLiveData<String>()
+    val favoritoOperationMessage: LiveData<String> get() = _favoritoOperationMessage
+
 
     fun cargarRecetas() {
         viewModelScope.launch {
@@ -62,30 +71,73 @@ class HomeViewModel(private val repositoryReceta: RecetaRepository) : ViewModel(
             misRecetasLiveData.postValue(recetas ?: emptyList())
         }
     }
-    fun cargarRecetasFavoritos(email: String){
-        viewModelScope.launch {
-            val recetas = repositoryReceta.getRecetasFavoritos(email)
-            favoritoLiveData.postValue(recetas ?:emptyList())
-        }
-    }
+
     fun getRecetasFavoritos(email: String, onResult: (List<Receta>) -> Unit) {
         viewModelScope.launch {
-            val favoritos = repositoryReceta.getRecetasFavoritos(email)
-            favoritoLiveData.postValue(favoritos ?:emptyList())
+            try {
+                val favoritos = repositoryReceta.getRecetasFavoritos(email)
+                _favoritoLiveData.postValue(favoritos ?: emptyList())
+                onResult(favoritos ?: emptyList()) // Este callback es para HomeFragment y otros
+                Log.d("HomeViewModel", "Favoritos cargados: ${favoritos?.size ?: 0}")
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error al cargar recetas favoritas: ${e.message}", e)
+                _favoritoLiveData.postValue(emptyList()) // En caso de error, una lista vacía
+                onResult(emptyList()) // Notifica el error a través del callback también
+                _favoritoOperationStatus.postValue(false)
+                _favoritoOperationMessage.postValue("Error al cargar tus favoritos.")
+            }
         }
     }
 
-    fun eliminarRecetaFavorito(email: String, receta: Int){
-        viewModelScope.launch{
-            val params = FavParams(email = email, recetaId = receta)
-            repositoryReceta.deleteFavorito(params)
+    fun eliminarRecetaFavorito(email: String, recetaId: Int) {
+        viewModelScope.launch {
+            try {
+                val params = FavParams(email = email, recetaId = recetaId)
+                // Asumo que repositoryReceta.deleteFavorito devuelve un Boolean o Response<Unit>
+                val success = repositoryReceta.deleteFavorito(params) // Llamas al repositorio
+
+                if (success) {
+                    Log.d("HomeViewModel", "Receta ID $recetaId eliminada de favoritos exitosamente.")
+                    _favoritoOperationStatus.postValue(true)
+                    _favoritoOperationMessage.postValue("Receta eliminada de favoritos.")
+                    // ¡CLAVE!: Recargar la lista de favoritos después de la eliminación exitosa
+                    getRecetasFavoritos(email) { /* no-op, el LiveData ya se actualiza */ }
+                } else {
+                    Log.e("HomeViewModel", "Fallo al eliminar receta ID $recetaId de favoritos. Repositorio indicó fallo.")
+                    _favoritoOperationStatus.postValue(false)
+                    _favoritoOperationMessage.postValue("No se pudo eliminar de favoritos. Inténtalo de nuevo.")
+                }
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Excepción al eliminar receta ID $recetaId de favoritos: ${e.message}", e)
+                _favoritoOperationStatus.postValue(false)
+                _favoritoOperationMessage.postValue("Error de conexión al eliminar de favoritos.")
+            }
         }
     }
 
-    fun agregarRecetaFavorito(email: String, receta: Int){
-        viewModelScope.launch{
-            val params = FavParams(email = email, recetaId = receta)
-            repositoryReceta.addFavorito(params)
+    fun agregarRecetaFavorito(email: String, recetaId: Int) {
+        viewModelScope.launch {
+            try {
+                val params = FavParams(email = email, recetaId = recetaId)
+                // Asumo que repositoryReceta.addFavorito devuelve un Boolean o Response<Unit>
+                val success = repositoryReceta.addFavorito(params) // Llamas al repositorio
+
+                if (success) {
+                    Log.d("HomeViewModel", "Receta ID $recetaId agregada a favoritos exitosamente.")
+                    _favoritoOperationStatus.postValue(true)
+                    _favoritoOperationMessage.postValue("Receta agregada a favoritos.")
+                    // ¡CLAVE!: Recargar la lista de favoritos después de la adición exitosa
+                    getRecetasFavoritos(email) { /* no-op, el LiveData ya se actualiza */ }
+                } else {
+                    Log.e("HomeViewModel", "Fallo al agregar receta ID $recetaId a favoritos. Repositorio indicó fallo.")
+                    _favoritoOperationStatus.postValue(false)
+                    _favoritoOperationMessage.postValue("No se pudo agregar a favoritos. Inténtalo de nuevo.")
+                }
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Excepción al agregar receta ID $recetaId a favoritos: ${e.message}", e)
+                _favoritoOperationStatus.postValue(false)
+                _favoritoOperationMessage.postValue("Error de conexión al agregar a favoritos.")
+            }
         }
     }
 

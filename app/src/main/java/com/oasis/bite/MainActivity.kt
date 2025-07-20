@@ -100,10 +100,16 @@ class MainActivity : AppCompatActivity() {
         val rolUsuario = intent.getStringExtra("rolUsuario")
         val opcionAutorizacion = findViewById<TextView>(R.id.opcionAutorizacion)
         val opcionMisCalculos = findViewById<TextView>(R.id.opcionMisCalculos)
-
+        val wifiSwitch = findViewById<Switch>(R.id.switchWifi)
         if (rolUsuario == "ADMIN") {
             Log.d("EMAIL ADMIN", rolUsuario.toString())
             opcionAutorizacion.visibility = View.VISIBLE
+        }
+
+        if(rolUsuario == "GUEST"){
+            opcionMisCalculos.visibility = View.GONE
+            btnCambiarContrasena.visibility = View.GONE
+            wifiSwitch.isEnabled = false
         }
 
         opcionAutorizacion.setOnClickListener {
@@ -115,7 +121,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, MisCalculosActivity::class.java)
             startActivity(intent)
         }
-        val wifiSwitch = findViewById<Switch>(R.id.switchWifi)
+
 
         userViewModel.loadWifiPreference(userEmail)
         Log.d("EMAIL USUAERIO", userEmail)
@@ -170,6 +176,7 @@ class MainActivity : AppCompatActivity() {
                     findViewById<View>(R.id.btnAbrirPopup).visibility = View.VISIBLE
                 }
             }
+
         }
         val appBarConfiguration = AppBarConfiguration(
             setOf(
@@ -184,12 +191,15 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.navigation_dashboard -> {
+                    if(rolUsuario != "GUEST"){
                     navController.navigate(R.id.navigation_dashboard)
                     true
+                    } else{false}
                 }
                 R.id.navigation_notifications -> {
+                    if(rolUsuario != "GUEST"){
                     navController.navigate(R.id.navigation_notifications)
-                    true
+                    true}else{false}
                 }
                 else -> false
             }

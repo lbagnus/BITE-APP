@@ -130,6 +130,17 @@
             tools:layout_editor_absoluteX="110dp"
             tools:layout_editor_absoluteY="296dp" />
 
+        <TextView
+            android:id="@+id/contadorImagenes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:text=""
+            android:textSize="14sp"
+            android:textColor="@color/gris"
+            android:visibility="gone"/>
+
         <ImageView
             android:id="@+id/imagenSeleccionad2"
             android:layout_width="150dp"

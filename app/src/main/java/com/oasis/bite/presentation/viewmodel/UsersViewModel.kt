@@ -10,6 +10,7 @@ import com.oasis.bite.data.repository.RecetaRepository
 import com.oasis.bite.domain.models.User
 
 import com.oasis.bite.data.repository.UserRepository
+import com.oasis.bite.domain.models.Role
 import com.oasis.bite.localdata.database.AppDatabase
 import com.oasis.bite.localdata.database.entities.LocalUser
 import com.oasis.bite.localdata.repository.UserSessionRepository
@@ -82,8 +83,9 @@ class UsersViewModel(private val sessionRepository: UserSessionRepository) : Vie
                         lastName = usuario.firstname,
                         role = usuario.role
                     )
+                    if(usuario.role != Role.GUEST){
                     sessionRepository.saveUserSession(userEntity)
-                    _localSessionExists.value = true // Actualizar estado de sesión local después de login exitoso
+                    _localSessionExists.value = true} // Actualizar estado de sesión local después de login exitoso
                 } else {
                     _mensajeError.value = "Usuario o contraseña incorrectos"
                     _usuarioLogueado.value = null

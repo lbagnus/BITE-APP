@@ -17,6 +17,7 @@ import com.google.gson.Gson
 import com.oasis.bite.ComentarioActivity
 import com.oasis.bite.R
 import com.oasis.bite.databinding.FragmentRecetaBinding
+import com.oasis.bite.domain.models.Role
 import com.oasis.bite.domain.models.User
 import com.oasis.bite.presentation.adapters.MediaAdapter
 import com.oasis.bite.presentation.adapters.ComentarioAdapter
@@ -76,6 +77,15 @@ class RecetaFragment : Fragment() {
                 binding.puntuacion2.text = it.averageRating.toString()
                 binding.puntuacion.text = it.averageRating.toString()
 
+                if(usuario.role == Role.GUEST){
+                    binding.btnFavorito.isEnabled = false
+                    binding.calculadora.isEnabled = false
+                    binding.botonAgregarResenia.isEnabled = false
+                }
+
+                if(idsFavoritos.contains(it.id)){
+                binding.btnFavorito.setImageResource(R.drawable.favorite_filled)}
+                else{binding.btnFavorito.setImageResource(R.drawable.favorite_border)}
                 binding.mainContentScrollView.visibility = View.VISIBLE
                 if (idsFavoritos.contains(it.id)) {
                     binding.btnFavorito.setImageResource(R.drawable.favorite_filled)
@@ -101,6 +111,7 @@ class RecetaFragment : Fragment() {
                 it.ingredientes.forEach { ingrediente ->
                     val itemView = inflater.inflate(R.layout.item_ingrediente, layoutIngredientes, false)
 
+                    // Suponiendo que item_ingrediente.xml tiene un TextView con id txtIngrediente
                     val txtIngrediente = itemView.findViewById<TextView>(R.id.txtNombreIngrediente)
                     txtIngrediente.text = ingrediente.nombre
 
@@ -112,8 +123,6 @@ class RecetaFragment : Fragment() {
 
                     layoutIngredientes.addView(itemView)
                 }
-
-                // PASOS
                 val layoutPasos = binding.layoutPasos
                 layoutPasos.removeAllViews()
                 val inflater2 = LayoutInflater.from(requireContext())
@@ -121,8 +130,10 @@ class RecetaFragment : Fragment() {
                 it.pasos.forEach { paso ->
                     val itemView = inflater2.inflate(R.layout.item_paso_receta, layoutPasos, false)
 
+                    // Suponiendo que item_ingrediente.xml tiene un TextView con id txtIngrediente
                     val txtNumeroPaso = itemView.findViewById<TextView>(R.id.txtPaso)
                     txtNumeroPaso.text = "${paso.numeroDePaso}. ${paso.contenido}"
+
 
                     val recyclerMediaPaso = itemView.findViewById<RecyclerView>(R.id.recyclerMediaPaso)
 
@@ -135,32 +146,31 @@ class RecetaFragment : Fragment() {
                     } else {
                         recyclerMediaPaso.visibility = View.GONE
                     }
-
                     layoutPasos.addView(itemView)
-                }
 
-                // COMENTARIOS
+                }
                 val comentarios = it.comentarios.orEmpty()
                 comentarioAdapter = ComentarioAdapter(comentarios)
-                binding.recyclerResenia.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                binding.recyclerResenia.layoutManager =
+                    LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
                 binding.recyclerResenia.adapter = comentarioAdapter
 
                 if (comentarios.isNotEmpty()) {
                     binding.recyclerResenia.visibility = View.VISIBLE
                     binding.tvSinComentarios.visibility = View.GONE
+                    binding.recyclerResenia.adapter = comentarioAdapter
                     comentarioAdapter.actualizarComentarios(comentarios)
                 } else {
                     binding.recyclerResenia.visibility = View.GONE
                     binding.tvSinComentarios.visibility = View.VISIBLE
                 }
 
-                // MULTIMEDIA PRINCIPAL
                 val listaMultimedia = it.imagenes.orEmpty()
                 val adapter = MediaAdapter(listaMultimedia)
+
                 binding.recyclerMedia.adapter = adapter
                 binding.recyclerMedia.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
-                // BOTÓN AGREGAR RESEÑA
                 binding.botonAgregarResenia.setOnClickListener {
                     val intent = Intent(requireContext(), ComentarioActivity::class.java)
                     intent.putExtra("recetaId", recetaId)
@@ -169,13 +179,16 @@ class RecetaFragment : Fragment() {
                     intent.putExtra("recetaAutor", receta.username)
                     Log.d("comentarioActivity", "recetaID: $recetaId")
                     startActivity(intent)
+
                 }
+
             }
         }
-
         binding.btnVolver.setOnClickListener {
             findNavController().navigateUp()
         }
+
+
 
         return binding.root
     }
@@ -210,7 +223,6 @@ class RecetaFragment : Fragment() {
         return json.let { Gson().fromJson(it, User::class.java) }
     }
 }
-
 
 
 

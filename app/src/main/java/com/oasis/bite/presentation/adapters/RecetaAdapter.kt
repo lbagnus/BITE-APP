@@ -1,4 +1,5 @@
 package com.oasis.bite.presentation.adapters
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -22,6 +23,7 @@ import com.oasis.bite.R
 import com.oasis.bite.VerifyCodeActivity
 import com.oasis.bite.domain.models.Receta
 import com.oasis.bite.domain.models.RecetaStatus
+import com.oasis.bite.domain.models.Role
 import com.oasis.bite.domain.models.User
 import com.oasis.bite.presentation.ui.home.HomeViewModel
 import kotlin.getValue
@@ -57,6 +59,7 @@ class RecetaAdapter(
 
         //Es la que rellena los datos en la vista ya creada. Se llama muchas veces, cada vez que una celda aparece en pantalla.
 
+        @SuppressLint("SuspiciousIndentation")
         override fun onBindViewHolder(holder: RecetaViewHolder, position: Int) {
             val receta = listaRecetas[position]
 
@@ -104,6 +107,10 @@ class RecetaAdapter(
 
             }else
                 holder.favorito.isSelected = esFavorito(receta)
+
+            if(usuario.role == Role.GUEST){
+                holder.favorito.isEnabled = false
+            }
 
             holder.favorito.setOnClickListener {
                 if (esFavorito(receta)) {
