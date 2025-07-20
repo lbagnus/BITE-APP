@@ -41,13 +41,19 @@ class RecetaFragment : Fragment() {
         val usuario = getUsuarioLogueado(requireContext())
         usuario?.let {
             viewModel.getRecetasFavoritos(it.email) { favoritos ->
-                idsFavoritos = favoritos.map { receta -> receta.id }}}
-
+                idsFavoritos = favoritos.map { receta -> receta.id }
+            }
+        }
+        binding.mainContentScrollView.visibility = View.GONE
+        binding.progressBarCargando.visibility = View.VISIBLE
         val recetaId = arguments?.getInt("recetaId") ?: -1
         if (recetaId != -1) {
+            limpiarCampos() // LIMPIAR CAMPOS ANTES DE CARGAR
             viewModel.cargarReceta(recetaId.toString())
         }
+
         Log.d("RecetaFragment", "Receta ID recibido: $recetaId")
+
         val botonCalculadora = binding.calculadora
         botonCalculadora.setOnClickListener {
             val bundle = Bundle().apply {
@@ -57,6 +63,7 @@ class RecetaFragment : Fragment() {
         }
 
         viewModel.receta.observe(viewLifecycleOwner) { receta ->
+            binding.progressBarCargando.visibility = View.GONE
             receta?.let {
                 binding.recetaTitulo.text = it.nombre
                 binding.recetaAutor.text = "Por ${it.username}"
@@ -69,22 +76,24 @@ class RecetaFragment : Fragment() {
                 binding.puntuacion2.text = it.averageRating.toString()
                 binding.puntuacion.text = it.averageRating.toString()
 
-                if(idsFavoritos.contains(it.id)){
-                binding.btnFavorito.setImageResource(R.drawable.favorite_filled)}
-                else{binding.btnFavorito.setImageResource(R.drawable.favorite_border)}
+                binding.mainContentScrollView.visibility = View.VISIBLE
+                if (idsFavoritos.contains(it.id)) {
+                    binding.btnFavorito.setImageResource(R.drawable.favorite_filled)
+                } else {
+                    binding.btnFavorito.setImageResource(R.drawable.favorite_border)
+                }
+
                 binding.btnFavorito.setOnClickListener {
-                    if (idsFavoritos.contains(receta.id)){
-                        viewModel.eliminarRecetaFavorito(usuario?.email.toString(),receta.id)
+                    if (idsFavoritos.contains(receta.id)) {
+                        viewModel.eliminarRecetaFavorito(usuario?.email.toString(), receta.id)
                         binding.btnFavorito.setImageResource(R.drawable.favorite_border)
-                    }
-                    else{
-                        viewModel.agregarRecetaFavorito(usuario?.email.toString(),receta.id)
+                    } else {
+                        viewModel.agregarRecetaFavorito(usuario?.email.toString(), receta.id)
                         binding.btnFavorito.setImageResource(R.drawable.favorite_filled)
                     }
                 }
 
-                // Mostrar ingredientes con LinearLayout
-                // Mostrar ingredientes usando item_ingrediente.xml
+                // INGREDIENTES
                 val layoutIngredientes = binding.layoutIngredientes
                 layoutIngredientes.removeAllViews()
                 val inflater = LayoutInflater.from(requireContext())
@@ -92,7 +101,6 @@ class RecetaFragment : Fragment() {
                 it.ingredientes.forEach { ingrediente ->
                     val itemView = inflater.inflate(R.layout.item_ingrediente, layoutIngredientes, false)
 
-                    // Suponiendo que item_ingrediente.xml tiene un TextView con id txtIngrediente
                     val txtIngrediente = itemView.findViewById<TextView>(R.id.txtNombreIngrediente)
                     txtIngrediente.text = ingrediente.nombre
 
@@ -104,6 +112,8 @@ class RecetaFragment : Fragment() {
 
                     layoutIngredientes.addView(itemView)
                 }
+
+                // PASOS
                 val layoutPasos = binding.layoutPasos
                 layoutPasos.removeAllViews()
                 val inflater2 = LayoutInflater.from(requireContext())
@@ -111,10 +121,8 @@ class RecetaFragment : Fragment() {
                 it.pasos.forEach { paso ->
                     val itemView = inflater2.inflate(R.layout.item_paso_receta, layoutPasos, false)
 
-                    // Suponiendo que item_ingrediente.xml tiene un TextView con id txtIngrediente
                     val txtNumeroPaso = itemView.findViewById<TextView>(R.id.txtPaso)
                     txtNumeroPaso.text = "${paso.numeroDePaso}. ${paso.contenido}"
-
 
                     val recyclerMediaPaso = itemView.findViewById<RecyclerView>(R.id.recyclerMediaPaso)
 
@@ -127,31 +135,32 @@ class RecetaFragment : Fragment() {
                     } else {
                         recyclerMediaPaso.visibility = View.GONE
                     }
-                    layoutPasos.addView(itemView)
 
+                    layoutPasos.addView(itemView)
                 }
+
+                // COMENTARIOS
                 val comentarios = it.comentarios.orEmpty()
                 comentarioAdapter = ComentarioAdapter(comentarios)
-                binding.recyclerResenia.layoutManager =
-                    LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                binding.recyclerResenia.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
                 binding.recyclerResenia.adapter = comentarioAdapter
 
                 if (comentarios.isNotEmpty()) {
                     binding.recyclerResenia.visibility = View.VISIBLE
                     binding.tvSinComentarios.visibility = View.GONE
-                    binding.recyclerResenia.adapter = comentarioAdapter
                     comentarioAdapter.actualizarComentarios(comentarios)
                 } else {
                     binding.recyclerResenia.visibility = View.GONE
                     binding.tvSinComentarios.visibility = View.VISIBLE
                 }
 
+                // MULTIMEDIA PRINCIPAL
                 val listaMultimedia = it.imagenes.orEmpty()
                 val adapter = MediaAdapter(listaMultimedia)
-
                 binding.recyclerMedia.adapter = adapter
                 binding.recyclerMedia.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
+                // BOTÓN AGREGAR RESEÑA
                 binding.botonAgregarResenia.setOnClickListener {
                     val intent = Intent(requireContext(), ComentarioActivity::class.java)
                     intent.putExtra("recetaId", recetaId)
@@ -160,16 +169,13 @@ class RecetaFragment : Fragment() {
                     intent.putExtra("recetaAutor", receta.username)
                     Log.d("comentarioActivity", "recetaID: $recetaId")
                     startActivity(intent)
-
                 }
-
             }
         }
+
         binding.btnVolver.setOnClickListener {
             findNavController().navigateUp()
         }
-
-
 
         return binding.root
     }
@@ -178,12 +184,33 @@ class RecetaFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+    private fun limpiarCampos() {
+        binding.recetaTitulo.text = ""
+        binding.recetaAutor.text = ""
+        binding.dificultad.text = ""
+        binding.porciones.text = ""
+        binding.personas2.text = ""
+        binding.tiempo.text = ""
+        binding.recetaDescripcion.text = ""
+        binding.reviews.text = ""
+        binding.puntuacion2.text = ""
+        binding.puntuacion.text = ""
+        binding.layoutIngredientes.removeAllViews()
+        binding.layoutPasos.removeAllViews()
+        binding.recyclerResenia.adapter = null
+        binding.recyclerMedia.adapter = null
+        binding.tvSinComentarios.visibility = View.GONE
+        binding.recyclerResenia.visibility = View.GONE
+    }
+
     fun getUsuarioLogueado(context: Context): User {
         val prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         val json = prefs.getString("usuario_logueado", null)
         return json.let { Gson().fromJson(it, User::class.java) }
     }
 }
+
 
 
 

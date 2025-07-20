@@ -26,8 +26,8 @@ import kotlin.Int
 fun LoginResponse.toUser(): User {
     return User(
         email = this.email,
-        firstName = this.nombre,
-        lastName = this.apellido,
+        firstname = this.nombre,
+        lastname = this.apellido,
         username = this.username,
         role = Role.valueOf(this.role)
     )

@@ -71,6 +71,7 @@ class ResultadoBusqueda : Fragment() {
         }
 
         homeViewModel.favoritoLiveData.observe(viewLifecycleOwner) { recetas ->
+            binding.progressBarCargaVistaRecetas.visibility = View.VISIBLE
             Log.d("Favoritos", "Recetas recibidas: $recetas")
             if (recetas != null) {
                 idsFavoritos = recetas.map { it.id }
@@ -78,21 +79,26 @@ class ResultadoBusqueda : Fragment() {
         }
 
         homeViewModel.recetasLiveData.observe(viewLifecycleOwner) { recetas ->
+
             Log.d("HomeFragment", "Recetas recibidas: $recetas")
             if (recetas != null) {
                 recetaAdapter.actualizarRecetas(recetas)
                 if (recetas.isEmpty()){
-                    binding.textoNoHayBusqueda.visibility = View.VISIBLE
+
                 }
             }
+
         }
 
         val categoriaNombre = arguments?.getString("categorianombre")
+
         categoriaNombre?.let {
             homeViewModel.cargarRecetasPorCategoria(it)
+
         }
 
         val query = arguments?.getString("query")
+
         query?.let {
             homeViewModel.cargarRecetasSearch(it)
         }
@@ -104,7 +110,9 @@ class ResultadoBusqueda : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         filtroViewModel.filtros.observe(viewLifecycleOwner) { filtro ->
+            //binding.progressBarCargaVistaRecetas.visibility = View.VISIBLE
             Log.d("ResultadoBusqueda", "Recibí filtros nuevos: $filtro")
+            //binding.progressBarCargaVistaRecetas.visibility = View.GONE
             // Llamás a un método que reciba los filtros y haga la llamada a la API
             homeViewModel.cargarRecetasConFiltro(
                 incluye = filtro.incluye,
@@ -112,6 +120,7 @@ class ResultadoBusqueda : Fragment() {
                 direction = filtro.direction,
                 username = filtro.username
             )
+
         }
 
         // Si ya hay filtros guardados, cargalos apenas se crea la vista

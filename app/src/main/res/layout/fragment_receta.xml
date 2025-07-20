@@ -46,6 +46,18 @@
         android:padding="4dp"
         />
 
+    <ProgressBar
+        android:id="@+id/progressBarCargando"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/btnVolver"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"/>
+
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/mainContentScrollView"
         android:layout_width="0dp"
@@ -55,6 +67,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:paddingHorizontal="16dp" android:fillViewport="true">
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -73,7 +86,6 @@
             android:id="@+id/recetaTitulo"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Pasta a la Carbonara"
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="@color/black"/>
@@ -85,7 +97,6 @@
                 android:id="@+id/recetaAutor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Por Julia Roberts"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -148,7 +159,7 @@
                 android:id="@+id/recetaDescripcion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp" android:text="En España, cuando la gente piensa en la carbonara, la elabora con nata, beicon e incluso con champiñones, cuando la salsa carbonara en su versión más tradicional, es una salsa sencilla y humilde que se elabora con tres ingredientes básicos: huevos, queso y panceta "
+                android:layout_marginTop="16dp"
                 android:textColor="@color/black"
                 android:layout_marginEnd="0dp" /> <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerMedia"
@@ -282,7 +293,6 @@
                 android:id="@+id/personas2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Para 4 personas"
                 android:drawablePadding="4dp"
                 android:textColor="@color/black"
                 android:textSize="16sp" android:gravity="center_vertical"

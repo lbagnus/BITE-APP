@@ -64,7 +64,7 @@
                 android:textSize="28sp"
                 android:textStyle="bold"
                 android:textColor="@color/black"
-                tools:text="Pasta a la Carbonara (Receta Local)" />
+                />
 
             <TextView
                 android:id="@+id/recetaAutor"

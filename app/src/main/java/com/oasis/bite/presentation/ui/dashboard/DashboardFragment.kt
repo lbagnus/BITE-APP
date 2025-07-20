@@ -79,6 +79,7 @@ class DashboardFragment : Fragment() {
         recyclerRecetas.itemAnimator = null
 
         homeViewModel.misRecetasLiveData.observe(viewLifecycleOwner) { recetas ->
+
             if (recetas != null && recetas.isNotEmpty()) {
                 Log.d("DashboardFragment", "Mis Recetas recibidas: ${recetas.size}")
                 recetaAdapter.actualizarRecetas(recetas)

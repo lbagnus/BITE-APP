@@ -52,8 +52,8 @@ class UsersViewModel(private val sessionRepository: UserSessionRepository) : Vie
                 _usuarioLogueado.value = User(
                     email = userEntity.email,
                     username = userEntity.username,
-                    firstName = userEntity.firstName,
-                    lastName = userEntity.lastName,
+                    firstname = userEntity.firstName,
+                    lastname = userEntity.lastName,
                     role = userEntity.role
                 )
                 _localSessionExists.value = true // Sesión local encontrada
@@ -78,8 +78,8 @@ class UsersViewModel(private val sessionRepository: UserSessionRepository) : Vie
                     val userEntity = LocalUser(
                         email = usuario.email,
                         username = usuario.username,
-                        firstName = usuario.firstName,
-                        lastName = usuario.lastName,
+                        firstName = usuario.firstname,
+                        lastName = usuario.firstname,
                         role = usuario.role
                     )
                     sessionRepository.saveUserSession(userEntity)

@@ -98,11 +98,8 @@ class LoginActivity : AppCompatActivity() {
                 sharedPrefs.edit().putString("usuario_logueado", usuarioJson).apply()
 
 
-                val nombreCompleto = "${usuario.firstName} ${usuario.lastName}"
-                val intent = Intent(this, MainActivity::class.java)
+
                 intent.putExtra("emailUsuario", usuario.email)
-                intent.putExtra("nombreUsuario", nombreCompleto)
-                intent.putExtra("nombre", usuario.firstName + " " + usuario.lastName)
                 intent.putExtra("rolUsuario", usuario.role.name)
 
                 Log.d("EMAIL LOGIN", usuario.email)

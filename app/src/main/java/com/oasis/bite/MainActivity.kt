@@ -50,6 +50,15 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
+
+        val usuario = getUsuarioLogueado(this)
+        val nombreCompleto = if (usuario != null) "${usuario.firstname}" else "Usuario"
+        Log.d("MainActivity", "Nombre completo cargado: $nombreCompleto")
+
+        findViewById<TextView>(R.id.saludoText)?.text = "¡Hola $nombreCompleto!"
+        findViewById<TextView>(R.id.nombreUsuario)?.text = nombreCompleto
+
+
         val factory = UsersViewModelFactory(applicationContext)
         val userViewModel = ViewModelProvider(this, factory).get(UsersViewModel::class.java)
 
@@ -68,7 +77,6 @@ class MainActivity : AppCompatActivity() {
             userViewModel.logout()
         }
 
-        val usuario = getUsuarioLogueado(this)
 
         // Obtener el DrawerLayout
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
@@ -88,12 +96,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        val nombreUsuario = intent.getStringExtra("username") ?: "Usuario"
         val userEmail = usuario.email
-        Log.d("nombreUsuario", nombreUsuario.toString())
-        findViewById<TextView>(R.id.saludoText)?.text = "¡Hola $nombreUsuario!"
-        findViewById<TextView>(R.id.nombreUsuario)?.text = nombreUsuario
-
         val rolUsuario = intent.getStringExtra("rolUsuario")
         val opcionAutorizacion = findViewById<TextView>(R.id.opcionAutorizacion)
         val opcionMisCalculos = findViewById<TextView>(R.id.opcionMisCalculos)
