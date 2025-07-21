@@ -50,6 +50,16 @@
                 android:layout_marginTop="0dp"
                 android:orientation="horizontal"
                 android:paddingHorizontal="30dp">
+                <Button
+                    android:id="@+id/rechazar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingTop="0dp"
+                    android:layout_weight="1"
+                    android:text="RECHAZAR"
+                    android:textColor="#FF0000"
+                    android:backgroundTint="@color/white"
+                    />
 
                 <Button
                     android:id="@+id/aprobar"
@@ -58,19 +68,10 @@
                     android:paddingTop="0dp"
                     android:layout_weight="1"
                     android:text="APROBAR"
-                    android:textColor="#FF0000"
+                    android:textColor="#008000"
                     android:backgroundTint="@color/white"/>
 
-                <Button
-                    android:id="@+id/rechazar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingTop="0dp"
-                    android:layout_weight="1"
-                    android:text="RECHAZAR"
-                    android:textColor="#008000"
-                    android:backgroundTint="@color/white"
-                    />
+
             </LinearLayout>
 
         </LinearLayout>

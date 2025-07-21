@@ -84,7 +84,8 @@ class RecetaAdapter(
                             putExtra("usuarioEmail", usuario.email)
                             putExtra("isEditando", true)
                             putExtra("reemplaza", false)
-                            putExtra("idReceta", receta.id)
+                            putExtra("idReceta", receta.id.toString())
+                            Log.d("Receta AdapterEditar", receta.id.toString())
                         }
                         context.startActivity(intent)
                     }

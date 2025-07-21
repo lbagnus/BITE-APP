@@ -10,6 +10,7 @@ import com.oasis.bite.data.model.LoginRequest
 import com.oasis.bite.data.model.LoginResponse
 import com.oasis.bite.data.model.PassRequest
 import com.oasis.bite.data.model.PassResetRequest
+import com.oasis.bite.data.model.PreferenceUpdateMessageResponse
 import com.oasis.bite.data.model.RecetaDTO
 import com.oasis.bite.data.model.RecetaRequest
 import com.oasis.bite.data.model.RecetaSimpleResponse
@@ -34,7 +35,7 @@ interface ApiService {
     suspend fun getRecetaPorId(@Path("id") id: String): Response<RecetaDTO>
 
 
-    @GET("recetas/search?orderBy=newest&direction=desc&limit=10")
+    @GET("recetas/search?orderBy=newest&direction=desc&limit=3")
     suspend fun getRecetasHome(): Response<List<RecetaSimpleResponse>>
 
     // Endpoint para buscar recetas con filtros
@@ -108,7 +109,7 @@ interface ApiService {
     suspend fun getComentariosPendientes(): Response<List<ComentarioResponse>>
 
     @PUT("users/usaDatos/{email}")
-    suspend fun cambiarFormatoCarga(@Path("email") email: String): Response<Boolean>
+    suspend fun cambiarFormatoCarga(@Path("email") email: String): Response<PreferenceUpdateMessageResponse>
 
     @GET("users/usaDatos/{email}")
     suspend fun getFormatoCarga(@Path("email") email: String): Response<Boolean>

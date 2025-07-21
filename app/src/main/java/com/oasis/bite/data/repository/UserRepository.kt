@@ -71,16 +71,17 @@ class UserRepository(private val apiService: ApiService) {
         return try {
             val response = apiService.cambiarFormatoCarga(userEmail)
             if (response.isSuccessful) {
-                Log.d("UserRepository", "Preferencia WiFi cambiada en la API exitosamente.")
-               response.body()!!
+               val message = response.body()!!.message
+                Log.d("UserRepository", "Preferencia WiFi cambiada en la API exitosamenteMensaje: $message.")
+                true
             } else {
                 val errorBody = response.errorBody()?.string()
                 Log.e("UserRepository", "Error al cambiar preferencia WiFi en API: ${response.code()} - ${response.message()}. Cuerpo: $errorBody")
-                false
+                return false
             }
         } catch (e: Exception) {
             Log.e("UserRepository", "Excepción al cambiar preferencia WiFi en API: ${e.message}", e)
-            false
+            return false
         }
     }
 }

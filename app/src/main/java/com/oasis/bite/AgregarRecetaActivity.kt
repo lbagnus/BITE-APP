@@ -251,6 +251,7 @@ class AgregarRecetaActivity : AppCompatActivity() {
             }
         val isEditando = intent.getBooleanExtra("isEditando", false)
         if (isEditando) {
+            Log.d("Editar receta",intent.getStringExtra("idReceta").toString() )
             viewModel.cargarReceta(intent.getStringExtra("idReceta").toString())
             viewModel.receta.observe(this) { receta ->
                 receta?.let {

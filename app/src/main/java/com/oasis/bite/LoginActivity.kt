@@ -107,11 +107,11 @@ class LoginActivity : AppCompatActivity() {
                 val sharedPrefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
                 sharedPrefs.edit().putString("usuario_logueado", usuarioJson).apply()
 
-                val nombreCompleto = "${usuario.firstName} ${usuario.lastName}"
+                val nombreCompleto = "${usuario.firstname} ${usuario.lastname}"
                 val intent = Intent(this, MainActivity::class.java)
                 intent.putExtra("emailUsuario", usuario.email)
                 intent.putExtra("nombreUsuario", nombreCompleto)
-                intent.putExtra("nombre", usuario.firstName + " " + usuario.lastName)
+                intent.putExtra("nombre", usuario.firstname + " " + usuario.lastname)
                 intent.putExtra("rolUsuario", usuario.role.name)
 
                 Log.d("EMAIL LOGIN", usuario.email)
